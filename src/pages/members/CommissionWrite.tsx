@@ -28,7 +28,12 @@ const CommissionWrite: React.FC = () => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'addressId' || name === 'size' ? (value === '' ? null : Number(value)) : value,
+      [name]:
+        name === 'addressId' || name === 'size'
+          ? value === ''
+            ? null
+            : Number(value)
+          : value,
     }));
   };
 
@@ -69,7 +74,7 @@ const CommissionWrite: React.FC = () => {
               name="size"
               value={form.size === null ? '' : form.size}
               onChange={handleChange}
-              placeholder='평수를 입력해주세요'
+              placeholder="평수를 입력해주세요"
               required
               className="w-full p-2 border border-gray-300 rounded"
             />
@@ -92,7 +97,9 @@ const CommissionWrite: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="block text-gray-700">어떤 청소를 희망하시나요?:</label>
+            <label className="block text-gray-700">
+              어떤 청소를 희망하시나요?:
+            </label>
             <select
               name="cleanType"
               value={form.cleanType}
@@ -120,14 +127,20 @@ const CommissionWrite: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-gray-700">청소할 장소의 사진을 올려주세요:</label>
+            <label className="block text-gray-700">
+              청소할 장소의 사진을 올려주세요:
+            </label>
             <input
-              type="text"
+              type="file"
               name="image"
               value={form.image}
               onChange={handleChange}
               required
-              className="w-full p-2 border border-gray-300 rounded"
+              className="w-full p-2 border border-gray-300 rounded file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-[#0BB8F9] file:text-white
+                          hover:file:bg-violet-100"
             />
           </div>
           <div>

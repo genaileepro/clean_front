@@ -6,6 +6,10 @@ import EmailInput from '../../utils/EmailInput';
 import { useLogin } from '../../hooks/useMembers';
 import { validatePassword } from '../../utils/validationUtils';
 import { Member } from '../../types/member';
+import {
+  handleApiError,
+  showErrorNotification,
+} from '../../utils/errorHandler';
 
 interface LoginForm {
   email: Member['email'];
@@ -15,7 +19,7 @@ interface LoginForm {
 interface FormErrors {
   email: string;
   password: string;
-  general?: string
+  general?: string;
 }
 
 const Login: React.FC = () => {
@@ -48,10 +52,11 @@ const Login: React.FC = () => {
 
     try {
       const { token, refreshToken } = await loginMutation.mutateAsync(formData);
-      authLogin(token, refreshToken, false );
+      authLogin(token, refreshToken, false);
       navigate('/memberhome');
     } catch (error) {
-      console.error('Login error', error);
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
       setErrors((prev) => ({
         ...prev,
         general: '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
@@ -72,9 +77,12 @@ const Login: React.FC = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-4">회원 로그인</h2>
           {errors.general && (
-            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4' role='alert'>
-              <span className='block sm:inline'>{errors.general}</span>
-              </div>
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              role="alert"
+            >
+              <span className="block sm:inline">{errors.general}</span>
+            </div>
           )}
           <form onSubmit={loginSubmit} className="space-y-4">
             <EmailInput

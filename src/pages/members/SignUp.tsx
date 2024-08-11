@@ -11,6 +11,10 @@ import {
   validatePhoneNumber,
   validateConfirmPassword,
 } from '../../utils/validationUtils';
+import {
+  handleApiError,
+  showErrorNotification,
+} from '../../utils/errorHandler';
 
 interface SignUpForm extends Omit<Member, 'id'> {
   password: string;
@@ -48,6 +52,7 @@ const SignUp: React.FC = () => {
     confirmPassword: '',
     nick: '',
     phoneNumber: '',
+    general: '',
   });
   const navigate = useNavigate();
   const signupMutation = useSignup();
@@ -91,7 +96,8 @@ const SignUp: React.FC = () => {
       await signupMutation.mutateAsync(submitData);
       navigate(`/login`);
     } catch (error) {
-      console.error('signup error:', error);
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
       setErrors((prev) => ({
         ...prev,
         general: '회원가입에 실패했습니다. 다시 시도해주세요.',

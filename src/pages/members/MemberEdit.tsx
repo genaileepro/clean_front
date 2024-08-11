@@ -7,6 +7,7 @@ import {
 } from '../../utils/validationUtils';
 import { FormEvent, useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
+import { handleApiError, showErrorNotification } from '../../utils/errorHandler';
 
 interface FormErrors {
   nick: string;
@@ -87,7 +88,8 @@ const MemberEdit: React.FC = () => {
       await updateMemberMutation.mutateAsync(dataToUpdate);
       navigate(`/member/${email}`);
     } catch (error) {
-      console.error('Update Error:', error);
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
       setErrors((prev) => ({
         ...prev,
         general: '회원 정보 수정에 실패했습니다.',
