@@ -78,7 +78,7 @@ const Login: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">회원 로그인</h2>
           {errors.general && (
             <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              className="border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
               role="alert"
             >
               <span className="block sm:inline">{errors.general}</span>

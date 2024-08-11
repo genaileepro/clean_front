@@ -54,6 +54,16 @@ const SignUp: React.FC = () => {
     phoneNumber: '',
     general: '',
   });
+  const resetErrors = () => {
+    setErrors({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      nick: '',
+      phoneNumber: '',
+      general: '',
+    });
+  };
   const navigate = useNavigate();
   const signupMutation = useSignup();
 
@@ -82,10 +92,10 @@ const SignUp: React.FC = () => {
 
   const signUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    resetErrors();
     if (Object.values(errors).some((err) => err !== '')) {
       setErrors((prev) => ({
         ...prev,
-        general: '입력한 정보를 다시 확인해주세요.',
       }));
       return;
     }
@@ -119,7 +129,7 @@ const SignUp: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">회원가입</h2>
           {errors.general && (
             <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              className="border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
               role="alert"
             >
               <span className="block sm:inline">{errors.general}</span>

@@ -1,7 +1,9 @@
 // errorHandler.ts
 
+import toast from "react-hot-toast";
+
 type ErrorCode =
-  | 1001 | 1002 | 1004 | 1005
+  | 1000 | 1001 | 1002 | 1004 | 1005
   | 2001 | 2002 | 2003 | 2004 | 2005
   | 3001 | 3002 | 3003
   | 4001 | 4002 | 4003 | 4004 | 4005 | 4006 | 4007 | 4008 | 4009 | 4010
@@ -9,6 +11,7 @@ type ErrorCode =
   | 6001 | 6002;
 
 const errorMessages: Record<ErrorCode, string> = {
+  1000 : '필수 정보를 입력해주세요.',
   1001: '잘못된 이미지입니다.',
   1002: '비밀번호가 옳지 않습니다.',
   1004: 'Authorization 헤더가 없거나 형식이 올바르지 않습니다.',
@@ -49,7 +52,6 @@ export const handleApiError = (error: any): string => {
 };
 
 export const showErrorNotification = (message: string) => {
-  // 여기에 에러 메시지를 화면에 표시하는 로직을 구현합니다.
-  // 예: toast 라이브러리 사용 또는 커스텀 알림 컴포넌트 렌더링
+  toast.error(message)
   console.error(message); // 임시로 콘솔에 출력
 };

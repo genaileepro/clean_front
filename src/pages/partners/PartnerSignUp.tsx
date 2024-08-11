@@ -3,9 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import EmailInput from '../../utils/EmailInput';
 import { Partner } from '../../types/partner';
-import { validatePassword, validatePhoneNumber, validateConfirmPassword } from '../../utils/validationUtils';
+import {
+  validatePassword,
+  validatePhoneNumber,
+  validateConfirmPassword,
+} from '../../utils/validationUtils';
 import { usePartnerSignup } from '../../hooks/usePartners';
-import { handleApiError, showErrorNotification } from '../../utils/errorHandler';
+import {
+  handleApiError,
+  showErrorNotification,
+} from '../../utils/errorHandler';
 
 interface PartnerSignUpForm extends Omit<Partner, 'id'> {
   email: string;
@@ -32,7 +39,7 @@ interface FormErrors {
 
 const validations = {
   password: validatePassword,
-  confirmPassword: (value: string, formData: PartnerSignUpForm) => 
+  confirmPassword: (value: string, formData: PartnerSignUpForm) =>
     validateConfirmPassword(formData.password, value),
   phoneNumber: validatePhoneNumber,
 };
@@ -46,7 +53,7 @@ const PartnerSignUp: React.FC = () => {
     managerName: '',
     companyName: '',
     businessType: '',
-    partnerType: 'INDIVIDUAL',  // Default value
+    partnerType: 'INDIVIDUAL', // Default value
   });
   const [errors, setErrors] = useState<FormErrors>({
     email: '',
@@ -58,25 +65,49 @@ const PartnerSignUp: React.FC = () => {
     businessType: '',
     partnerType: '',
   });
+  const resetErrors = () => {
+    setErrors({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phoneNumber: '',
+      managerName: '',
+      companyName: '',
+      businessType: '',
+      partnerType: '',
+    });
+  };
   const navigate = useNavigate();
   const signupMutation = usePartnerSignup();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if(validations[name as keyof typeof validations]){
-      const validationResult = validations[name as keyof typeof validations](value, formData)
+    if (validations[name as keyof typeof validations]) {
+      const validationResult = validations[name as keyof typeof validations](
+        value,
+        formData,
+      );
       setErrors((prev) => ({ ...prev, [name]: validationResult.message }));
     }
-    if (name === 'password' && formData.confirmPassword){
-      const confirmResult = validateConfirmPassword(value, formData.confirmPassword)
-      setErrors((prev) => ({ ...prev, confirmPassword: confirmResult.message}))
+    if (name === 'password' && formData.confirmPassword) {
+      const confirmResult = validateConfirmPassword(
+        value,
+        formData.confirmPassword,
+      );
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: confirmResult.message,
+      }));
     }
   };
 
   const signUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    resetErrors();
     if (Object.values(errors).some((err) => err !== '')) {
       setErrors((prev) => ({
         ...prev,
@@ -86,7 +117,7 @@ const PartnerSignUp: React.FC = () => {
     }
 
     try {
-      const { confirmPassword, ...submitData } = formData
+      const { confirmPassword, ...submitData } = formData;
       await signupMutation.mutateAsync(submitData);
       navigate(`/partnerlogin`);
     } catch (error) {
@@ -138,11 +169,24 @@ const PartnerSignUp: React.FC = () => {
                 setErrors((prev) => ({ ...prev, email: error }))
               }
             />
-            {['password', 'confirmPassword', 'phoneNumber', 'managerName', 'companyName', 'businessType'].map((field) => (
+            {[
+              'password',
+              'confirmPassword',
+              'phoneNumber',
+              'managerName',
+              'companyName',
+              'businessType',
+            ].map((field) => (
               <div key={field}>
                 <label className="block mb-1">{fieldLabels[field]}</label>
                 <input
-                  type={field === 'password' ? 'password' : field === 'confirmPassword' ? 'password' : 'text'}
+                  type={
+                    field === 'password'
+                      ? 'password'
+                      : field === 'confirmPassword'
+                        ? 'password'
+                        : 'text'
+                  }
                   name={field}
                   value={formData[field as keyof PartnerSignUpForm]}
                   onChange={handleChange}
