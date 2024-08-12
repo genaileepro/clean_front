@@ -112,7 +112,7 @@ const PartnerHome: React.FC = () => {
       {/* 푸터 섹션 */}
       <footer className="bg-[#144156] text-white p-4 text-center">
         <nav className="mb-4">
-        <button onClick={() => navigate('/partnerhome')} className="text-white py-2 px-4 rounded-md m-2">파트너 홈</button>
+        <button onClick={() => navigate('/pthome')} className="text-white py-2 px-4 rounded-md m-2">파트너 홈</button>
         <button onClick={() => navigate('/commissioncalling')} className="text-white py-2 px-4 rounded-md m-2">회원 새 의뢰 보기</button>
         <button onClick={() => navigate('/commissionestimate')} className="text-white py-2 px-4 rounded-md m-2">견적 목록</button>
         <button onClick={() => navigate('/commissionmatching')} className="text-white py-2 px-4 rounded-md m-2">견적매칭 확인하기</button>        
