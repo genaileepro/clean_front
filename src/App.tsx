@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Router from './shared/Router';
 import { useEffect, useState } from 'react';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         <AuthProvider>
           <Router />
         </AuthProvider>
+        <Toaster />
       </BrowserRouter>
       {ShowDevtools && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>

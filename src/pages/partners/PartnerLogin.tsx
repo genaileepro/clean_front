@@ -6,6 +6,7 @@ import EmailInput from '../../utils/EmailInput';
 import { usePartnerLogin } from '../../hooks/usePartners';
 import { validatePassword } from '../../utils/validationUtils';
 import { Partner } from '../../types/partner';
+import { handleApiError, showErrorNotification } from '../../utils/errorHandler';
 
 interface PartnerLoginForm {
   email: Partner['email'];
@@ -52,7 +53,8 @@ const PartnerLogin: React.FC = () => {
       authLogin(token, refreshToken, true);
       navigate('/pthome');
     } catch (error) {
-      console.error('Login error', error);
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
       setErrors((prev) => ({
         ...prev,
         general: '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
