@@ -28,7 +28,7 @@ const SignUpSelector = () => {
               </button>
               <button
                 className="bg-[#144156] text-white py-2 px-4 rounded"
-                onClick={() => navigate('/partnersignup')}
+                onClick={() => navigate('/ptsignup')}
                 type="button"
               >
                 파트너 회원가입

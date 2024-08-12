@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    {
-      "source": "/api/members/login",
-      "destination": "https://mb.clean-room.co.kr/api/members/login"
-    }
-  ]
-}

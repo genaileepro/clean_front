@@ -49,8 +49,9 @@ const PartnerLogin: React.FC = () => {
 
     try {
       const { token, refreshToken } = await loginMutation.mutateAsync(formData);
+      localStorage.setItem('isPartner', 'true');
       authLogin(token, refreshToken, true);
-      navigate('/partnerhome');
+      navigate('/pthome');
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
@@ -110,7 +111,7 @@ const PartnerLogin: React.FC = () => {
               </button>
               <button
                 className="bg-[#144156] text-white py-2 px-4 rounded"
-                onClick={() => navigate('/partnersignup')}
+                onClick={() => navigate('/ptsignup')}
                 type="button"
               >
                 회원가입
