@@ -20,7 +20,8 @@ const PartnerHeader: React.FC = () => {
             src={icon}
             alt="Home"
             className="h-12 cursor-pointer"
-            onClick={() => navigate(isAuthenticated ? '/partnerhome' : '/')}
+            onClick={() => navigate('/pthome')}
+
           />
         </div>
         {isAuthenticated && (
@@ -51,7 +52,9 @@ const PartnerHeader: React.FC = () => {
             <>
               <button
                 className="bg-[#144156]"
-                onClick={() => navigate(`/partner/${partner.email}`)}
+
+                onClick={() => navigate(`/pt/:email`)}
+
               >
                 마이 페이지
               </button>
@@ -62,17 +65,12 @@ const PartnerHeader: React.FC = () => {
             </>
           ) : (
             <>
-              <button
-                className="bg-[#144156] text-2xl"
-                onClick={() => navigate('/partnerlogin')}
-              >
+              <button className="bg-[#144156] text-2xl" onClick={() => navigate('/ptlogin')}>
                 로그인
               </button>
               <div className="w-px h-6 bg-white mx-2"></div>
-              <button
-                className="bg-[#144156] text-2xl"
-                onClick={() => navigate('/partnersignup')}
-              >
+              <button className="bg-[#144156] text-2xl" onClick={() => navigate('/ptsignup')}>
+
                 회원가입
               </button>
             </>

@@ -30,7 +30,7 @@ const Header: React.FC = () => {
           <button className="h-btn" onClick={() => navigate('/service')}>
             서비스 알아보기
           </button>
-          <button className="h-btn" onClick={() => navigate('/partnerrecruitment')}>
+          <button className="h-btn" onClick={() => navigate('/ptrecruitment')}>
             파트너를 모집해요
           </button>
         </div>
