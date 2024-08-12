@@ -102,7 +102,7 @@ const PartnerEdit: React.FC = () => {
         password: formData.password || undefined,
       };
       await updatePartnerMutation.mutateAsync(dataToUpdate);
-      navigate(`/partner/${email}`);
+      navigate(`/pt/${email}`);
     } catch (error) {
       console.error('Update Error:', error);
       setErrors((prev) => ({
@@ -251,7 +251,7 @@ const PartnerEdit: React.FC = () => {
           <button
             className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
-            onClick={() => navigate(`/partner/${email}`)}
+            onClick={() => navigate(`/pt/${email}`)}
           >
             취소
           </button>

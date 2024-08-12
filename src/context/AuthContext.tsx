@@ -52,8 +52,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       const storedToken = localStorage.getItem('token');
+      const isPartner = localStorage.getItem('isPartner') === 'true';
       if (storedToken) {
-        await fetchProfile();
+        await fetchProfile(isPartner);
       }
     };
 
@@ -74,6 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('isPartner'); // 여기 추가
     setIsAuthenticated(false);
     setMember(null);
     setPartner(null);

@@ -29,7 +29,7 @@ const LoginSelector = () => {
               </button>
               <button
                 className="bg-[#144156] text-white py-2 px-4 rounded"
-                onClick={() => navigate('/partnerlogin')}
+                onClick={() => navigate('/ptlogin')}
                 type="button"
                 >
                 파트너 로그인
