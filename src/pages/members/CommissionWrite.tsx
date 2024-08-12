@@ -112,7 +112,7 @@ const CommissionWrite: React.FC = () => {
             <label className="block text-gray-700">주소:</label>
             <input
               type="text"
-              name="address"
+              name="addressId"
               value={form.addressId}
               onChange={handleChange}
               required
