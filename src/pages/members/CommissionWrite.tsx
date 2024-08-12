@@ -118,7 +118,7 @@ const CommissionWrite: React.FC = () => {
           <div>
             <label className="block text-gray-700">주소:</label>
             <input
-              type="text"
+              type="number"
               name="addressId"
               value={form.addressId}
               onChange={handleChange}
@@ -131,7 +131,7 @@ const CommissionWrite: React.FC = () => {
               청소할 장소의 사진을 올려주세요:
             </label>
             <input
-              type="file"
+              type="text"
               name="image"
               value={form.image}
               onChange={handleChange}
