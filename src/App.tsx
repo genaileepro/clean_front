@@ -10,18 +10,20 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: false
-    }
-  }
+      retry: false,
+    },
+  },
 });
 
 const App: React.FC = () => {
-  const [ShowDevtools, setShowDevtools] = useState<React.ComponentType | null>(null);
+  const [ShowDevtools, setShowDevtools] = useState<React.ComponentType | null>(
+    null,
+  );
 
   // 개발 모드에서만 DevTools 로드
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-        setShowDevtools(true);
+      setShowDevtools(true);
     }
   }, []);
 

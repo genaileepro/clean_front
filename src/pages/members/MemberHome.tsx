@@ -21,7 +21,7 @@ const MemberHome: React.FC = () => {
             <button onClick={() => navigate('/service')} className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md m-2">
             서비스 알아보기
             </button>
-            <button onClick={() => navigate('/partnerrecruitment')} className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md m-2">사업자등록 알아보기</button>
+            <button onClick={() => navigate('/ptrecruitment')} className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md m-2">사업자등록 알아보기</button>
         </div>
     </section>
 

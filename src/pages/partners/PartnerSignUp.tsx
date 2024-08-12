@@ -119,7 +119,7 @@ const PartnerSignUp: React.FC = () => {
     try {
       const { confirmPassword, ...submitData } = formData;
       await signupMutation.mutateAsync(submitData);
-      navigate(`/partnerlogin`);
+      navigate(`/ptlogin`);
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
@@ -222,7 +222,7 @@ const PartnerSignUp: React.FC = () => {
               </button>
               <button
                 className="bg-[#144156] text-white py-2 px-4 rounded"
-                onClick={() => navigate(`/partnerlogin`)}
+                onClick={() => navigate(`/ptlogin`)}
                 type="button"
               >
                 로그인하러가기

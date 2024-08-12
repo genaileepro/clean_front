@@ -68,6 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ) => {
     localStorage.setItem('token', token);
     localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('isPartner', isPartner ? 'true' : 'false');
     setIsAuthenticated(true);
     fetchProfile(isPartner);
   };
