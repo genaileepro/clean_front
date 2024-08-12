@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const partnerApi = axios.create({
-});
+const partnerApi = axios.create({});
 
 partnerApi.interceptors.request.use(
   (config) => {
@@ -28,7 +27,7 @@ partnerApi.interceptors.response.use(
         partnerApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         return partnerApi(originalRequest);
       } catch (refreshError) {
-        window.location.href = '/partnerlogin';
+        window.location.href = '/ptlogin';
         return Promise.reject(refreshError);
       }
     }
