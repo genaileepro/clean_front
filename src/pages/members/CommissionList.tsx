@@ -5,6 +5,7 @@ import {
   useDeleteCommission,
 } from '../../hooks/useCommissions';
 import { Commission } from '../../types/commission';
+import { showErrorNotification } from '../../utils/errorHandler';
 
 const CommissionList: React.FC = () => {
   const { data: commissions, isLoading, error } = useCommissions();
@@ -14,10 +15,9 @@ const CommissionList: React.FC = () => {
     if (window.confirm('정말로 이 의뢰를 삭제하시겠습니까?')) {
       try {
         await deleteCommissionMutation.mutateAsync(id);
-        console.log(`Commission with id: ${id} deleted successfully`);
       } catch (error) {
         console.error('Delete failed:', error);
-        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+        showErrorNotification('삭제에 실패했습니다. 다시 시도해주세요.');
       }
     }
   };

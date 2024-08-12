@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCommission, useUpdateCommission } from '../../hooks/useCommissions';
 import { Commission, HouseType, CleanType } from '../../types/commission';
+import { showErrorNotification } from '../../utils/errorHandler';
 
 const CommissionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -9,13 +10,12 @@ const CommissionDetail: React.FC = () => {
   const commissionId = Number(id);
 
   const { data: commission, isLoading, error } = useCommission(commissionId);
-
   const updateCommissionMutation = useUpdateCommission();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedCommission, setEditedCommission] = useState<
-    Commission | undefined
-  >(undefined);
+  const [editedCommission, setEditedCommission] = useState<Commission | null>(
+    null,
+  );
 
   useEffect(() => {
     if (commission) {
@@ -32,14 +32,23 @@ const CommissionDetail: React.FC = () => {
     if (!editedCommission) return;
 
     try {
+      const updateData = {
+        image: editedCommission.image,
+        size: editedCommission.size,
+        houseType: editedCommission.houseType,
+        cleanType: editedCommission.cleanType,
+        desiredDate: editedCommission.desiredDate,
+        significant: editedCommission.significant,
+      };
+
       await updateCommissionMutation.mutateAsync({
         id: commissionId,
-        commission: editedCommission,
+        commission: updateData,
       });
       setIsEditing(false);
     } catch (error) {
       console.error('Update failed:', error);
-      alert('업데이트에 실패했습니다. 다시 시도해주세요.');
+      showErrorNotification('업데이트에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -52,7 +61,7 @@ const CommissionDetail: React.FC = () => {
     setEditedCommission((prev) =>
       prev
         ? { ...prev, [name]: name === 'size' ? Number(value) : value }
-        : undefined,
+        : null,
     );
   };
 
@@ -104,9 +113,9 @@ const CommissionDetail: React.FC = () => {
           <div>
             <label className="block mb-1">Desired Date</label>
             <input
-              type="date"
+              type="datetime-local"
               name="desiredDate"
-              value={editedCommission?.desiredDate?.split('T')[0] || ''}
+              value={editedCommission?.desiredDate?.split('.')[0] || ''}
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
             />
@@ -119,6 +128,16 @@ const CommissionDetail: React.FC = () => {
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
               rows={4}
+            />
+          </div>
+          <div>
+            <label className="block mb-1">Image URL</label>
+            <input
+              type="text"
+              name="image"
+              value={editedCommission?.image || ''}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
             />
           </div>
           <div className="flex space-x-4">
@@ -153,10 +172,22 @@ const CommissionDetail: React.FC = () => {
           </p>
           <p>
             <strong>Desired Date:</strong>{' '}
-            {new Date(commission.desiredDate).toLocaleDateString()}
+            {new Date(commission.desiredDate).toLocaleString()}
           </p>
           <p>
             <strong>Significant Details:</strong> {commission.significant}
+          </p>
+          <p>
+            <strong>Image:</strong>{' '}
+            {commission.image ? (
+              <img
+                src={commission.image}
+                alt="Commission"
+                className="mt-2 max-w-full h-auto"
+              />
+            ) : (
+              'No image'
+            )}
           </p>
           <button
             onClick={() => setIsEditing(true)}
