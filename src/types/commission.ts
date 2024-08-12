@@ -1,13 +1,13 @@
 export enum HouseType {
   APT = 'APT',
-  OneRoom = 'OneRoom',
-  House = 'House',
-  Toilet = 'Toilet',
+  OneRoom = 'ONEROOM',
+  House = 'HOUSE',
+  Toilet = 'TOILET',
 }
 
 export enum CleanType {
-  Normal = 'Normal',
-  Special = 'Special',
+  Normal = 'NORMAL',
+  Special = 'SPECIAL',
 }
 
 export interface Address {
