@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateCommission } from '../../hooks/useCommissions';
-import { HouseType, CleanType, Commission } from '../../types/commission';
+import { HouseType, CleanType, CommissionFormData } from '../../types/commission';
 import logo from '../../assets/logo.png';
 
 const CommissionWrite: React.FC = () => {
   const navigate = useNavigate();
   const createCommissionMutation = useCreateCommission();
 
-  const [form, setForm] = useState<
-    Omit<Commission, 'commissionId' | 'memberNick'>
-  >({
+  const [form, setForm] = useState<CommissionFormData>({
     size: null,
     houseType: '',
     cleanType: '',
-    addressId: 0,
+    addressId: null,
     image: '',
     desiredDate: '',
     significant: '',
@@ -43,6 +41,8 @@ const CommissionWrite: React.FC = () => {
     try {
       const newCommission = {
         ...form,
+        size: form.size || 0,
+        addressId: form.addressId || 0,
         desiredDate: new Date(form.desiredDate).toISOString(),
       };
 
@@ -120,7 +120,7 @@ const CommissionWrite: React.FC = () => {
             <input
               type="number"
               name="addressId"
-              value={form.addressId}
+              value={form.addressId === null ? '' : form.addressId}
               onChange={handleChange}
               required
               className="w-full p-2 border border-gray-300 rounded"

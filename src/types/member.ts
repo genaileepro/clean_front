@@ -2,6 +2,7 @@ export interface Member {
   email: string;
   nick: string;
   phoneNumber: string;
+  password: string;
 }
 
 export interface LoginCredentials {

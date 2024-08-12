@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import * as api from '../api/commissions';
 import { Commission } from '../types/commission';
+import { showErrorNotification } from '../utils/errorHandler';
 
 export const useCommissions = (): UseQueryResult<Commission[], Error> => {
   return useQuery({
@@ -41,10 +42,15 @@ export const useDeleteCommission = (): UseMutationResult<
   unknown
 > => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: api.deleteCommission,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commissions'] });
+    },
+    onError: (error) => {
+      console.error('Delete commission error:', error);
+      showErrorNotification('Commission deletion failed. Please try again.');
     },
   });
 };
@@ -65,6 +71,7 @@ export const useUpdateCommission = (): UseMutationResult<
   unknown
 > => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ id, commission }) => api.updateCommission(id, commission),
     onSuccess: (updatedCommission) => {
@@ -73,6 +80,10 @@ export const useUpdateCommission = (): UseMutationResult<
         updatedCommission,
       );
       queryClient.invalidateQueries({ queryKey: ['commissions'] });
+    },
+    onError: (error) => {
+      console.error('Update commission error:', error);
+      showErrorNotification('Commission update failed. Please try again.');
     },
   });
 };

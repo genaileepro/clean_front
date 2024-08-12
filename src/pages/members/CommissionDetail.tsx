@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCommission, useUpdateCommission } from '../../hooks/useCommissions';
 import { Commission, HouseType, CleanType } from '../../types/commission';
+import { showErrorNotification } from '../../utils/errorHandler';
 
 const CommissionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -9,13 +10,10 @@ const CommissionDetail: React.FC = () => {
   const commissionId = Number(id);
 
   const { data: commission, isLoading, error } = useCommission(commissionId);
-
   const updateCommissionMutation = useUpdateCommission();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedCommission, setEditedCommission] = useState<
-    Commission | undefined
-  >(undefined);
+  const [editedCommission, setEditedCommission] = useState<Commission | null>(null);
 
   useEffect(() => {
     if (commission) {
@@ -32,27 +30,32 @@ const CommissionDetail: React.FC = () => {
     if (!editedCommission) return;
 
     try {
+      const updateData = {
+        image: editedCommission.image,
+        size: editedCommission.size,
+        houseType: editedCommission.houseType,
+        cleanType: editedCommission.cleanType,
+        desiredDate: editedCommission.desiredDate,
+        significant: editedCommission.significant
+      };
+
       await updateCommissionMutation.mutateAsync({
         id: commissionId,
-        commission: editedCommission,
+        commission: updateData,
       });
       setIsEditing(false);
     } catch (error) {
       console.error('Update failed:', error);
-      alert('업데이트에 실패했습니다. 다시 시도해주세요.');
+      showErrorNotification('업데이트에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setEditedCommission((prev) =>
-      prev
-        ? { ...prev, [name]: name === 'size' ? Number(value) : value }
-        : undefined,
+      prev ? { ...prev, [name]: name === 'size' ? Number(value) : value } : null
     );
   };
 
@@ -104,9 +107,9 @@ const CommissionDetail: React.FC = () => {
           <div>
             <label className="block mb-1">Desired Date</label>
             <input
-              type="date"
+              type="datetime-local"
               name="desiredDate"
-              value={editedCommission?.desiredDate?.split('T')[0] || ''}
+              value={editedCommission?.desiredDate?.split('.')[0] || ''}
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
             />
@@ -121,15 +124,23 @@ const CommissionDetail: React.FC = () => {
               rows={4}
             />
           </div>
+          <div>
+            <label className="block mb-1">Image URL</label>
+            <input
+              type="text"
+              name="image"
+              value={editedCommission?.image || ''}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+          </div>
           <div className="flex space-x-4">
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded"
               disabled={updateCommissionMutation.isPending}
             >
-              {updateCommissionMutation.isPending
-                ? 'Saving...'
-                : 'Save Changes'}
+              {updateCommissionMutation.isPending ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               type="button"
@@ -142,22 +153,12 @@ const CommissionDetail: React.FC = () => {
         </form>
       ) : (
         <div className="space-y-4">
-          <p>
-            <strong>Size:</strong> {commission.size} m²
-          </p>
-          <p>
-            <strong>House Type:</strong> {commission.houseType}
-          </p>
-          <p>
-            <strong>Clean Type:</strong> {commission.cleanType}
-          </p>
-          <p>
-            <strong>Desired Date:</strong>{' '}
-            {new Date(commission.desiredDate).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Significant Details:</strong> {commission.significant}
-          </p>
+          <p><strong>Size:</strong> {commission.size} m²</p>
+          <p><strong>House Type:</strong> {commission.houseType}</p>
+          <p><strong>Clean Type:</strong> {commission.cleanType}</p>
+          <p><strong>Desired Date:</strong> {new Date(commission.desiredDate).toLocaleString()}</p>
+          <p><strong>Significant Details:</strong> {commission.significant}</p>
+          <p><strong>Image:</strong> {commission.image ? <img src={commission.image} alt="Commission" className="mt-2 max-w-full h-auto" /> : 'No image'}</p>
           <button
             onClick={() => setIsEditing(true)}
             className="bg-green-500 text-white px-4 py-2 rounded"

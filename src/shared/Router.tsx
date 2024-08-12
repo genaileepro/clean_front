@@ -71,7 +71,7 @@ const Router: React.FC = () => {
           <Route path="/member/:email/edit" element={<MemberEdit />} />
           <Route path="/commissionwrite" element={<CommissionWrite />} />
           <Route path="/commissionlist" element={<CommissionList />} />
-          <Route path="/commissiondetail/:id" element={<CommissionDetail />} />
+          <Route path="/commissiondetail" element={<CommissionDetail />} />
           <Route path="/userorders" element={<UserOrders />} />
         </Route>
       </Route>

@@ -53,5 +53,5 @@ export const handleApiError = (error: any): string => {
 
 export const showErrorNotification = (message: string) => {
   toast.error(message)
-  console.error(message); // 임시로 콘솔에 출력
+  console.error(message);
 };
