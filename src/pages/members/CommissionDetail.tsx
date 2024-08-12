@@ -13,9 +13,7 @@ const CommissionDetail: React.FC = () => {
   const updateCommissionMutation = useUpdateCommission();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editedCommission, setEditedCommission] = useState<Commission | null>(
-    null,
-  );
+  const [editedCommission, setEditedCommission] = useState<Commission | null>(null);
 
   useEffect(() => {
     if (commission) {
@@ -38,7 +36,7 @@ const CommissionDetail: React.FC = () => {
         houseType: editedCommission.houseType,
         cleanType: editedCommission.cleanType,
         desiredDate: editedCommission.desiredDate,
-        significant: editedCommission.significant,
+        significant: editedCommission.significant
       };
 
       await updateCommissionMutation.mutateAsync({
@@ -53,15 +51,11 @@ const CommissionDetail: React.FC = () => {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setEditedCommission((prev) =>
-      prev
-        ? { ...prev, [name]: name === 'size' ? Number(value) : value }
-        : null,
+      prev ? { ...prev, [name]: name === 'size' ? Number(value) : value } : null
     );
   };
 
@@ -146,9 +140,7 @@ const CommissionDetail: React.FC = () => {
               className="bg-blue-500 text-white px-4 py-2 rounded"
               disabled={updateCommissionMutation.isPending}
             >
-              {updateCommissionMutation.isPending
-                ? 'Saving...'
-                : 'Save Changes'}
+              {updateCommissionMutation.isPending ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               type="button"
@@ -161,34 +153,12 @@ const CommissionDetail: React.FC = () => {
         </form>
       ) : (
         <div className="space-y-4">
-          <p>
-            <strong>Size:</strong> {commission.size} m²
-          </p>
-          <p>
-            <strong>House Type:</strong> {commission.houseType}
-          </p>
-          <p>
-            <strong>Clean Type:</strong> {commission.cleanType}
-          </p>
-          <p>
-            <strong>Desired Date:</strong>{' '}
-            {new Date(commission.desiredDate).toLocaleString()}
-          </p>
-          <p>
-            <strong>Significant Details:</strong> {commission.significant}
-          </p>
-          <p>
-            <strong>Image:</strong>{' '}
-            {commission.image ? (
-              <img
-                src={commission.image}
-                alt="Commission"
-                className="mt-2 max-w-full h-auto"
-              />
-            ) : (
-              'No image'
-            )}
-          </p>
+          <p><strong>Size:</strong> {commission.size} m²</p>
+          <p><strong>House Type:</strong> {commission.houseType}</p>
+          <p><strong>Clean Type:</strong> {commission.cleanType}</p>
+          <p><strong>Desired Date:</strong> {new Date(commission.desiredDate).toLocaleString()}</p>
+          <p><strong>Significant Details:</strong> {commission.significant}</p>
+          <p><strong>Image:</strong> {commission.image ? <img src={commission.image} alt="Commission" className="mt-2 max-w-full h-auto" /> : 'No image'}</p>
           <button
             onClick={() => setIsEditing(true)}
             className="bg-green-500 text-white px-4 py-2 rounded"

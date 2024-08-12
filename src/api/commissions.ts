@@ -13,12 +13,19 @@ export const fetchCommissions = async (): Promise<Commission[]> => {
   return response.data;
 };
 
+export const fetchSingleCommission = async (
+  id: number,
+): Promise<Commission> => {
+  const response = await api.get<Commission>(`/commission?commissionId=${id}`);
+  return response.data;
+};
+
 export const deleteCommission = async (id: number): Promise<void> => {
   await api.delete<Commission>(`commission?commissionId=${id}`);
 };
 
 export const fetchCommission = async (id: number): Promise<Commission> => {
-  const response = await api.get<Commission>(`commission/${id}`);
+  const response = await api.get<Commission>(`/commission?commissionId=${id}`);
   return response.data;
 };
 
@@ -26,6 +33,9 @@ export const updateCommission = async (
   id: number,
   commission: Partial<Commission>,
 ): Promise<Commission> => {
-  const response = await api.put<Commission>(`/commission/${id}`, commission);
+  const response = await api.put<Commission>(
+    `/commission?commissionId=${id}`,
+    commission,
+  );
   return response.data;
 };

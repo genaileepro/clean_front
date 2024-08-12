@@ -16,7 +16,7 @@ export const fetchCurrentMember = async (): Promise<Member> => {
 export const updateMember = async (
   member: Partial<Member>,
 ): Promise<Member> => {
-  const response = await api.put<Member>('/members/profile', member);
+  const response = await api.patch<Member>('/members/profile', member);
   return response.data;
 };
 

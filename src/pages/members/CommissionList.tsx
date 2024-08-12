@@ -48,13 +48,13 @@ const CommissionList: React.FC = () => {
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                 onClick={() => handleDeleteCommission(commission.commissionId)}
               >
-                Delete
+                의뢰 삭제
               </button>
               <Link
-                to={`/commissiondetail/${commission.commissionId}`}
+                to={`/commissiondetail?commissionId=${commission.commissionId}`}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 inline-block"
               >
-                Update
+                상세 보기
               </Link>
             </div>
           </li>

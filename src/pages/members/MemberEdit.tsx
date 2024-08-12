@@ -7,7 +7,10 @@ import {
 } from '../../utils/validationUtils';
 import { FormEvent, useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
-import { handleApiError, showErrorNotification } from '../../utils/errorHandler';
+import {
+  handleApiError,
+  showErrorNotification,
+} from '../../utils/errorHandler';
 
 interface FormErrors {
   nick: string;
@@ -25,25 +28,27 @@ const MemberEdit: React.FC = () => {
   const [formData, setFormData] = useState({
     email: email || '',
     password: '',
-    nick: member?.nick || '',
-    phoneNumber: member?.phoneNumber || '',
+    nick: '',
+    phoneNumber: '',
   });
   const [errors, setErrors] = useState<FormErrors>({
     password: '',
     nick: '',
     phoneNumber: '',
   });
+  const [originalPassword, setOriginalPassword] = useState('');
 
-  useEffect(()=>{
-    if(member){
+  useEffect(() => {
+    if (member) {
       setFormData({
         email: member.email,
         nick: member.nick,
         phoneNumber: member.phoneNumber,
         password: '',
-      })
+      });
+      setOriginalPassword(member.password);
     }
-  }, [member])
+  }, [member]);
 
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러 발생: {error.message}</div>;
@@ -59,7 +64,7 @@ const MemberEdit: React.FC = () => {
     } else if (name === 'phoneNumber') {
       validationResult = validatePhoneNumber(value);
     } else if (name === 'password') {
-      validationResult = validatePassword(value);
+      validationResult = value ? validatePassword(value) : null;
     }
 
     if (validationResult) {
@@ -72,7 +77,11 @@ const MemberEdit: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (errors.nick || errors.phoneNumber || (formData.password && errors.password)) {
+    if (
+      errors.nick ||
+      errors.phoneNumber ||
+      (formData.password && errors.password)
+    ) {
       setErrors((prev) => ({
         ...prev,
         general: '입력한 정보를 다시 확인해주세요.',
@@ -83,8 +92,8 @@ const MemberEdit: React.FC = () => {
     try {
       const dataToUpdate = {
         ...formData,
-        password: formData.password || undefined,
-      }
+        password: formData.password || originalPassword,
+      };
       await updateMemberMutation.mutateAsync(dataToUpdate);
       navigate(`/member/${email}`);
     } catch (error) {
@@ -100,12 +109,12 @@ const MemberEdit: React.FC = () => {
   return (
     <div className="max-w-md mx-auto mt-10">
       <div className="p-6 hidden sm:block">
-          <img
-            src={logo}
-            alt="깔끔한방 로고"
-            className="w-full h-auto max-h-[200px] object-contain"
-          />
-        </div>
+        <img
+          src={logo}
+          alt="깔끔한방 로고"
+          className="w-full h-auto max-h-[200px] object-contain"
+        />
+      </div>
       <h2 className="text-2xl font-bold mb-4">회원 정보 수정</h2>
       {errors.general && (
         <div
@@ -128,7 +137,10 @@ const MemberEdit: React.FC = () => {
           </label>
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="password"
+          >
             새 비밀번호
           </label>
           <input
@@ -140,7 +152,9 @@ const MemberEdit: React.FC = () => {
             onChange={handleChange}
             placeholder="변경하려면 입력하세요"
           />
-          {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
+          {errors.password && (
+            <p className="text-red-500 text-xs italic">{errors.password}</p>
+          )}
         </div>
         <div className="mb-4">
           <label
