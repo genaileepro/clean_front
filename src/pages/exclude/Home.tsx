@@ -96,7 +96,7 @@ const Home: React.FC = () => {
         <nav className="mb-4">
             <button onClick={() => navigate('/')} className="text-white py-2 px-4 rounded-md m-2">홈</button>
             <button onClick={() => navigate('/service')} className="text-white py-2 px-4 rounded-md m-2">서비스 알아보기</button>
-            <button onClick={() => navigate('/partnerrecruitment')} className="text-white py-2 px-4 rounded-md m-2">파트너를 모집해요</button>
+            <button onClick={() => navigate('/ptrecruitment')} className="text-white py-2 px-4 rounded-md m-2">파트너를 모집해요</button>
             <button onClick={() => navigate('/loginselect')} className="text-white py-2 px-4 rounded-md m-2">로그인</button>/
             <button onClick={() => navigate('/signupselect')} className="text-white py-2 px-4 rounded-md m-2">회원가입</button>
         </nav>
