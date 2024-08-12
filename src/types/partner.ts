@@ -5,7 +5,7 @@ export interface Partner {
   managerName: string;
   companyName: string;
   businessType: string;
-  partnerType: string;  
+  partnerType: string;
   // token 필드는 회원가입 시 필요하지 않으므로 제거
 }
 
