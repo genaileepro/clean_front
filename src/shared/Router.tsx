@@ -57,7 +57,7 @@ const Router: React.FC = () => {
         <Route element={<PublicOnlyRoute />}>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/ptrlogin" element={<PartnerLogin />} />
+          <Route path="/ptlogin" element={<PartnerLogin />} />
           <Route path="/ptsignup" element={<PartnerSignUp />} />
         </Route>
       </Route>
