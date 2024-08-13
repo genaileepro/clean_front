@@ -1,23 +1,27 @@
 export interface Estimate {
   id: number;
-  commissionId: Commission;
-  partnerId: number;
-  price: number;
+  commissionId: number;
+  tmpPrice: number;
   statement: string;
   fixedDate: string; // ISO 형식의 날짜 문자열
-  approved?: boolean; // 선택적 속성
+  nick: string;
+  address: string;
+  houseType: 'APT' | 'HOUSE' | 'OFFICE';
+  cleanType: 'NORMAL' | 'SPECIAL';
+  desiredDate: string; // ISO 형식의 날짜 문자열
+  price?: number;
 }
 
 export interface Commission {
   id: number;
-  memberNick: string; // 회원 닉네임
-  image?: string; // 이미지, 선택적 속성
-  size: number; // 크기
-  houseType: 'APT' | 'HOUSE' | 'OFFICE'; // 집 종류
-  cleanType: 'NORMAL' | 'SPECIAL'; // 청소 종류
-  address: string; // 주소
-  desiredDate: string; // 희망 날짜, ISO 형식의 날짜 문자열
-  significant?: string; // 추가적인 중요 정보, 선택적 속성
+  memberNick: string;
+  image?: string;
+  size: number;
+  houseType: 'APT' | 'HOUSE' | 'OFFICE';
+  cleanType: 'NORMAL' | 'SPECIAL';
+  address: string;
+  desiredDate: string; // ISO 형식의 날짜 문자열
+  significant?: string;
 }
 
 export interface Member {
@@ -63,5 +67,5 @@ export interface Partner {
   managerName: string;
   companyName: string;
   businessType: string;
-  partnerType: 'INDIVIDUAL' | 'CORPORATION' | 'PUBLIC_INSTITUTION'; // 가능한 값들
+  partnerType: 'INDIVIDUAL' | 'CORPORATION' | 'PUBLIC_INSTITUTION';
 }

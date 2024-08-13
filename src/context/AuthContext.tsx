@@ -9,7 +9,12 @@ export interface AuthContextType {
   loading: boolean;
   member: Member | null;
   partner: Partner | null;
-  login: (token: string, refreshToken: string, isPartner: boolean) => void;
+  login: (
+    token: string,
+    refreshToken: string,
+    isPartner: boolean,
+    id: number,
+  ) => void; // 여기서 id 추가
   logout: () => void;
   fetchProfile: (isPartner?: boolean) => Promise<Boolean>;
 }
@@ -65,10 +70,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token: string,
     refreshToken: string,
     isPartner: boolean = false,
+    partnerId?: number, // partnerId를 추가로 받아올 수 있도록 수정
   ) => {
     localStorage.setItem('token', token);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('isPartner', isPartner ? 'true' : 'false');
+
+    // 파트너 로그인인 경우 partnerId 저장
+    if (isPartner && partnerId) {
+      localStorage.setItem('partnerId', partnerId.toString());
+    }
+
     setIsAuthenticated(true);
     fetchProfile(isPartner);
   };
