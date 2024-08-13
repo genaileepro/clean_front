@@ -29,8 +29,9 @@ api.interceptors.response.use(
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // localStorage.removeItem('token');
-        // localStorage.removeItem('refreshToken');
+        // 리프레시 토큰도 만료된 경우 로그인 페이지로 리다이렉트
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
