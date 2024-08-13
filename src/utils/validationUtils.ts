@@ -110,4 +110,3 @@ export const validateSignificant = createValidator(
   (significant) => significant.length > 0 && significant.length <= 500,
   '특이사항은 500자 이내로 입력해주세요.',
 );
-

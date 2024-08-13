@@ -1,10 +1,13 @@
-import { Estimate, Commission } from '../types/estimate'; // Commission 타입도 가져옵니다.
 import partnerApiInstance from './partnerAxiosConfig';
+import { Estimate, Commission } from '../types/estimate';
 
 // 새로운 견적 생성
-export const createEstimate = async (
-  estimate: Partial<Estimate>,
-): Promise<Estimate> => {
+export const createEstimate = async (estimate: {
+  commissionId: number;
+  tmpPrice: number;
+  statement: string;
+  fixedDate: string; // ISO 형식의 날짜 문자열
+}): Promise<Estimate> => {
   const response = await partnerApiInstance.post<Estimate>(
     '/partner/estimate',
     estimate,
@@ -15,10 +18,14 @@ export const createEstimate = async (
 // 기존 견적 업데이트
 export const updateEstimate = async (
   id: number,
-  estimate: Partial<Estimate>,
+  estimate: {
+    tmpPrice: number;
+    statement: string;
+    fixedDate: string; // ISO 형식의 날짜 문자열
+  },
 ): Promise<Estimate> => {
   const response = await partnerApiInstance.put<Estimate>(
-    `/partner/estimate?id=${id}`,
+    `/partner/estimate?id=${id}`, // id를 쿼리 매개변수로 전달하는 방식 유지
     estimate,
   );
   return response.data;
@@ -29,7 +36,7 @@ export const deleteEstimate = async (
   id: number,
 ): Promise<{ message: string }> => {
   const response = await partnerApiInstance.delete<{ message: string }>(
-    `/partner/estimate?id=${id}`,
+    `/partner/estimate?id=${id}`, // id를 쿼리 매개변수로 전달하는 방식 유지
   );
   return response.data;
 };

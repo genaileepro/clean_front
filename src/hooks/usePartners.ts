@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as partner from '../api/partner'
-import { Partner, PartnerLoginCredentials, PartnerLoginResponse } from '../types/partner';
+import * as partner from '../api/partner';
+import {
+  Partner,
+  PartnerLoginCredentials,
+  PartnerLoginResponse,
+} from '../types/partner';
+import { partnerLogin } from '../api/partner'; // 실제 API 요청 함수
 
 export const usePartners = () => {
   return useQuery<Partner[], Error>({
@@ -41,12 +46,19 @@ export const useDeletePartner = () => {
 
 export const usePartnerLogin = () => {
   return useMutation<PartnerLoginResponse, Error, PartnerLoginCredentials>({
-    mutationFn: partner.partnerLogin,
+    mutationFn: async (formData) => {
+      const response = await partnerLogin(formData); // Login API 호출
+      return response; // 여기에서 바로 response를 반환합니다.
+    },
   });
 };
 
 export const usePartnerSignup = () => {
-  return useMutation<Partner, Error, Omit<Partner, 'id'> & { password: string }>({
+  return useMutation<
+    Partner,
+    Error,
+    Omit<Partner, 'id'> & { password: string }
+  >({
     mutationFn: partner.partnerSignup,
   });
 };

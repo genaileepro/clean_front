@@ -1,77 +1,99 @@
 import React, { useState, useEffect } from 'react';
-import partnerApi from '../../api/partnerAxiosConfig';
-import { Commission } from '../../types/estimate';
-import ErrorNotification from '../../utils/ErrorNotification';
+import { useNavigate } from 'react-router-dom';
+import {
+  getEstimateList,
+  deleteEstimate,
+  updateEstimate,
+} from '../../api/estimate';
+import { Estimate } from '../../types/estimate';
 
 const MyEstimates: React.FC = () => {
-  const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [estimates, setEstimates] = useState<Estimate[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEstimates = async () => {
+      setIsLoading(true);
       try {
-        const response = await partnerApi.get('/partner/estimate/list'); // 견적 목록 가져오기
-        setCommissions(response.data);
-      } catch (err) {
-        console.error('Error fetching estimates:', err);
-        setError('Failed to load estimates.');
+        const data = await getEstimateList(); // API 호출로 모든 견적 데이터 가져오기
+        setEstimates(data);
+      } catch (error) {
+        console.error('Error fetching estimates', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchEstimates();
   }, []);
 
-  // 견적 최종 제출 처리 함수
-  const handleFinalSubmit = async (commissionId: number) => {
+  const handleDelete = async (id: number) => {
     try {
-      await partnerApi.post(`/commissions/${commissionId}/estimate/final`);
-      alert('견적이 최종 제출되었습니다.');
-    } catch (err) {
-      console.error('Error submitting final estimate:', err);
-      setError('Error submitting final estimate');
+      await deleteEstimate(id); // API 호출로 견적 삭제
+      setEstimates(estimates.filter((estimate) => estimate.id !== id)); // 삭제된 항목을 목록에서 제거
+    } catch (error) {
+      console.error('Error deleting estimate', error);
     }
   };
 
+  const handleEdit = (id: number) => {
+    navigate(`/editestimate/${id}`); // 수정 페이지로 이동
+  };
+
+  const handleSend = (id: number) => {
+    // 견적 발송 로직을 추가할 예정
+    console.log(`Sending estimate with id: ${id}`);
+  };
+
   return (
-    <div className="container mx-auto max-w-screen-md mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">내 견적 목록</h1>
-      {error && <ErrorNotification message={error} />}
-      {commissions.length > 0 ? (
-        commissions.map((commission) => (
-          <div
-            key={commission.id}
-            className="bg-white border rounded-lg shadow-lg p-6 w-full max-w-lg mx-auto mb-4"
-          >
-            <p className="text-gray-600 mb-2">
-              <strong>회원 닉네임:</strong> {commission.memberNick}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>주소:</strong> {commission.address}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>집 종류:</strong> {commission.houseType}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>청소 종류:</strong> {commission.cleanType}
-            </p>
-            <p className="text-gray-600 mb-4">
-              <strong>희망 날짜:</strong> {commission.desiredDate}
-            </p>
-            <div className="flex space-x-4">
+    <div className="container mx-auto max-w-screen-xl mt-12">
+      <h1 className="text-4xl font-bold text-center mb-8">
+        나의 예상 견적 목록
+      </h1>
+      {isLoading ? (
+        <p className="text-center mt-4">Loading...</p>
+      ) : (
+        <div className="flex flex-wrap justify-center">
+          {estimates.map((estimate) => (
+            <div
+              key={estimate.id}
+              className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
+            >
+              <h3 className="text-xl font-bold mb-2">예상 견적</h3>
+              <p className="text-gray-600 mb-2">
+                <strong>의뢰 ID:</strong> {estimate.commissionId}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>가격:</strong> {estimate.tmpPrice}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>설명:</strong> {estimate.statement}
+              </p>
+              <p className="text-gray-600 mb-4">
+                <strong>확정 날짜:</strong> {estimate.fixedDate}
+              </p>
               <button
-                className="bg-green-500 text-white py-2 px-4 rounded-md w-full"
-                onClick={() => handleFinalSubmit(commission.id)}
+                onClick={() => handleEdit(estimate.id)}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md mb-2 w-full"
               >
-                최종 제출
-              </button>
-              <button className="bg-yellow-500 text-white py-2 px-4 rounded-md w-full">
                 수정
               </button>
+              <button
+                onClick={() => handleDelete(estimate.id)}
+                className="bg-red-500 text-white py-2 px-4 rounded-md mb-2 w-full"
+              >
+                삭제
+              </button>
+              <button
+                onClick={() => handleSend(estimate.id)}
+                className="bg-green-500 text-white py-2 px-4 rounded-md w-full"
+              >
+                견적 발송
+              </button>
             </div>
-          </div>
-        ))
-      ) : (
-        <p>저장된 견적이 없습니다.</p>
+          ))}
+        </div>
       )}
     </div>
   );

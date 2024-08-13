@@ -6,7 +6,10 @@ import EmailInput from '../../utils/EmailInput';
 import { usePartnerLogin } from '../../hooks/usePartners';
 import { validatePassword } from '../../utils/validationUtils';
 import { Partner } from '../../types/partner';
-import { handleApiError, showErrorNotification } from '../../utils/errorHandler';
+import {
+  handleApiError,
+  showErrorNotification,
+} from '../../utils/errorHandler';
 
 interface PartnerLoginForm {
   email: Partner['email'];
@@ -48,9 +51,11 @@ const PartnerLogin: React.FC = () => {
     }
 
     try {
-      const { token, refreshToken } = await loginMutation.mutateAsync(formData);
+      const { id, token, refreshToken } =
+        await loginMutation.mutateAsync(formData);
+
       localStorage.setItem('isPartner', 'true');
-      authLogin(token, refreshToken, true);
+      authLogin(token, refreshToken, true, id); // partnerId를 함께 전달
       navigate('/pthome');
     } catch (error) {
       const errorMessage = handleApiError(error);
@@ -75,7 +80,10 @@ const PartnerLogin: React.FC = () => {
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-4">파트너 로그인</h2>
           {errors.general && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+              role="alert"
+            >
               <span className="block sm:inline">{errors.general}</span>
             </div>
           )}

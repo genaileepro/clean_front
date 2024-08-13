@@ -18,9 +18,9 @@ const CommissionCalling: React.FC = () => {
     const fetchCommissions = async () => {
       setIsLoading(true);
       try {
-        const data = await getCommissionList(); // 전체 데이터를 API 요청
+        const data = await getCommissionList(); // API 요청으로 모든 Commission 데이터 가져오기
         setCommissions(data);
-        setVisibleCommissions(data.slice(0, 9)); // 첫 페이지의 9개 데이터만 먼저 로드
+        setVisibleCommissions(data.slice(0, 9)); // 초기 로드 시 첫 페이지의 9개 데이터만 표시
         setHasMore(data.length > 9);
       } catch (err) {
         console.error('Error fetching commissions', err);
@@ -32,13 +32,13 @@ const CommissionCalling: React.FC = () => {
     fetchCommissions();
   }, []);
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     const newPage = page + 1;
     const newCommissions = commissions.slice(newPage * 9 - 9, newPage * 9);
     setVisibleCommissions((prev) => [...prev, ...newCommissions]);
     setPage(newPage);
     setHasMore(commissions.length > newPage * 9);
-  };
+  }, [commissions, page]);
 
   const lastCommissionElementRef = useCallback(
     (node: HTMLDivElement) => {
@@ -53,7 +53,7 @@ const CommissionCalling: React.FC = () => {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, hasMore],
+    [isLoading, hasMore, loadMore],
   );
 
   return (
