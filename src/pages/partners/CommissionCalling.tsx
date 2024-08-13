@@ -5,34 +5,40 @@ import { Commission } from '../../types/estimate';
 
 const CommissionCalling: React.FC = () => {
   const [commissions, setCommissions] = useState<Commission[]>([]);
+  const [visibleCommissions, setVisibleCommissions] = useState<Commission[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1); // 페이지 번호 상태 추가
-  const [hasMore, setHasMore] = useState(true); // 더 많은 데이터가 있는지 여부 상태
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const observer = useRef<IntersectionObserver | null>(null);
   const navigate = useNavigate();
 
-  const fetchCommissions = async (page: number) => {
-    setIsLoading(true);
-    try {
-      const data = await getCommissionList(); // 페이지 번호를 API 요청에 전달
-      // console.log('Fetched data:', data);
-
-      if (data && Array.isArray(data)) {
-        setCommissions((prevCommissions) => [...prevCommissions, ...data]);
-        setHasMore(data.length > 0); // 가져온 데이터가 있으면 hasMore를 true로 설정
-      } else {
-        setHasMore(false);
-      }
-    } catch (err) {
-      console.error('Error fetching commissions', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchCommissions(page); // 페이지 로드 시 처음 데이터를 가져옴
-  }, [page]);
+    const fetchCommissions = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getCommissionList(); // 전체 데이터를 API 요청
+        setCommissions(data);
+        setVisibleCommissions(data.slice(0, 9)); // 첫 페이지의 9개 데이터만 먼저 로드
+        setHasMore(data.length > 9);
+      } catch (err) {
+        console.error('Error fetching commissions', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCommissions();
+  }, []);
+
+  const loadMore = () => {
+    const newPage = page + 1;
+    const newCommissions = commissions.slice(newPage * 9 - 9, newPage * 9);
+    setVisibleCommissions((prev) => [...prev, ...newCommissions]);
+    setPage(newPage);
+    setHasMore(commissions.length > newPage * 9);
+  };
 
   const lastCommissionElementRef = useCallback(
     (node: HTMLDivElement) => {
@@ -41,7 +47,7 @@ const CommissionCalling: React.FC = () => {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1); // 마지막 요소가 보이면 다음 페이지 데이터 로드
+          loadMore(); // 마지막 요소가 보이면 더 많은 데이터를 로드
         }
       });
 
@@ -54,11 +60,13 @@ const CommissionCalling: React.FC = () => {
     <div className="container mx-auto max-w-screen-xl mt-12">
       <h1 className="text-4xl font-bold text-center mb-8">회원 새 의뢰 보기</h1>
       <div className="flex flex-wrap justify-center">
-        {commissions.map((commission, index) => (
+        {visibleCommissions.map((commission, index) => (
           <div
             key={commission.id}
             ref={
-              commissions.length === index + 1 ? lastCommissionElementRef : null
+              visibleCommissions.length === index + 1
+                ? lastCommissionElementRef
+                : null
             }
             className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
           >
