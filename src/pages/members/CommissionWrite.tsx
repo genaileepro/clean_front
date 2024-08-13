@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateCommission } from '../../hooks/useCommissions';
-import { HouseType, CleanType, CommissionFormData } from '../../types/commission';
+import {
+  HouseType,
+  CleanType,
+  CommissionFormData,
+} from '../../types/commission';
 import logo from '../../assets/logo.png';
+import AddressSelector from '../../components/common/AddressSelector';
 
 const CommissionWrite: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +23,13 @@ const CommissionWrite: React.FC = () => {
     significant: '',
   });
 
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
+
+  const handleAddressSelect = (addressId: number, address: string) => {
+    setForm((prev) => ({ ...prev, addressId }));
+    setSelectedAddress(address);
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -26,12 +38,7 @@ const CommissionWrite: React.FC = () => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === 'addressId' || name === 'size'
-          ? value === ''
-            ? null
-            : Number(value)
-          : value,
+      [name]: name === 'size' ? (value === '' ? null : Number(value)) : value,
     }));
   };
 
@@ -42,7 +49,7 @@ const CommissionWrite: React.FC = () => {
       const newCommission = {
         ...form,
         size: form.size || 0,
-        addressId: form.addressId || 0,
+        addressId: form.addressId || 0, // 여기서 addressId를 사용합니다.
         desiredDate: new Date(form.desiredDate).toISOString(),
       };
 
@@ -117,14 +124,14 @@ const CommissionWrite: React.FC = () => {
           </div>
           <div>
             <label className="block text-gray-700">주소:</label>
+            
             <input
-              type="number"
-              name="addressId"
-              value={form.addressId === null ? '' : form.addressId}
-              onChange={handleChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
+              type="text"
+              value={selectedAddress}
+              readOnly
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
             />
+            <AddressSelector onSelectAddress={handleAddressSelect} />
           </div>
           <div>
             <label className="block text-gray-700">
