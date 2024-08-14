@@ -14,8 +14,9 @@ import {
 } from '../../utils/errorHandler';
 
 interface FormErrors {
-  nick: string;
   password: string;
+  confirmPassword: string;
+  nick: string;
   phoneNumber: string;
   general?: string;
 }
@@ -68,9 +69,23 @@ const MemberEdit: React.FC = () => {
     } else if (name === 'phoneNumber') {
       validationResult = validatePhoneNumber(value);
     } else if (name === 'password') {
-      validationResult = value ? validatePassword(value) : null;
+      validationResult = value
+        ? validatePassword(value)
+        : { isValid: true, message: '' };
+      if (formData.confirmPassword) {
+        const confirmResult = validateConfirmPassword(
+          value,
+          formData.confirmPassword,
+        );
+        setErrors((prev) => ({
+          ...prev,
+          confirmPassword: confirmResult.message,
+        }));
+      }
     } else if (name === 'confirmPassword') {
-      validationResult = value ? validateConfirmPassword(formData.password, value) : null;
+      validationResult = value
+        ? validateConfirmPassword(formData.password, value)
+        : { isValid: true, message: '' };
     }
 
     if (validationResult) {
@@ -86,11 +101,20 @@ const MemberEdit: React.FC = () => {
     if (
       errors.nick ||
       errors.phoneNumber ||
-      (formData.password && errors.password)
+      (formData.password && (errors.password || errors.confirmPassword))
     ) {
       setErrors((prev) => ({
         ...prev,
         general: '입력한 정보를 다시 확인해주세요.',
+      }));
+      return;
+    }
+
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: '비밀번호가 일치하지 않습니다.',
+        general: '비밀번호가 일치하지 않습니다.',
       }));
       return;
     }
@@ -165,21 +189,23 @@ const MemberEdit: React.FC = () => {
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="password"
+            htmlFor="confirmPassword"
           >
             비밀번호 확인
           </label>
           <input
-            className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-            id="password"
+            className={`shadow appearance-none border ${errors.confirmPassword ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            id="confirmPassword"
             type="password"
-            name="password"
-            value={formData.password}
+            name="confirmPassword"
+            value={formData.confirmPassword}
             onChange={handleChange}
-            placeholder="변경하려면 입력하세요"
+            placeholder="비밀번호를 다시 입력하세요"
           />
-          {errors.password && (
-            <p className="text-red-500 text-xs italic">{errors.password}</p>
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-xs italic">
+              {errors.confirmPassword}
+            </p>
           )}
         </div>
         <div className="mb-4">
