@@ -33,15 +33,13 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
 
   return (
     <div className="relative">
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-brand text-white py-2 px-4 rounded"
-        >
-          주소 선택
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-brand text-white py-2 px-4 rounded"
+      >
+        주소 선택
+      </button>
       {isOpen && (
         <div className="absolute z-10 mt-1 w-[400px] right-0 bg-white border border-gray-300 rounded shadow-lg">
           <div className="flex border-b">
@@ -73,7 +71,7 @@ const AddressSelector: React.FC<AddressSelectorProps> = ({
                       key={address.id}
                       className="flex justify-between items-center mb-2"
                     >
-                      <span>{address.address + " " + address.addressDetail}</span>
+                      <span>{`${address.address} ${address.addressDetail}`}</span>
                       <button
                         type="button"
                         onClick={() => handleAddressSelect(address)}

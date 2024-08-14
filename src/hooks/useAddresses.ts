@@ -7,6 +7,7 @@ export const useAddresses = () => {
 
   const fetchAddresses = async (): Promise<AddressData[]> => {
     const response = await api.get('/address/signup');
+    console.log('addresses', response.data)
     return response.data;
   };
 

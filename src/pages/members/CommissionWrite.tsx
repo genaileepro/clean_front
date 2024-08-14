@@ -131,7 +131,7 @@ const CommissionWrite: React.FC = () => {
             <div className="flex align-middle justify-between">
               <input
                 type="text"
-                value={selectedAddress?.addressCode}
+                value={selectedAddress?.addressCode || ''}
                 readOnly
                 placeholder="우편번호"
                 className="w-60 p-2 mt-1 border border-gray-300 rounded"
@@ -140,14 +140,14 @@ const CommissionWrite: React.FC = () => {
             </div>
             <input
               type="text"
-              value={selectedAddress?.address}
+              value={selectedAddress?.address || ''}
               readOnly
               placeholder="주소"
               className="w-full p-2 mt-1 border border-gray-300 rounded"
             />
             <input
               type="text"
-              value={selectedAddress?.addressDetail}
+              value={selectedAddress?.addressDetail || ''}
               readOnly
               placeholder="상세주소"
               className="w-full p-2 mt-1 border border-gray-300 rounded"
@@ -158,7 +158,8 @@ const CommissionWrite: React.FC = () => {
               청소할 장소의 사진을 올려주세요:
             </label>
             <input
-              type="file"
+              type='text'
+              // type="file"
               name="image"
               accept="image/*"
               value={form.image}
