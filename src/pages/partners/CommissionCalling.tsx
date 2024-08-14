@@ -5,9 +5,7 @@ import { Commission } from '../../types/estimate';
 
 const CommissionCalling: React.FC = () => {
   const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [visibleCommissions, setVisibleCommissions] = useState<Commission[]>(
-    [],
-  );
+  const [visibleCommissions, setVisibleCommissions] = useState<Commission[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -39,6 +37,14 @@ const CommissionCalling: React.FC = () => {
     setPage(newPage);
     setHasMore(commissions.length > newPage * 9);
   }, [commissions, page]);
+
+  const handleWriteEstimate = (commissionId: number) => {
+    navigate(`/writeestimate/${commissionId}`);
+    // 견적 작성을 완료한 commission을 visibleCommissions에서 제거
+    setVisibleCommissions((prevCommissions) =>
+      prevCommissions.filter((commission) => commission.id !== commissionId)
+    );
+  };
 
   const lastCommissionElementRef = useCallback(
     (node: HTMLDivElement) => {
@@ -87,7 +93,7 @@ const CommissionCalling: React.FC = () => {
               <strong>희망 날짜:</strong> {commission.desiredDate}
             </p>
             <button
-              onClick={() => navigate(`/writeestimate/${commission.id}`)}
+              onClick={() => handleWriteEstimate(commission.id)}
               className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md"
             >
               견적 작성
