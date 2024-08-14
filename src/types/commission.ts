@@ -10,9 +10,11 @@ export enum CleanType {
   Special = 'SPECIAL',
 }
 
-export interface Address {
+export interface AddressData {
   id: number;
+  addressCode: string;
   address: string;
+  addressDetail: string;
 }
 
 export interface Commission {
@@ -21,8 +23,7 @@ export interface Commission {
   size: number | null;
   houseType: HouseType | '';
   cleanType: CleanType | '';
-  addressId?: number; // Made optional
-  address?: Address; // Added Address object
+  addressId?: number;
   image?: string;
   desiredDate: string;
   significant: string;
@@ -34,5 +35,4 @@ export interface CommissionFormData
     'commissionId' | 'memberNick' | 'addressId' | 'address'
   > {
   addressId: number | null;
-  address?: Address;
 }
