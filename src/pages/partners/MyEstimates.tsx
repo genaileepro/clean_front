@@ -13,9 +13,10 @@ const MyEstimates: React.FC = () => {
       setIsLoading(true);
       try {
         const data = await getEstimateList();
-        // SEND 상태의 견적은 제외하고 표시
+        // SEND 또는 CONTACT 상태의 견적은 제외하고 표시
         const filteredEstimates = data.filter(
-          (estimate) => estimate.status !== 'SEND',
+          (estimate) =>
+            estimate.status !== 'SEND' && estimate.status !== 'CONTACT',
         );
         setEstimates(filteredEstimates);
       } catch (err) {

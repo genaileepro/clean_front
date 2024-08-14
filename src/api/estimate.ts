@@ -42,16 +42,17 @@ export const getConfirmList = async (): Promise<Estimate[]> => {
   }
 };
 
-// 견적 상태 업데이트
+// 견적 상태 및 commissionStatus 업데이트
 export const updateEstimateStatus = async (
   id: number,
-  status: 'SEND' | 'CHECK' | 'FINISH',
+  status: 'SEND' | 'CHECK' | 'FINISH' | 'CONTACT',
+  commissionStatus?: 'SEND' | 'CHECK' | 'FINISH' | 'CONTACT', // commissionStatus에 'CONTACT' 추가
 ): Promise<Estimate> => {
   const token = localStorage.getItem('token');
   try {
     const response = await partnerApiInstance.patch<Estimate>(
       `/partner/estimate?id=${id}`,
-      { status },
+      { status, commissionStatus }, // commissionStatus 포함
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,9 +89,15 @@ export const deleteEstimate = async (
 
 // 파트너 견적 목록 조회
 export const getEstimateList = async (): Promise<Estimate[]> => {
+  const token = localStorage.getItem('token');
   try {
     const response = await partnerApiInstance.get<Estimate[]>(
       '/partner/estimate/list',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
     return response.data;
   } catch (error) {
@@ -101,9 +108,15 @@ export const getEstimateList = async (): Promise<Estimate[]> => {
 
 // 파트너 Commission 목록 조회
 export const getCommissionList = async (): Promise<Commission[]> => {
+  const token = localStorage.getItem('token');
   try {
     const response = await partnerApiInstance.get<Commission[]>(
       '/partner/commissionlist',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
     return response.data;
   } catch (error) {
@@ -112,6 +125,7 @@ export const getCommissionList = async (): Promise<Commission[]> => {
   }
 };
 
+// 견적 업데이트
 export const updateEstimate = async (
   id: number,
   updateData: Partial<Estimate>,
