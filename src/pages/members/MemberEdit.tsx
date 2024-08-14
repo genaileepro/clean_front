@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCurrentMember, useUpdateMember } from '../../hooks/useMembers';
 import {
+  validateConfirmPassword,
   validateNickName,
   validatePassword,
   validatePhoneNumber,
@@ -28,11 +29,13 @@ const MemberEdit: React.FC = () => {
   const [formData, setFormData] = useState({
     email: email || '',
     password: '',
+    confirmPassword: '',
     nick: '',
     phoneNumber: '',
   });
   const [errors, setErrors] = useState<FormErrors>({
     password: '',
+    confirmPassword: '',
     nick: '',
     phoneNumber: '',
   });
@@ -45,6 +48,7 @@ const MemberEdit: React.FC = () => {
         nick: member.nick,
         phoneNumber: member.phoneNumber,
         password: '',
+        confirmPassword: '',
       });
       setOriginalPassword(member.password);
     }
@@ -65,6 +69,8 @@ const MemberEdit: React.FC = () => {
       validationResult = validatePhoneNumber(value);
     } else if (name === 'password') {
       validationResult = value ? validatePassword(value) : null;
+    } else if (name === 'confirmPassword') {
+      validationResult = value ? validateConfirmPassword(formData.password, value) : null;
     }
 
     if (validationResult) {
@@ -142,6 +148,26 @@ const MemberEdit: React.FC = () => {
             htmlFor="password"
           >
             새 비밀번호
+          </label>
+          <input
+            className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            id="password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="변경하려면 입력하세요"
+          />
+          {errors.password && (
+            <p className="text-red-500 text-xs italic">{errors.password}</p>
+          )}
+        </div>
+        <div className="mb-4">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="password"
+          >
+            비밀번호 확인
           </label>
           <input
             className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
