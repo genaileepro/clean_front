@@ -21,7 +21,7 @@ const AddressBook: React.FC<AddressBookProps> = ({ onSelectAddress }) => {
             key={address.id}
             className="flex justify-between items-center mb-2"
           >
-            <span>{address.address}</span>
+            <span>{address.address + address.addressDetail}</span>
             <div>
               <button
                 onClick={() => onSelectAddress(address.id, address.address)}

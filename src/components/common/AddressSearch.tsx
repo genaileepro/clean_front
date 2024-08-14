@@ -1,11 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-
-interface AddressData {
-  zonecode: string;
-  address: string;
-  extraAddress: string;
-}
+import { AddressData } from '../../types/commission';
 
 interface AddressSearchProps {
   onComplete: (data: AddressData) => void;
@@ -19,11 +14,15 @@ declare global {
 
 const AddressSearch: React.FC<AddressSearchProps> = ({ onComplete }) => {
   const scriptRef = useRef<HTMLScriptElement | null>(null);
+  const [addressDetail, setAddressDeatil] = useState('');
+  const [selectedAddress, setSelectedAddress] =
+    useState<Partial<AddressData> | null>(null);
 
   useEffect(() => {
     if (!scriptRef.current) {
       const script = document.createElement('script');
-      script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+      script.src =
+        '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
       script.async = true;
       document.body.appendChild(script);
       scriptRef.current = script;
@@ -32,43 +31,74 @@ const AddressSearch: React.FC<AddressSearchProps> = ({ onComplete }) => {
 
   const handleClick = () => {
     new window.daum.Postcode({
-      oncomplete: function(data: any) {
-        let addr = '';
-        let extraAddr = '';
+      oncomplete: function (data: any) {
+        const addr =
+          data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
 
-        if (data.userSelectedType === 'R') {
-          addr = data.roadAddress;
-        } else {
-          addr = data.jibunAddress;
-        }
-
-        if(data.userSelectedType === 'R'){
-          if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
-            extraAddr += data.bname;
-          }
-          if(data.buildingName !== '' && data.apartment === 'Y'){
-            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-          }
-          if(extraAddr !== ''){
-            extraAddr = ' (' + extraAddr + ')';
-          }
-        }
-
-        onComplete({
-          zonecode: data.zonecode,
+        setSelectedAddress({
+          addressCode: data.zonecode,
           address: addr,
-          extraAddress: extraAddr
         });
-        toast.success('주소가 등록되었습니다.')
-      }
+      },
     }).open();
   };
 
+  const handleSubmit = () => {
+    if (selectedAddress && addressDetail) {
+      onComplete({
+        id: 0,
+        addressCode: selectedAddress.addressCode!,
+        address: selectedAddress.address!,
+        addressDetail: addressDetail,
+      });
+      toast.success('주소가 등록되었습니다.');
+    } else {
+      toast.error('모든 주소 정보를 입력해주세요.');
+    }
+  };
+
   return (
-    <button 
-    type='button'
-    className='w-50 bg-brand text-white py-1 px-2 rounded'
-    onClick={handleClick}>주소 검색</button>
+    <div>
+      <button
+        type="button"
+        className="w-50 bg-brand text-white py-1 px-2 rounded"
+        onClick={handleClick}
+      >
+        주소 검색
+      </button>
+      {selectedAddress && (
+        <>
+          <input
+            type="text"
+            value={selectedAddress.addressCode}
+            readOnly
+            placeholder="우편번호"
+            className="w-full p-2 mt-2 border border-gray-300 rounded"
+          />
+          <input
+            type="text"
+            value={selectedAddress.address}
+            readOnly
+            placeholder="주소"
+            className="w-full p-2 mt-2 border border-gray-300 rounded"
+          />
+          <input
+            type="text"
+            value={addressDetail}
+            onChange={(e) => setAddressDeatil(e.target.value)}
+            placeholder="상세 주소를 입력하세요"
+            className="w-full p-2 mt-2 border border-gray-300 rounded"
+          />
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="w-full bg-brand text-white py-1 px-2 rounded mt-2"
+          >
+            주소 등록
+          </button>
+        </>
+      )}
+    </div>
   );
 };
 
