@@ -9,6 +9,7 @@ import {
 } from '../../types/commission';
 import logo from '../../assets/logo.png';
 import AddressSelector from '../../components/common/AddressSelector';
+import toast from 'react-hot-toast';
 
 const CommissionWrite: React.FC = () => {
   const navigate = useNavigate();
@@ -127,48 +128,56 @@ const CommissionWrite: React.FC = () => {
           </div>
           <div>
             <label className="block text-gray-700">주소:</label>
-            <div
-            className='flex align-middle justify-between'
-            >
+            <div className="flex align-middle justify-between">
               <input
                 type="text"
-                value={selectedAddress?.addressCode}
+                value={selectedAddress?.addressCode || ''}
                 readOnly
                 placeholder="우편번호"
                 className="w-60 p-2 mt-1 border border-gray-300 rounded"
               />
               <AddressSelector onSelectAddress={handleAddressSelect} />
-              </div>
-              <input
-                type="text"
-                value={selectedAddress?.address}
-                readOnly
-                placeholder="주소"
-                className="w-full p-2 mt-1 border border-gray-300 rounded"
-              />
-              <input
-                type="text"
-                value={selectedAddress?.addressDetail}
-                readOnly
-                placeholder="상세주소"
-                className="w-full p-2 mt-1 border border-gray-300 rounded"
-              />
+            </div>
+            <input
+              type="text"
+              value={selectedAddress?.address || ''}
+              readOnly
+              placeholder="주소"
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
+            <input
+              type="text"
+              value={selectedAddress?.addressDetail || ''}
+              readOnly
+              placeholder="상세주소"
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+            />
           </div>
           <div>
             <label className="block text-gray-700">
               청소할 장소의 사진을 올려주세요:
             </label>
             <input
-              type="text"
+              type='text'
+              // type="file"
               name="image"
+              accept="image/*"
               value={form.image}
-              onChange={handleChange}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file && file.size > 5 * 1024 * 1024) {
+                  toast.error('사진의 크기는 5mb를 넘을 수 없습니다.');
+                  e.target.value = '';
+                } else {
+                  handleChange(e);
+                }
+              }}
               required
               className="w-full p-2 border border-gray-300 rounded file:mr-4 file:py-2 file:px-4
                           file:rounded-full file:border-0
                           file:text-sm file:font-semibold
                           file:bg-[#0BB8F9] file:text-white
-                          hover:file:bg-violet-100"
+                          hover:file:bg-brand-dark"
             />
           </div>
           <div>
