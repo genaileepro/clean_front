@@ -1,6 +1,7 @@
 export interface Estimate {
   id: number;
   commissionId: number;
+  partnerId: number;
   tmpPrice: number;
   statement: string;
   fixedDate: string; // ISO 형식의 날짜 문자열
@@ -10,7 +11,8 @@ export interface Estimate {
   cleanType: 'NORMAL' | 'SPECIAL';
   desiredDate: string; // ISO 형식의 날짜 문자열
   price?: number;
-  status?: 'CHECK' | 'SEND' | 'FINISH'; // status 필드 추가
+  status?: 'CHECK' | 'SEND' | 'FINISH' | 'CONTACT'; // status 필드에 'CONTACT' 추가
+  commissionStatus?: 'CHECK' | 'SEND' | 'FINISH' | 'CONTACT'; // commissionStatus 필드에 'CONTACT' 추가
 }
 
 export interface Commission {
