@@ -53,12 +53,14 @@ const EditEstimates: React.FC = () => {
 
     try {
       const updatedEstimate = {
-        tmpPrice, // 임시 가격
-        commissionId: estimate.commissionId, // 기존 견적의 commissionId 포함
-        price: estimate.price || 0, // price가 있으면 포함, 없으면 기본값 0 사용
+        ...estimate,
+        tmpPrice,
+        statement,
+        fixedDate,
       };
 
       await updateEstimate(estimate.id, updatedEstimate);
+      alert('견적이 성공적으로 수정되었습니다.');
       navigate('/myestimates');
     } catch (error: any) {
       console.error('Error updating estimate:', error?.message || error);

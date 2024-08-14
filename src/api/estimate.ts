@@ -1,14 +1,10 @@
 import partnerApiInstance from './partnerAxiosConfig';
 import { Estimate, Commission } from '../types/estimate';
-import axios from 'axios';
 
 // 새로운 견적 생성
-export const createEstimate = async (estimate: {
-  commissionId: number;
-  tmpPrice: number;
-  statement: string;
-  fixedDate: string; // ISO 형식의 날짜 문자열
-}): Promise<Estimate> => {
+export const createEstimate = async (
+  estimate: Partial<Estimate>,
+): Promise<Estimate> => {
   const token = localStorage.getItem('token');
   try {
     const response = await partnerApiInstance.post<Estimate>(
@@ -27,26 +23,44 @@ export const createEstimate = async (estimate: {
   }
 };
 
-// 기존 견적 업데이트
-export const updateEstimate = async (
-  id: number,
-  updateData: Partial<Estimate>,
-): Promise<Estimate> => {
+// 확정된 견적 목록 조회
+export const getConfirmList = async (): Promise<Estimate[]> => {
   const token = localStorage.getItem('token');
   try {
-    const response = await axios.patch<Estimate>(
-      `/partner/estimate?id=${id}`,
-      updateData,
+    const response = await partnerApiInstance.get<Estimate[]>(
+      '/partner/estimate/confirmlist',
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          Accept: '*/*',
         },
       },
     );
     return response.data;
   } catch (error) {
-    console.error('Error updating estimate:', error);
+    console.error('Error fetching confirm list:', error);
+    throw error;
+  }
+};
+
+// 견적 상태 업데이트
+export const updateEstimateStatus = async (
+  id: number,
+  status: 'SEND' | 'CHECK' | 'FINISH',
+): Promise<Estimate> => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await partnerApiInstance.patch<Estimate>(
+      `/partner/estimate?id=${id}`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating estimate status:', error);
     throw error;
   }
 };
@@ -94,6 +108,28 @@ export const getCommissionList = async (): Promise<Commission[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching commission list:', error);
+    throw error;
+  }
+};
+
+export const updateEstimate = async (
+  id: number,
+  updateData: Partial<Estimate>,
+): Promise<Estimate> => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await partnerApiInstance.patch<Estimate>(
+      `/partner/estimate?id=${id}`,
+      updateData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating estimate:', error);
     throw error;
   }
 };
