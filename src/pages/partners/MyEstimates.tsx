@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getEstimateList, deleteEstimate } from '../../api/estimate'; // deleteEstimate 함수 추가
-import { Estimate } from '../../types/estimate'; // Estimate 타입 가져오기
+import { getEstimateList, deleteEstimate } from '../../api/estimate';
+import { Estimate } from '../../types/estimate';
 
 const MyEstimates: React.FC = () => {
-  const [estimates, setEstimates] = useState<Estimate[]>([]); // Estimate 타입 배열로 상태 정의
+  const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -12,8 +12,12 @@ const MyEstimates: React.FC = () => {
     const fetchEstimates = async () => {
       setIsLoading(true);
       try {
-        const data = await getEstimateList(); // API 요청으로 모든 Estimate 데이터 가져오기
-        setEstimates(data);
+        const data = await getEstimateList();
+        // SEND 상태의 견적은 제외하고 표시
+        const filteredEstimates = data.filter(
+          (estimate) => estimate.status !== 'SEND',
+        );
+        setEstimates(filteredEstimates);
       } catch (err) {
         console.error('Error fetching estimates', err);
       } finally {
@@ -27,8 +31,8 @@ const MyEstimates: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('정말로 이 견적을 삭제하시겠습니까?')) {
       try {
-        await deleteEstimate(id); // 삭제 API 호출
-        setEstimates(estimates.filter((estimate) => estimate.id !== id)); // 삭제된 견적을 목록에서 제거
+        await deleteEstimate(id);
+        setEstimates(estimates.filter((estimate) => estimate.id !== id));
       } catch (error) {
         console.error('Error deleting estimate', error);
         alert('견적 삭제 중 오류가 발생했습니다.');
@@ -37,8 +41,7 @@ const MyEstimates: React.FC = () => {
   };
 
   const handleSendEstimate = (estimateId: number) => {
-    // 견적 발송 로직을 여기에 추가
-    alert(`견적 ID ${estimateId}를 발송했습니다!`);
+    navigate(`/sendestimate/${estimateId}`);
   };
 
   return (

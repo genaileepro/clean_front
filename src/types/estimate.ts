@@ -10,6 +10,7 @@ export interface Estimate {
   cleanType: 'NORMAL' | 'SPECIAL';
   desiredDate: string; // ISO 형식의 날짜 문자열
   price?: number;
+  status?: 'CHECK' | 'SEND' | 'FINISH'; // status 필드 추가
 }
 
 export interface Commission {
