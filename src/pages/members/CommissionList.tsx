@@ -13,6 +13,7 @@ import {
   CleanType,
   Status,
 } from '../../types/commission';
+import toast from 'react-hot-toast';
 
 const CommissionList: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const CommissionList: React.FC = () => {
     if (window.confirm('정말로 이 의뢰를 삭제하시겠습니까?')) {
       try {
         await deleteCommissionMutation.mutateAsync(id);
-        showErrorNotification('의뢰가 성공적으로 삭제되었습니다');
+        toast.success('의뢰가 성공적으로 삭제되었습니다');
       } catch (error) {
         showErrorNotification('의뢰 삭제에 실패했습니다');
       }
