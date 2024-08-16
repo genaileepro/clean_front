@@ -6,10 +6,10 @@ import {
   CleanType,
   CommissionFormData,
   AddressData,
+  Status,
 } from '../../types/commission';
 import logo from '../../assets/logo.png';
 import AddressSelector from '../../components/common/AddressSelector';
-import toast from 'react-hot-toast';
 
 const CommissionWrite: React.FC = () => {
   const navigate = useNavigate();
@@ -55,6 +55,10 @@ const CommissionWrite: React.FC = () => {
         size: form.size || 0,
         addressId: form.addressId || 0,
         desiredDate: new Date(form.desiredDate).toISOString(),
+        houseType: form.houseType as HouseType,
+        cleanType: form.cleanType as CleanType,
+        address: selectedAddress?.address || '',
+        status: 'CHECK' as Status,
       };
 
       await createCommissionMutation.mutateAsync(newCommission);
@@ -158,20 +162,21 @@ const CommissionWrite: React.FC = () => {
               청소할 장소의 사진을 올려주세요:
             </label>
             <input
-              type='text'
+              type="text"
               // type="file"
               name="image"
               accept="image/*"
               value={form.image}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file && file.size > 5 * 1024 * 1024) {
-                  toast.error('사진의 크기는 5mb를 넘을 수 없습니다.');
-                  e.target.value = '';
-                } else {
-                  handleChange(e);
-                }
-              }}
+              onChange={handleChange}
+              // onChange={(e) => {
+              //   const file = e.target.files?.[0];
+              //   if (file && file.size > 5 * 1024 * 1024) {
+              //     toast.error('사진의 크기는 5mb를 넘을 수 없습니다.');
+              //     e.target.value = '';
+              //   } else {
+              //     handleChange(e);
+              //   }
+              // }}
               required
               className="w-full p-2 border border-gray-300 rounded file:mr-4 file:py-2 file:px-4
                           file:rounded-full file:border-0

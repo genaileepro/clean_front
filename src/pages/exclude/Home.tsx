@@ -100,7 +100,7 @@ const Home: React.FC = () => {
             고객이 우리 서비스를 선택하는 이유
           </p>
         </div>
-        <ul className="list-decimal list-inside mt-4 text-left max-w-md mx-auto  mt-6">
+        <ul className="list-decimal list-inside mt-4 text-left max-w-md mx-auto">
           <li className="mb-2">
             빠르고 간편한 청소 예약: 클릭 몇 번으로 청소 전문가와 연결됩니다.
           </li>

@@ -1,5 +1,32 @@
 import api from './axiosConfig';
-import { Commission } from '../types/commission';
+import {
+  Commission,
+  CommissionConfirmedResponse,
+  CommissionConfirmDetailResponse,
+} from '../types/commission';
+
+export const fetchCommissions = async (): Promise<Commission[]> => {
+  const response = await api.get<Commission[]>('/commission');
+  return response.data;
+};
+
+export const fetchCommissionConfirm = async (
+  commissionId: number,
+): Promise<CommissionConfirmedResponse> => {
+  const response = await api.get<CommissionConfirmedResponse>(
+    `/commission/confirmed?id=${commissionId}`,
+  );
+  return response.data;
+};
+
+export const fetchCommissionConfirmDetail = async (
+  commissionId: number,
+): Promise<CommissionConfirmDetailResponse> => {
+  const response = await api.get<CommissionConfirmDetailResponse>(
+    `/commission/confirmdetail?id=${commissionId}`,
+  );
+  return response.data;
+};
 
 export const createCommission = async (
   commission: Omit<Commission, 'commissionId' | 'memberNick'>,
@@ -8,34 +35,20 @@ export const createCommission = async (
   return response.data;
 };
 
-export const fetchCommissions = async (): Promise<Commission[]> => {
-  const response = await api.get<Commission[]>('/commission');
-  return response.data;
-};
-
-export const fetchSingleCommission = async (
-  id: number,
-): Promise<Commission> => {
-  const response = await api.get<Commission>(`/commission?commissionId=${id}`);
-  return response.data;
-};
-
-export const deleteCommission = async (id: number): Promise<void> => {
-  await api.delete<Commission>(`commission?commissionId=${id}`);
-};
-
-export const fetchCommission = async (id: number): Promise<Commission> => {
-  const response = await api.get<Commission>(`/commission?commissionId=${id}`);
-  return response.data;
-};
-
-export const updateCommission = async (
-  id: number,
-  commission: Partial<Commission>,
-): Promise<Commission> => {
-  const response = await api.put<Commission>(
-    `/commission?commissionId=${id}`,
+export const updateCommission = async ({
+  commissionId,
+  commission,
+}: {
+  commissionId: number;
+  commission: Partial<Commission>;
+}): Promise<Commission> => {
+  const response = await api.patch<Commission>(
+    `/commission?id=${commissionId}`,
     commission,
   );
   return response.data;
+};
+
+export const deleteCommission = async (commissionId: number): Promise<void> => {
+  await api.delete(`/commission?id=${commissionId}`);
 };

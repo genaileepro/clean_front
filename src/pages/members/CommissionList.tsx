@@ -1,65 +1,125 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   useCommissions,
   useDeleteCommission,
 } from '../../hooks/useCommissions';
-import { Commission } from '../../types/commission';
 import { showErrorNotification } from '../../utils/errorHandler';
+import noImages from '../../assets/noImages.png';
+import noHistory from '../../assets/noHistory.png';
+import {
+  Commission,
+  HouseType,
+  CleanType,
+  Status,
+} from '../../types/commission';
 
 const CommissionList: React.FC = () => {
-  const { data: commissions, isLoading, error } = useCommissions();
+  const navigate = useNavigate();
+  const { data: commissions, isLoading, isError, error } = useCommissions();
   const deleteCommissionMutation = useDeleteCommission();
 
-  const handleDeleteCommission = async (id: number) => {
-    if (window.confirm('정말로 이 의뢰를 삭제하시겠습니까?')) {
-      try {
-        await deleteCommissionMutation.mutateAsync(id);
-      } catch (error) {
-        console.error('Delete failed:', error);
-        showErrorNotification('삭제에 실패했습니다. 다시 시도해주세요.');
-      }
+  const handleDeleteCommission = async (commissionId: number) => {
+    try {
+      await deleteCommissionMutation.mutateAsync(commissionId);
+      showErrorNotification('의뢰가 성공적으로 삭제되었습니다');
+    } catch (error) {
+      showErrorNotification('의뢰 삭제에 실패했습니다');
     }
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {(error as Error).message}</p>;
-  if (!commissions || commissions.length === 0)
-    return <p>의뢰 목록이 비어있습니다.</p>;
+  const getStatusText = (status: Status) => {
+    switch (status) {
+      case Status.CHECK:
+        return '확인 중';
+      case Status.SEND:
+        return '전송됨';
+      case Status.CONTECT:
+        return '연락 중';
+      case Status.FINISH:
+        return '완료';
+      default:
+        return '확인 중';
+    }
+  };
+
+  if (isLoading) return <div className="text-center">로딩 중...</div>;
+  if (isError) return <div className="text-center">에러: {error?.message}</div>;
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-2xl font-bold mb-4">Commission List</h1>
-      <ul className="space-y-4">
-        {commissions.map((commission: Commission) => (
-          <li
-            key={commission.commissionId}
-            className="bg-white shadow rounded-lg p-4"
-          >
-            <h2 className="text-xl font-semibold">Size: {commission.size}</h2>
-            <p>House Type: {commission.houseType}</p>
-            <p>Clean Type: {commission.cleanType}</p>
-            <p>
-              Desired Date: {new Date(commission.desiredDate).toLocaleString()}
-            </p>
-            <p>Significant: {commission.significant}</p>
-            <div className="mt-4 space-x-2">
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                onClick={() => handleDeleteCommission(commission.commissionId)}
+    <div className="bg-white min-h-screen py-4">
+      <div className="container mx-auto px-4 max-w-3xl">
+        {commissions && commissions.length > 0 ? (
+          <div className="space-y-4">
+            {commissions.map((commission: Commission) => (
+              <div
+                key={commission.commissionId}
+                className="bg-gray-50 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-102"
+                onClick={() =>
+                  navigate(
+                    `/commissiondetail?commissionId=${commission.commissionId}`,
+                  )
+                }
               >
-                의뢰 삭제
-              </button>
-              <Link
-                to={`/commissiondetail?commissionId=${commission.commissionId}`}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 inline-block"
-              >
-                상세 보기
-              </Link>
-            </div>
-          </li>
-        ))}
-      </ul>
+                <div className="flex">
+                  <div className="w-32 h-32 flex-shrink-0">
+                    <img
+                      src={commission.image || noImages}
+                      alt={`Commission ${commission.commissionId}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 p-3">
+                    <h2 className="text-lg font-semibold mb-1">
+                      {HouseType[commission.houseType]} 청소
+                    </h2>
+                    <div className="grid grid-cols-2 gap-1 text-sm">
+                      <p>
+                        <span className="font-medium">평수:</span>{' '}
+                        {commission.size} 평
+                      </p>
+                      <p>
+                        <span className="font-medium">청소 등급:</span>{' '}
+                        {CleanType[commission.cleanType]}
+                      </p>
+                      <p>
+                        <span className="font-medium">희망일:</span>{' '}
+                        {new Date(commission.desiredDate).toLocaleDateString()}
+                      </p>
+                      <p>
+                        <span className="font-medium">상태:</span>{' '}
+                        {getStatusText(commission.status)}
+                      </p>
+                    </div>
+                    <p className="text-sm mt-1">
+                      <span className="font-medium">요청사항:</span>{' '}
+                      {commission.significant || '없음'}
+                    </p>
+                    <div className="mt-2 flex justify-end">
+                      <button
+                        onClick={() =>
+                          handleDeleteCommission(commission.commissionId)
+                        }
+                        className="bg-gray-200 text-gray-700 px-2 py-1 text-sm rounded hover:bg-gray-300 transition-colors"
+                      >
+                        의뢰 삭제
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center h-[calc(100vh-2rem)]">
+            <img
+              src={noHistory}
+              alt="No history"
+              className="max-w-full max-h-full"
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
