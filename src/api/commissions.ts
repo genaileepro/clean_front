@@ -49,6 +49,6 @@ export const updateCommission = async ({
   return response.data;
 };
 
-export const deleteCommission = async (commissionId: number): Promise<void> => {
-  await api.delete(`/commission?id=${commissionId}`);
+export const deleteCommission = async (id: number): Promise<void> => {
+  await api.delete(`/commission?commissionId=${id}`);
 };

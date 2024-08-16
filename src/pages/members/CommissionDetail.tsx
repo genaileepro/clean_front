@@ -16,20 +16,13 @@ const CommissionDetail: React.FC = () => {
     error,
   } = useCommissionConfirm(parsedCommissionId!);
 
-  if (isLoading) return <div className="text-center">로딩 중...</div>;
-  if (error)
-    return (
-      <div className="text-center text-red-500">에러: {error.message}</div>
-    );
-  if (
-    !commissionData ||
-    !commissionData.content ||
-    commissionData.content.length === 0
-  ) {
-    return <div className="text-center">의뢰를 찾을 수 없습니다.</div>;
-  }
+  if (isLoading) return <div>로딩 중...</div>;
+  if (error) return <div>에러: {error.message}</div>;
+  if (!commissionData)
+    return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>;
 
-  const commission = commissionData.content[0];
+  const commission = commissionData.content?.[0];
+  if (!commission) return <div>의뢰를 찾을 수 없습니다.</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -42,7 +35,7 @@ const CommissionDetail: React.FC = () => {
         />
         <div className="grid grid-cols-2 gap-4">
           <p>
-            <span className="font-semibold">크기:</span> {commission.size} m²
+            <span className="font-semibold">크기:</span> {commission.size} 평
           </p>
           <p>
             <span className="font-semibold">집 종류:</span>{' '}
