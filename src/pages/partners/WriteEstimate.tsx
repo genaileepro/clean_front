@@ -10,6 +10,7 @@ import {
 
 const WriteEstimate: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // URL에서 commission ID 가져오기
+  const commissionId = id ? parseInt(id, 10) : null;
   const navigate = useNavigate();
   const [commission, setCommission] = useState<Commission | null>(null);
   const [tmpPrice, setTmpPrice] = useState<number>(0); // 숫자로 초기화
@@ -23,11 +24,13 @@ const WriteEstimate: React.FC = () => {
   });
 
   useEffect(() => {
+    if (commissionId === null) return;
+
     const fetchCommission = async () => {
       try {
         const commissions = await getCommissionList();
         const selectedCommission = commissions.find(
-          (c) => c.id === parseInt(id!, 10),
+          (c) => c.id === commissionId,
         );
         setCommission(selectedCommission || null);
       } catch (error) {
@@ -36,7 +39,7 @@ const WriteEstimate: React.FC = () => {
     };
 
     fetchCommission();
-  }, [id]);
+  }, [commissionId]);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
@@ -141,7 +144,9 @@ const WriteEstimate: React.FC = () => {
               id="tmpPrice"
               value={tmpPrice}
               onChange={handlePriceChange}
-              className={`w-full border rounded-md py-2 px-3 text-gray-700 ${errors.tmpPrice ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full border rounded-md py-2 px-3 text-gray-700 ${
+                errors.tmpPrice ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
             {errors.tmpPrice && (
@@ -159,7 +164,9 @@ const WriteEstimate: React.FC = () => {
               id="statement"
               value={statement}
               onChange={(e) => setStatement(e.target.value)}
-              className={`w-full border rounded-md py-2 px-3 text-gray-700 ${errors.statement ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full border rounded-md py-2 px-3 text-gray-700 ${
+                errors.statement ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             ></textarea>
             {errors.statement && (
@@ -174,11 +181,13 @@ const WriteEstimate: React.FC = () => {
               확정 날짜:
             </label>
             <input
-              type="date"
+              type="datetime-local" // 여기에 datetime-local을 사용합니다.
               id="fixedDate"
               value={fixedDate}
               onChange={(e) => setFixedDate(e.target.value)}
-              className={`w-full border rounded-md py-2 px-3 text-gray-700 ${errors.fixedDate ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full border rounded-md py-2 px-3 text-gray-700 ${
+                errors.fixedDate ? 'border-red-500' : 'border-gray-300'
+              }`}
               required
             />
             {errors.fixedDate && (
