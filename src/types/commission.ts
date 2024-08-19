@@ -1,7 +1,8 @@
 export enum HouseType {
   APT = 'APT',
+  ONEROOM = 'ONEROOM',
   HOUSE = 'HOUSE',
-  OFFICE = 'OFFICE',
+  TOILET = 'TOILET',
 }
 
 export enum CleanType {
