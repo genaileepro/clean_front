@@ -5,7 +5,9 @@ import { Commission } from '../../types/estimate';
 
 const CommissionCalling: React.FC = () => {
   const [commissions, setCommissions] = useState<Commission[]>([]);
-  const [visibleCommissions, setVisibleCommissions] = useState<Commission[]>([]);
+  const [visibleCommissions, setVisibleCommissions] = useState<Commission[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -17,9 +19,13 @@ const CommissionCalling: React.FC = () => {
       setIsLoading(true);
       try {
         const data = await getCommissionList(); // API 요청으로 모든 Commission 데이터 가져오기
-        setCommissions(data);
-        setVisibleCommissions(data.slice(0, 9)); // 초기 로드 시 첫 페이지의 9개 데이터만 표시
-        setHasMore(data.length > 9);
+        // status가 'SEND'인 경우만 필터링
+        const filteredData = data.filter(
+          (commission) => commission.status === 'SEND',
+        );
+        setCommissions(filteredData);
+        setVisibleCommissions(filteredData.slice(0, 9)); // 초기 로드 시 첫 페이지의 9개 데이터만 표시
+        setHasMore(filteredData.length > 9);
       } catch (err) {
         console.error('Error fetching commissions', err);
       } finally {
@@ -42,7 +48,7 @@ const CommissionCalling: React.FC = () => {
     navigate(`/writeestimate/${commissionId}`);
     // 견적 작성을 완료한 commission을 visibleCommissions에서 제거
     setVisibleCommissions((prevCommissions) =>
-      prevCommissions.filter((commission) => commission.id !== commissionId)
+      prevCommissions.filter((commission) => commission.id !== commissionId),
     );
   };
 
