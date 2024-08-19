@@ -19,12 +19,15 @@ const CommissionList: React.FC = () => {
   const { data: commissions, isLoading, isError, error } = useCommissions();
   const deleteCommissionMutation = useDeleteCommission();
 
-  const handleDeleteCommission = async (commissionId: number) => {
-    try {
-      await deleteCommissionMutation.mutateAsync(commissionId);
-      showErrorNotification('의뢰가 성공적으로 삭제되었습니다');
-    } catch (error) {
-      showErrorNotification('의뢰 삭제에 실패했습니다');
+  const handleDeleteCommission = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('정말로 이 의뢰를 삭제하시겠습니까?')) {
+      try {
+        await deleteCommissionMutation.mutateAsync(id);
+        showErrorNotification('의뢰가 성공적으로 삭제되었습니다');
+      } catch (error) {
+        showErrorNotification('의뢰 삭제에 실패했습니다');
+      }
     }
   };
 
@@ -97,8 +100,8 @@ const CommissionList: React.FC = () => {
                     </p>
                     <div className="mt-2 flex justify-end">
                       <button
-                        onClick={() =>
-                          handleDeleteCommission(commission.commissionId)
+                        onClick={(e) =>
+                          handleDeleteCommission(commission.commissionId, e)
                         }
                         className="bg-gray-200 text-gray-700 px-2 py-1 text-sm rounded hover:bg-gray-300 transition-colors"
                       >
