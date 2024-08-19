@@ -22,6 +22,7 @@ export interface Commission {
   size: number;
   houseType: 'APT' | 'HOUSE' | 'OFFICE';
   cleanType: 'NORMAL' | 'SPECIAL';
+  status: 'CHECK' | 'SEND' | 'FINISH' | 'CONTACT'; // status 필드 추가
   address: string;
   desiredDate: string; // ISO 형식의 날짜 문자열
   significant?: string;
