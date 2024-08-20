@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export interface ValidationResult {
   isValid: boolean;
   message: string;
@@ -110,3 +112,44 @@ export const validateSignificant = createValidator(
   (significant) => significant.length > 0 && significant.length <= 500,
   '특이사항은 500자 이내로 입력해주세요.',
 );
+
+export interface ValidationResult {
+  isValid: boolean;
+  message: string;
+}
+
+// 공공 API를 이용한 사업자 등록번호 유효성 검사 함수
+export const validateBusinessNumber = async (businessNumber: string) => {
+  if (!businessNumber) {
+    return { isValid: false, message: '사업자 등록번호를 입력해주세요.' };
+  }
+
+  const serviceKey = import.meta.env.VITE_PUBLIC_API_KEY; // 환경변수에서 API 키 가져오기
+  const apiUrl = `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${serviceKey}`;
+
+  const requestData = {
+    b_no: [businessNumber],
+  };
+
+  try {
+    const response = await axios.post(apiUrl, requestData, {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+
+    const taxType = response.data.data[0].tax_type;
+
+    if (taxType === '국세청에 등록되지 않은 사업자등록번호입니다.') {
+      return { isValid: false, message: taxType };
+    }
+
+    return { isValid: true, message: '' };
+  } catch (error) {
+    return {
+      isValid: false,
+      message: '사업자 등록번호 확인 중 오류가 발생했습니다.',
+    };
+  }
+};

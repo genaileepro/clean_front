@@ -29,6 +29,7 @@ import WriteEstimate from '../pages/partners/WriteEstimate';
 import EstimateDetail from '../pages/members/EstimateDetail';
 import EditEstimates from '../pages/partners/EditEstimates';
 import SendEstimate from '../pages/partners/SendEstimate';
+import BusinessStatusCheck from '../pages/exclude/PartnerCheck';
 
 const ProtectedRoute: React.FC<{ allowedRole: 'member' | 'partner' }> = ({
   allowedRole,
@@ -59,6 +60,7 @@ const Router: React.FC = () => {
         <Route path="/ptrecruitment" element={<PartnerRecruitment />} />
         <Route path="/loginselect" element={<LoginSelector />} />
         <Route path="/signupselect" element={<SignUpSelector />} />
+        <Route path="/bscheck" element={<BusinessStatusCheck />} />
 
         {/* Public Only Routes (for non-authenticated users) */}
         <Route element={<PublicOnlyRoute />}>
