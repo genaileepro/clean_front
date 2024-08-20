@@ -18,11 +18,22 @@ export const fetchCurrentPartner = async (): Promise<Partner> => {
 export const updatePartner = async (
   partner: Partial<Partner>,
 ): Promise<Partner> => {
-  const response = await partnerApiInstance.put<Partner>(
-    `/partner/profile`,
-    partner,
-  );
-  return response.data;
+  const token = localStorage.getItem('token'); // 토큰이 필요하다면 헤더에 추가
+  try {
+    const response = await partnerApiInstance.patch<Partner>(
+      `/partner/profile`,
+      partner,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Authorization 헤더에 토큰을 추가
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating partner profile:', error);
+    throw error;
+  }
 };
 
 export const deletePartner = async (email: string): Promise<void> => {

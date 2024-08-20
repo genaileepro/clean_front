@@ -82,6 +82,13 @@ const CommissionCalling: React.FC = () => {
             }
             className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
           >
+            {commission.image && (
+              <img
+                src={commission.image}
+                alt="Commission"
+                className="w-full h-40 object-cover rounded-md mb-4"
+              />
+            )}
             <h3 className="text-xl font-bold mb-2">청소 견적의뢰</h3>
             <p className="text-gray-600 mb-2">
               <strong>회원 닉네임:</strong> {commission.memberNick}
