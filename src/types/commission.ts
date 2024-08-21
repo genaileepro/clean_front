@@ -53,6 +53,7 @@ export interface Estimate {
   fixedDate: string;
   statement: string;
   approved: boolean;
+  ststus: Status;
   partnerId: number;
   partnerName: string;
 }
@@ -64,9 +65,10 @@ export interface CommissionConfirmedResponse {
     houseType: HouseType;
     cleanType: CleanType;
     desiredDate: string;
-    significant: string;
-    image: string;
-    estimates: Estimate[];
+    significant?: string;
+    image?: string;
+    status: Status;
+    estimates?: Estimate[];
   }[];
   pageable: {
     pageNumber: number;

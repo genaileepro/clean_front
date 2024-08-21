@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import icon from '../../assets/icon.png';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
@@ -17,6 +17,14 @@ const Header: React.FC = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [isMenuOpen]);
 
   return (
     <div className="bg-[#0bb8f9] text-white">
@@ -33,7 +41,7 @@ const Header: React.FC = () => {
         {/* 햄버거 메뉴 아이콘 (모바일) */}
         <div className="md:hidden">
           <button onClick={toggleMenu} className="text-white">
-            <Menu size={24} />
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
@@ -85,81 +93,109 @@ const Header: React.FC = () => {
         </div>
 
         {/* 모바일 메뉴 */}
-        {isMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-[#0bb8f9] md:hidden">
-            <div className="flex flex-col items-center py-4">
-              <button
-                className="h-btn my-2"
+        <div
+          className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
+            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="flex flex-col h-full">
+            <div className="flex justify-end p-4">
+              <button onClick={toggleMenu} className="text-black">
+                <X size={24} />
+              </button>
+            </div>
+            {/* 최상단 문구 */}
+            <div className="p-4 border-b border-gray-200">
+              {!isAuthenticated && (
+                <a
+                  href="/loginselect"
+                  className="text-black text-xl hover:underline"
+                >
+                  로그인하러 가기
+                </a>
+              )}
+            </div>
+            <div className="flex flex-col items-start p-4 space-y-4">
+              <div
+                className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
                   navigate('/');
                   toggleMenu();
                 }}
               >
-                홈
-              </button>
-              <button
-                className="h-btn my-2"
+                <span className="text-black text-xl">홈</span>
+              </div>
+              <div
+                className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
                   navigate('/service');
                   toggleMenu();
                 }}
               >
-                서비스 알아보기
-              </button>
-              <button
-                className="h-btn my-2"
+                <span className="text-black text-xl">서비스 알아보기</span>
+              </div>
+              <div
+                className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => {
                   navigate('/ptrecruitment');
                   toggleMenu();
                 }}
               >
-                파트너를 모집해요
-              </button>
+                <span className="text-black text-xl">파트너를 모집해요</span>
+              </div>
               {isAuthenticated ? (
                 <>
-                  <button
-                    className="h-btn my-2"
+                  <div
+                    className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       navigate('/member/:email');
                       toggleMenu();
                     }}
                   >
-                    마이 페이지
-                  </button>
-                  <button
-                    className="h-btn my-2"
+                    <span className="text-black text-xl">마이 페이지</span>
+                  </div>
+                  <div
+                    className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       handleLogout();
                       toggleMenu();
                     }}
                   >
-                    Log Out
-                  </button>
+                    <span className="text-black text-xl">Log Out</span>
+                  </div>
                 </>
               ) : (
                 <>
-                  <button
-                    className="h-btn my-2"
+                  <div
+                    className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       navigate('/loginselect');
                       toggleMenu();
                     }}
                   >
-                    로그인
-                  </button>
-                  <button
-                    className="h-btn my-2"
+                    <span className="text-black text-xl">로그인</span>
+                  </div>
+                  <div
+                    className="w-full p-2 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       navigate('/signupselect');
                       toggleMenu();
                     }}
                   >
-                    회원가입
-                  </button>
+                    <span className="text-black text-xl">회원가입</span>
+                  </div>
                 </>
               )}
             </div>
           </div>
+        </div>
+
+        {/* Overlay */}
+        {isMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={toggleMenu}
+          ></div>
         )}
       </div>
     </div>
