@@ -2,23 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'SBAggroThin';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
+    format('woff');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SBAggroLight';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
+    format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SBAggroNormal';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
+    format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SBAggroBold';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
+    format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* RIDIBatang 폰트 추가 */
+@font-face {
+  font-family: 'RIDIBatang';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff')
+    format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Tailwind에서 사용하기 위한 추가 폰트 설정 */
+@layer base {
+  body {
+    font-family: 'SBAggroB', sans-serif; /* 기본 폰트를 설정 */
+  }
+}
+
+/* 버튼 등 커스텀 컴포넌트 설정 */
 @layer components {
   .btn {
-    background-color: #0bb8f9;
-    color: #ffffff;
-    padding: 10px;
-    margin: 1px;
-    border-radius: 8px;
+    @apply bg-brand text-white p-3 m-1 rounded-lg;
   }
 
   .h-btn {
-    background-color: none;
-    color: #ffffff;
-    padding: 10px;
     @apply px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark transition-colors duration-200;
   }
 }
 
+/* 유틸리티 레이어 커스텀 설정 */
 @layer utilities {
   @variants responsive {
     /* Chrome, Safari, Edge, Opera에서 스피너 제거 */
