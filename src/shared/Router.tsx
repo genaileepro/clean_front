@@ -30,6 +30,7 @@ import EstimateDetail from '../pages/members/EstimateDetail';
 import EditEstimates from '../pages/partners/EditEstimates';
 import SendEstimate from '../pages/partners/SendEstimate';
 import BusinessStatusCheck from '../pages/exclude/PartnerCheck';
+import CommissionView from '../pages/partners/CommissionView';
 
 const ProtectedRoute: React.FC<{ allowedRole: 'member' | 'partner' }> = ({
   allowedRole,
@@ -94,6 +95,7 @@ const Router: React.FC = () => {
           <Route path="/pt/:email" element={<PartnerInfo />} />
           <Route path="/pt/:email/edit" element={<PartnerEdit />} />
           <Route path="/commissioncalling" element={<CommissionCalling />} />
+          <Route path="/commissionview/:id" element={<CommissionView />} />
           <Route path="/writeestimate/:id" element={<WriteEstimate />} />
           <Route path="/editestimate/:id" element={<EditEstimates />} />
           <Route path="/sendestimate/:id" element={<SendEstimate />} />
