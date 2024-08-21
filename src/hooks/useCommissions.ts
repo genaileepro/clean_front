@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../api/commissions';
 import {
   Commission,
-  CommissionConfirmedResponse,
   CommissionConfirmDetailResponse,
 } from '../types/commission';
 import { showErrorNotification } from '../utils/errorHandler';
@@ -15,7 +14,7 @@ export const useCommissions = () => {
 };
 
 export const useCommissionConfirm = (commissionId: number) => {
-  return useQuery<CommissionConfirmedResponse, Error>({
+  return useQuery<Commission, Error>({
     queryKey: ['commissionConfirm', commissionId],
     queryFn: () => api.fetchCommissionConfirm(commissionId),
     enabled: !!commissionId,

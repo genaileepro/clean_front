@@ -171,10 +171,11 @@ const CommissionWrite: React.FC = () => {
               // onChange={(e) => {
               //   const file = e.target.files?.[0];
               //   if (file && file.size > 5 * 1024 * 1024) {
-              //     toast.error('사진의 크기는 5mb를 넘을 수 없습니다.');
+              //     toast.error('사진의 크기는 4mb를 넘을 수 없습니다.');
               //     e.target.value = '';
               //   } else {
               //     handleChange(e);
+              // jpg, jpeg,png, gif
               //   }
               // }}
               required

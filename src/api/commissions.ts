@@ -1,7 +1,6 @@
 import api from './axiosConfig';
 import {
   Commission,
-  CommissionConfirmedResponse,
   CommissionConfirmDetailResponse,
 } from '../types/commission';
 
@@ -12,11 +11,14 @@ export const fetchCommissions = async (): Promise<Commission[]> => {
 
 export const fetchCommissionConfirm = async (
   commissionId: number,
-): Promise<CommissionConfirmedResponse> => {
-  const response = await api.get<CommissionConfirmedResponse>(
+): Promise<Commission> => {
+  const response = await api.get<Commission[]>(
     `/commission/confirmed?id=${commissionId}`,
   );
-  return response.data;
+  if (response.data.length === 0) {
+    throw new Error('Commission not found');
+  }
+  return response.data[0]; // 배열의 첫 번째 요소만 반환
 };
 
 export const fetchCommissionConfirmDetail = async (

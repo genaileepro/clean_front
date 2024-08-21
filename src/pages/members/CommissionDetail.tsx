@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useCommissionConfirm } from '../../hooks/useCommissions';
-import { HouseType, CleanType } from '../../types/commission';
+import { HouseType, CleanType, Estimate } from '../../types/commission';
 import noImages from '../../assets/noImages.png';
 
 const CommissionDetail: React.FC = () => {
@@ -11,17 +11,16 @@ const CommissionDetail: React.FC = () => {
   const parsedCommissionId = commissionId ? Number(commissionId) : undefined;
 
   const {
-    data: commissionData,
+    data: commission,
     isLoading,
     error,
   } = useCommissionConfirm(parsedCommissionId!);
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (error) return <div>에러: {error.message}</div>;
-  if (!commissionData)
-    return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>;
+  console.log('Parsed Commission ID:', parsedCommissionId);
+  console.log('Commission Data:', commission);
 
-  const commission = commissionData.content?.[0];
+  if (isLoading) return <div>로딩 중...</div>;
+  if (error) return <div>에러가 발생했습니다: {(error as Error).message}</div>;
   if (!commission) return <div>의뢰를 찾을 수 없습니다.</div>;
 
   return (
@@ -59,7 +58,7 @@ const CommissionDetail: React.FC = () => {
       <h2 className="text-2xl font-bold mb-4">견적 목록</h2>
       {commission.estimates && commission.estimates.length > 0 ? (
         <div className="space-y-4">
-          {commission.estimates.map((estimate) => (
+          {commission.estimates.map((estimate: Estimate) => (
             <div
               key={estimate.id}
               className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-50"
