@@ -44,12 +44,9 @@ const CommissionCalling: React.FC = () => {
     setHasMore(commissions.length > newPage * 9);
   }, [commissions, page]);
 
-  const handleWriteEstimate = (commissionId: number) => {
-    navigate(`/writeestimate/${commissionId}`);
-    // 견적 작성을 완료한 commission을 visibleCommissions에서 제거
-    setVisibleCommissions((prevCommissions) =>
-      prevCommissions.filter((commission) => commission.id !== commissionId),
-    );
+  const handleWriteEstimate = (commission: Commission) => {
+    // commission 데이터를 상태로 넘겨줍니다.
+    navigate(`/commissionview/${commission.id}`, { state: { commission } });
   };
 
   const lastCommissionElementRef = useCallback(
@@ -106,10 +103,10 @@ const CommissionCalling: React.FC = () => {
               <strong>희망 날짜:</strong> {commission.desiredDate}
             </p>
             <button
-              onClick={() => handleWriteEstimate(commission.id)}
+              onClick={() => handleWriteEstimate(commission)}
               className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md"
             >
-              견적 작성
+              상세 보기
             </button>
           </div>
         ))}

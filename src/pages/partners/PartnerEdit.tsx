@@ -3,6 +3,7 @@ import { useCurrentPartner, useUpdatePartner } from '../../hooks/usePartners';
 import {
   validatePassword,
   validatePhoneNumber,
+  validateConfirmPassword,
 } from '../../utils/validationUtils';
 import { FormEvent, useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
@@ -10,6 +11,7 @@ import logo from '../../assets/logo.png';
 interface PartnerEditForm {
   email: string;
   password: string;
+  confirmPassword: string;
   phoneNumber: string;
   managerName: string;
   companyName: string;
@@ -19,6 +21,7 @@ interface PartnerEditForm {
 
 interface FormErrors {
   password: string;
+  confirmPassword: string;
   phoneNumber: string;
   managerName: string;
   companyName: string;
@@ -36,6 +39,7 @@ const PartnerEdit: React.FC = () => {
   const [formData, setFormData] = useState<PartnerEditForm>({
     email: email || '',
     password: '',
+    confirmPassword: '',
     phoneNumber: '',
     managerName: '',
     companyName: '',
@@ -44,6 +48,7 @@ const PartnerEdit: React.FC = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({
     password: '',
+    confirmPassword: '',
     phoneNumber: '',
     managerName: '',
     companyName: '',
@@ -56,6 +61,7 @@ const PartnerEdit: React.FC = () => {
       setFormData({
         email: partner.email,
         password: '',
+        confirmPassword: '',
         phoneNumber: partner.phoneNumber,
         managerName: partner.managerName,
         companyName: partner.companyName,
@@ -83,6 +89,18 @@ const PartnerEdit: React.FC = () => {
       validationResult = validatePhoneNumber(value);
     } else if (name === 'password') {
       validationResult = validatePassword(value);
+      if (formData.confirmPassword) {
+        const confirmResult = validateConfirmPassword(
+          value,
+          formData.confirmPassword,
+        );
+        setErrors((prev) => ({
+          ...prev,
+          confirmPassword: confirmResult.message,
+        }));
+      }
+    } else if (name === 'confirmPassword') {
+      validationResult = validateConfirmPassword(formData.password, value);
     }
 
     if (validationResult) {
@@ -96,8 +114,10 @@ const PartnerEdit: React.FC = () => {
     e.preventDefault();
 
     if (
-      Object.values(errors).some((err) => err !== '') ||
-      (formData.password && errors.password)
+      errors.phoneNumber ||
+      errors.password ||
+      errors.confirmPassword ||
+      (formData.password && formData.password !== formData.confirmPassword)
     ) {
       setErrors((prev) => ({
         ...prev,
@@ -153,8 +173,49 @@ const PartnerEdit: React.FC = () => {
           </label>
         </div>
         <div className="mb-4">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="password"
+          >
+            새 비밀번호 (변경하려면 입력)
+          </label>
+          <input
+            className={`shadow appearance-none border ${
+              errors.password ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            id="password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="변경하려면 입력하세요"
+          />
           {errors.password && (
             <p className="text-red-500 text-xs italic">{errors.password}</p>
+          )}
+        </div>
+        <div className="mb-4">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="confirmPassword"
+          >
+            비밀번호 확인
+          </label>
+          <input
+            className={`shadow appearance-none border ${
+              errors.confirmPassword ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            id="confirmPassword"
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="비밀번호를 한번 더 입력하세요"
+          />
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-xs italic">
+              {errors.confirmPassword}
+            </p>
           )}
         </div>
         <div className="mb-4">
@@ -165,7 +226,9 @@ const PartnerEdit: React.FC = () => {
             전화번호
           </label>
           <input
-            className={`shadow appearance-none border ${errors.phoneNumber ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            className={`shadow appearance-none border ${
+              errors.phoneNumber ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
             id="phoneNumber"
             type="tel"
             name="phoneNumber"
@@ -184,7 +247,9 @@ const PartnerEdit: React.FC = () => {
             담당자명
           </label>
           <input
-            className={`shadow appearance-none border ${errors.managerName ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            className={`shadow appearance-none border ${
+              errors.managerName ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
             id="managerName"
             type="text"
             name="managerName"
@@ -203,7 +268,9 @@ const PartnerEdit: React.FC = () => {
             업체명
           </label>
           <input
-            className={`shadow appearance-none border ${errors.companyName ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            className={`shadow appearance-none border ${
+              errors.companyName ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
             id="companyName"
             type="text"
             name="companyName"
@@ -222,7 +289,9 @@ const PartnerEdit: React.FC = () => {
             서비스 유형
           </label>
           <input
-            className={`shadow appearance-none border ${errors.businessType ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            className={`shadow appearance-none border ${
+              errors.businessType ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
             id="businessType"
             type="text"
             name="businessType"
@@ -241,7 +310,9 @@ const PartnerEdit: React.FC = () => {
             사업자 유형
           </label>
           <select
-            className={`shadow appearance-none border ${errors.partnerType ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+            className={`shadow appearance-none border ${
+              errors.partnerType ? 'border-red-500' : ''
+            } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
             id="partnerType"
             name="partnerType"
             value={formData.partnerType}
@@ -255,24 +326,9 @@ const PartnerEdit: React.FC = () => {
             <p className="text-red-500 text-xs italic">{errors.partnerType}</p>
           )}
         </div>
-        <label
-          className="block text-gray-700 text-sm font-bold mb-2"
-          htmlFor="password"
-        >
-          정보를 수정하려면 기존 비밀번호로 인증해주세요.
-        </label>
-        <input
-          className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-          id="password"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="변경하려면 입력하세요"
-        />
         <div className="flex items-center justify-between">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold mt-8 py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="submit"
           >
             수정 완료
