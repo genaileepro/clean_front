@@ -79,14 +79,14 @@ const PartnerHeader: React.FC = () => {
           ) : (
             <>
               <button
-                className="bg-[#144156] text-2xl"
+                className="bg-[#144156]"
                 onClick={() => navigate('/ptlogin')}
               >
                 로그인
               </button>
               <div className="w-px h-6 bg-white mx-2"></div>
               <button
-                className="bg-[#144156] text-2xl"
+                className="bg-[#144156]"
                 onClick={() => navigate('/ptsignup')}
               >
                 회원가입

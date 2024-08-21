@@ -23,21 +23,18 @@ const CommissionMatching: React.FC = () => {
       try {
         const estimateList = await getEstimateList();
 
-        // '진행중' 상태의 카드: status가 'CONTACT'이고 commissionStatus가 'SEND'인 경우
         const inProgress = estimateList.filter(
           (estimate) =>
             estimate.status === 'CONTACT' &&
             estimate.commissionStatus === 'SEND',
         );
 
-        // '매칭중' 상태의 카드: status가 'CONTACT'이고 commissionStatus가 'CONTACT'인 경우
         const matching = estimateList.filter(
           (estimate) =>
             estimate.status === 'CONTACT' &&
             estimate.commissionStatus === 'CONTACT',
         );
 
-        // '완료된' 상태의 카드: status가 'FINISH'인 경우
         const completed = estimateList.filter(
           (estimate) => estimate.status === 'FINISH',
         );
@@ -80,112 +77,71 @@ const CommissionMatching: React.FC = () => {
   };
 
   const renderTabContent = () => {
-    if (activeTab === 'inProgress') {
-      return inProgressEstimates.map((estimate) => (
-        <div
-          key={estimate.id}
-          className="bg-white border border-gray-200 rounded-lg shadow-lg m-4 p-6 w-80"
-        >
-          <h3 className="text-xl font-bold text-gray-700 mb-2">진행 중</h3>
-          <p className="text-gray-600 mb-2">
-            <strong>회원 닉네임:</strong> {estimate.nick}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>주소:</strong> {estimate.address}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>집 종류:</strong> {estimate.houseType}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>청소 종류:</strong> {estimate.cleanType}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>의뢰 ID:</strong> {estimate.commissionId}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>확정 가격:</strong> {estimate.tmpPrice}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>설명:</strong> {estimate.statement}
-          </p>
-          <p className="text-gray-600 mb-4">
-            <strong>확정 날짜:</strong> {estimate.fixedDate}
-          </p>
-        </div>
-      ));
-    } else if (activeTab === 'matching') {
-      return matchingEstimates.map((estimate) => (
-        <div
-          key={estimate.id}
-          className="bg-white border border-blue-200 rounded-lg shadow-lg m-4 p-6 w-80"
-        >
-          <h3 className="text-xl font-bold text-blue-700 mb-2">매칭 중</h3>
-          <p className="text-gray-600 mb-2">
-            <strong>회원 닉네임:</strong> {estimate.nick}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>주소:</strong> {estimate.address}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>집 종류:</strong> {estimate.houseType}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>청소 종류:</strong> {estimate.cleanType}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>의뢰 ID:</strong> {estimate.commissionId}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>확정 가격:</strong> {estimate.tmpPrice}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>설명:</strong> {estimate.statement}
-          </p>
-          <p className="text-gray-600 mb-4">
-            <strong>확정 날짜:</strong> {estimate.fixedDate}
-          </p>
+    const renderCard = (
+      estimate: Estimate,
+      statusColor: string,
+      title: string,
+    ) => (
+      <div
+        key={estimate.id}
+        className={`bg-white border ${statusColor} rounded-lg shadow-lg m-4 p-6 w-80`}
+      >
+        {/* 이미지 추가 */}
+        {estimate.image && (
+          <img
+            src={estimate.image}
+            alt="Estimate"
+            className="w-full h-40 object-cover rounded-t-lg mb-4"
+          />
+        )}
+        <h3 className={`text-xl font-bold ${statusColor} mb-2`}>{title}</h3>
+        <p className="text-gray-600 mb-2">
+          <strong>회원 닉네임:</strong> {estimate.nick}
+        </p>
+        <p className="text-gray-600 mb-2">
+          <strong>주소:</strong> {estimate.address}
+        </p>
+        <p className="text-gray-600 mb-2">
+          <strong>집 종류:</strong> {estimate.houseType}
+        </p>
+        <p className="text-gray-600 mb-2">
+          <strong>청소 종류:</strong> {estimate.cleanType}
+        </p>
+        <p className="text-gray-600 mb-2">
+          <strong>의뢰 ID:</strong> {estimate.commissionId}
+        </p>
+        <p className="text-gray-600 mb-2">
+          <strong>확정 가격:</strong> {estimate.tmpPrice}
+        </p>
+        <p className="text-gray-600 mb-2">
+          <strong>설명:</strong> {estimate.statement}
+        </p>
+        <p className="text-gray-600 mb-4">
+          <strong>확정 날짜:</strong> {estimate.fixedDate}
+        </p>
+        {activeTab === 'matching' && (
           <button
             className="bg-blue-500 text-white py-2 px-4 rounded-md"
             onClick={() => handleFinalMatch(estimate)}
           >
             최종 매칭
           </button>
-        </div>
-      ));
+        )}
+      </div>
+    );
+
+    if (activeTab === 'inProgress') {
+      return inProgressEstimates.map((estimate) =>
+        renderCard(estimate, 'border-gray-200 text-gray-700', '진행 중'),
+      );
+    } else if (activeTab === 'matching') {
+      return matchingEstimates.map((estimate) =>
+        renderCard(estimate, 'border-blue-200 text-blue-700', '매칭 중'),
+      );
     } else if (activeTab === 'completed') {
-      return completedEstimates.map((estimate) => (
-        <div
-          key={estimate.id}
-          className="bg-white border border-yellow-200 rounded-lg shadow-lg m-4 p-6 w-80"
-        >
-          <h3 className="text-xl font-bold text-yellow-700 mb-2">매칭 완료</h3>
-          <p className="text-gray-600 mb-2">
-            <strong>회원 닉네임:</strong> {estimate.nick}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>주소:</strong> {estimate.address}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>집 종류:</strong> {estimate.houseType}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>청소 종류:</strong> {estimate.cleanType}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>의뢰 ID:</strong> {estimate.commissionId}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>확정 가격:</strong> {estimate.tmpPrice}
-          </p>
-          <p className="text-gray-600 mb-2">
-            <strong>설명:</strong> {estimate.statement}
-          </p>
-          <p className="text-gray-600 mb-4">
-            <strong>확정 날짜:</strong> {estimate.fixedDate}
-          </p>
-          <p className="text-green-500 font-bold">매칭 완료</p>
-        </div>
-      ));
+      return completedEstimates.map((estimate) =>
+        renderCard(estimate, 'border-yellow-200 text-yellow-700', '매칭 완료'),
+      );
     }
   };
 

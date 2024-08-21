@@ -114,6 +114,14 @@ const WriteEstimate: React.FC = () => {
     <div className="container mx-auto max-w-screen-md mt-12">
       <h1 className="text-4xl font-bold text-center mb-8">견적 작성</h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
+        {/* 이미지 표시 */}
+        {commission.image && (
+          <img
+            src={commission.image}
+            alt="Commission"
+            className="w-full h-40 object-cover rounded-lg mb-4"
+          />
+        )}
         <h2 className="text-2xl font-bold mb-4">의뢰 상세 정보</h2>
         <p className="text-gray-600 mb-2">
           <strong>회원 닉네임:</strong> {commission.memberNick}
@@ -181,7 +189,7 @@ const WriteEstimate: React.FC = () => {
               확정 날짜:
             </label>
             <input
-              type="datetime-local" // 여기에 datetime-local을 사용합니다.
+              type="datetime-local"
               id="fixedDate"
               value={fixedDate}
               onChange={(e) => setFixedDate(e.target.value)}

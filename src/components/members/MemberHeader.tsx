@@ -54,7 +54,7 @@ const MemberHeader: React.FC = () => {
         </div>
 
         {/* 데스크톱 로그인/회원가입 버튼 */}
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center ">
           {isAuthenticated ? (
             <>
               <button
@@ -71,14 +71,14 @@ const MemberHeader: React.FC = () => {
           ) : (
             <>
               <button
-                className="h-btn text-2xl"
+                className="h-btn"
                 onClick={() => navigate('/loginselect')}
               >
                 로그인
               </button>
               <div className="w-px h-6 bg-white mx-2"></div>
               <button
-                className="h-btn text-2xl"
+                className="h-btn"
                 onClick={() => navigate('/signupselect')}
               >
                 회원가입

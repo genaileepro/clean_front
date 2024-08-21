@@ -7,6 +7,7 @@ export interface Estimate {
   fixedDate: string; // ISO 형식의 날짜 문자열
   nick: string;
   address: string;
+  image: string; // 이미지 필드 추가
   houseType: 'APT' | 'HOUSE' | 'OFFICE';
   cleanType: 'NORMAL' | 'SPECIAL';
   desiredDate: string; // ISO 형식의 날짜 문자열
@@ -18,7 +19,7 @@ export interface Estimate {
 export interface Commission {
   id: number;
   memberNick: string;
-  image?: string;
+  image?: string; // 이미지 필드 추가
   size: number;
   houseType: 'APT' | 'HOUSE' | 'OFFICE';
   cleanType: 'NORMAL' | 'SPECIAL';
