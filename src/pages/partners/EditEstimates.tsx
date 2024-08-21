@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { updateEstimate, getEstimateList } from '../../api/estimate';
-import { getCommissionList } from '../../api/estimate'; // getCommissionList API 가져오기
+import {
+  updateEstimate,
+  getEstimateList,
+  getCommissionList,
+} from '../../api/estimate'; // getCommissionList API 가져오기
 import { Estimate, Commission } from '../../types/estimate'; // Estimate와 Commission 타입 가져오기
 
 const EditEstimates: React.FC = () => {
@@ -77,6 +80,14 @@ const EditEstimates: React.FC = () => {
       <h1 className="text-4xl font-bold text-center mb-8">견적 수정</h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4">의뢰 상세 정보</h2>
+        {/* 이미지 표시 */}
+        {commission.image && (
+          <img
+            src={commission.image}
+            alt="Commission"
+            className="w-full h-60 object-cover rounded-md mb-4"
+          />
+        )}
         <p className="text-gray-600 mb-2">
           <strong>회원 닉네임:</strong> {commission.memberNick}
         </p>
