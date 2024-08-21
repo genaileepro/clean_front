@@ -54,6 +54,14 @@ const MyEstimates: React.FC = () => {
             key={estimate.id}
             className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
           >
+            {/* 이미지 표시 */}
+            {estimate.image && (
+              <img
+                src={estimate.image}
+                alt="Estimate"
+                className="w-full h-40 object-cover rounded-t-lg mb-4"
+              />
+            )}
             <h3 className="text-xl font-bold mb-2">청소 견적</h3>
             <p className="text-gray-600 mb-2">
               <strong>의뢰 ID:</strong> {estimate.commissionId}
