@@ -48,7 +48,9 @@ const MyEstimates: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-xl mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">나의 견적 목록</h1>
+      <h1 className="text-4xl text-center mb-8 font-[JalnanGothic]">
+        나의 견적 목록
+      </h1>
       {isLoading ? (
         <p className="text-center mt-4">Loading...</p>
       ) : estimates.length > 0 ? (
@@ -109,7 +111,6 @@ const MyEstimates: React.FC = () => {
             alt="No history available"
             className="w-64 h-64 object-contain"
           />
-
         </div>
       )}
     </div>

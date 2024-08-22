@@ -67,7 +67,7 @@ const CommissionCalling: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-xl mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">회원 새 의뢰 보기</h1>
+      <h1 className="text-4xl text-center mb-8 font-[JalnanGothic]">회원 새 의뢰 보기</h1>
       {visibleCommissions.length > 0 ? (
         <div className="flex flex-wrap justify-center">
           {visibleCommissions.map((commission, index) => (

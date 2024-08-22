@@ -2,51 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'SBAggroThin';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
-    format('woff');
-  font-weight: 100;
-  font-style: normal;
-}
+/* Noto Sans KR 폰트 설정 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
 
+/* JalnanGothic 폰트 설정 */
 @font-face {
-  font-family: 'SBAggroLight';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
-    format('woff');
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'SBAggroNormal';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
-    format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'SBAggroBold';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff')
-    format('woff');
-  font-weight: 700;
-  font-style: normal;
-}
-
-/* RIDIBatang 폰트 추가 */
-@font-face {
-  font-family: 'RIDIBatang';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/RIDIBatang.woff')
+  font-family: 'JalnanGothic';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/JalnanGothic.woff')
     format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
-/* Tailwind에서 사용하기 위한 추가 폰트 설정 */
+/* Tailwind에서 기본 폰트 설정 */
 @layer base {
   body {
-    font-family: 'SBAggroB', sans-serif; /* 기본 폰트를 설정 */
+    font-family: 'Noto Sans KR', sans-serif; /* 기본 폰트를 설정 */
   }
 }
 

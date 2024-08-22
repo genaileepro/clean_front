@@ -15,13 +15,13 @@ const PartnerInfo: React.FC = () => {
   return (
     <div className="max-w-md mx-auto mt-10">
       <div className="p-6 hidden sm:block">
-          <img
-            src={logo}
-            alt="깔끔한방 로고"
-            className="w-full h-auto max-h-[200px] object-contain"
-          />
-        </div>
-      <h2 className="text-2xl font-bold mb-4">파트너 정보</h2>
+        <img
+          src={logo}
+          alt="깔끔한방 로고"
+          className="w-full h-auto max-h-[200px] object-contain"
+        />
+      </div>
+      <h2 className="text-2xl mb-4 font-[JalnanGothic]">파트너 정보</h2>
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
