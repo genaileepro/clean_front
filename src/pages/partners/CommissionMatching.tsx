@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getEstimateList, updateEstimateStatus } from '../../api/estimate';
-import { Estimate } from '../../types/estimate'; // Estimate 타입을 가져옵니다.
+import { Estimate } from '../../types/estimate';
+import noHistoryImage from '../../assets/noHistory.png'; // 이미지 경로 임포트
 
 const CommissionMatching: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
@@ -86,7 +87,6 @@ const CommissionMatching: React.FC = () => {
         key={estimate.id}
         className={`bg-white border ${statusColor} rounded-lg shadow-lg m-4 p-6 w-80`}
       >
-        {/* 이미지 추가 */}
         {estimate.image && (
           <img
             src={estimate.image}
@@ -131,16 +131,59 @@ const CommissionMatching: React.FC = () => {
     );
 
     if (activeTab === 'inProgress') {
-      return inProgressEstimates.map((estimate) =>
-        renderCard(estimate, 'border-gray-200 text-gray-700', '진행 중'),
+      return inProgressEstimates.length > 0 ? (
+        inProgressEstimates.map((estimate) =>
+          renderCard(estimate, 'border-gray-200 text-gray-700', '진행 중'),
+        )
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-8">
+          <img
+            src={noHistoryImage}
+            alt="No history available"
+            className="w-64 h-64 object-contain"
+          />
+          <p className="text-gray-600 text-xl mt-4 text-center">
+            진행 중인 내역이 없습니다.
+          </p>
+        </div>
       );
     } else if (activeTab === 'matching') {
-      return matchingEstimates.map((estimate) =>
-        renderCard(estimate, 'border-blue-200 text-blue-700', '매칭 중'),
+      return matchingEstimates.length > 0 ? (
+        matchingEstimates.map((estimate) =>
+          renderCard(estimate, 'border-blue-200 text-blue-700', '매칭 중'),
+        )
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-8">
+          <img
+            src={noHistoryImage}
+            alt="No history available"
+            className="w-64 h-64 object-contain"
+          />
+          <p className="text-gray-600 text-xl mt-4 text-center">
+            매칭 중인 내역이 없습니다.
+          </p>
+        </div>
       );
     } else if (activeTab === 'completed') {
-      return completedEstimates.map((estimate) =>
-        renderCard(estimate, 'border-yellow-200 text-yellow-700', '매칭 완료'),
+      return completedEstimates.length > 0 ? (
+        completedEstimates.map((estimate) =>
+          renderCard(
+            estimate,
+            'border-yellow-200 text-yellow-700',
+            '매칭 완료',
+          ),
+        )
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-8">
+          <img
+            src={noHistoryImage}
+            alt="No history available"
+            className="w-64 h-64 object-contain"
+          />
+          <p className="text-gray-600 text-xl mt-4 text-center">
+            완료된 내역이 없습니다.
+          </p>
+        </div>
       );
     }
   };
@@ -184,7 +227,15 @@ const CommissionMatching: React.FC = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+        <div
+          className={
+            inProgressEstimates.length > 0 ||
+            matchingEstimates.length > 0 ||
+            completedEstimates.length > 0
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8'
+              : 'flex justify-center items-center mt-8'
+          }
+        >
           {isLoading ? <p>Loading...</p> : renderTabContent()}
         </div>
       </div>

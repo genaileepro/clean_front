@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEstimateList, deleteEstimate } from '../../api/estimate';
 import { Estimate } from '../../types/estimate';
+import noHistoryImage from '../../assets/noHistory.png'; // 이미지 경로 임포트
 
 const MyEstimates: React.FC = () => {
   const [estimates, setEstimates] = useState<Estimate[]>([]);
@@ -48,57 +49,69 @@ const MyEstimates: React.FC = () => {
   return (
     <div className="container mx-auto max-w-screen-xl mt-12">
       <h1 className="text-4xl font-bold text-center mb-8">나의 견적 목록</h1>
-      <div className="flex flex-wrap justify-center">
-        {estimates.map((estimate) => (
-          <div
-            key={estimate.id}
-            className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
-          >
-            {/* 이미지 표시 */}
-            {estimate.image && (
-              <img
-                src={estimate.image}
-                alt="Estimate"
-                className="w-full h-40 object-cover rounded-t-lg mb-4"
-              />
-            )}
-            <h3 className="text-xl font-bold mb-2">청소 견적</h3>
-            <p className="text-gray-600 mb-2">
-              <strong>의뢰 ID:</strong> {estimate.commissionId}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>임시 가격:</strong> {estimate.tmpPrice}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>설명:</strong> {estimate.statement}
-            </p>
-            <p className="text-gray-600 mb-4">
-              <strong>확정 날짜:</strong> {estimate.fixedDate}
-            </p>
-            <div className="grid grid-flow-col justify-stretch gap-x-3">
-              <button
-                onClick={() => navigate(`/editestimate/${estimate.id}`)}
-                className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md"
-              >
-                수정
-              </button>
-              <button
-                onClick={() => handleDelete(estimate.id)}
-                className="bg-[#ff5b49] text-white py-2 px-4 rounded-md"
-              >
-                삭제
-              </button>
-              <button
-                onClick={() => handleSendEstimate(estimate.id)}
-                className="bg-[#2ef21d] text-white py-2 px-4 rounded-md"
-              >
-                견적발송
-              </button>
+      {isLoading ? (
+        <p className="text-center mt-4">Loading...</p>
+      ) : estimates.length > 0 ? (
+        <div className="flex flex-wrap justify-center">
+          {estimates.map((estimate) => (
+            <div
+              key={estimate.id}
+              className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
+            >
+              {/* 이미지 표시 */}
+              {estimate.image && (
+                <img
+                  src={estimate.image}
+                  alt="Estimate"
+                  className="w-full h-40 object-cover rounded-t-lg mb-4"
+                />
+              )}
+              <h3 className="text-xl font-bold mb-2">청소 견적</h3>
+              <p className="text-gray-600 mb-2">
+                <strong>의뢰 ID:</strong> {estimate.commissionId}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>임시 가격:</strong> {estimate.tmpPrice}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>설명:</strong> {estimate.statement}
+              </p>
+              <p className="text-gray-600 mb-4">
+                <strong>확정 날짜:</strong> {estimate.fixedDate}
+              </p>
+              <div className="grid grid-flow-col justify-stretch gap-x-3">
+                <button
+                  onClick={() => navigate(`/editestimate/${estimate.id}`)}
+                  className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(estimate.id)}
+                  className="bg-[#ff5b49] text-white py-2 px-4 rounded-md"
+                >
+                  삭제
+                </button>
+                <button
+                  onClick={() => handleSendEstimate(estimate.id)}
+                  className="bg-[#2ef21d] text-white py-2 px-4 rounded-md"
+                >
+                  견적발송
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      {isLoading && <p className="text-center mt-4">Loading...</p>}
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-8">
+          <img
+            src={noHistoryImage}
+            alt="No history available"
+            className="w-64 h-64 object-contain"
+          />
+
+        </div>
+      )}
     </div>
   );
 };

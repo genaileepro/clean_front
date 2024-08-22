@@ -301,7 +301,7 @@ const PartnerSignUp: React.FC = () => {
                 onClick={() => navigate(`/ptlogin`)}
                 type="button"
               >
-                로그인하러가기
+                취소
               </button>
             </div>
           </form>
