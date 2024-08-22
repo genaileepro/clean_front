@@ -4,13 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Jua"', 'sans-serif'], // 주아 폰트
-        ridibatang: ['"RIDIBatang"', 'serif'], // 리디바탕 폰트
-        gangwon: ['"GangwonEduPowerExtraBoldA"', 'sans-serif'], // 강원튼튼체 폰트
-        sbaggroThin: ['"SBAggroThin"', 'sans-serif'], // 100 굵기
-        sbaggroLight: ['"SBAggroLight"', 'sans-serif'], // 300 굵기
-        sbaggroNormal: ['"SBAggroNormal"', 'sans-serif'], // 500 굵기
-        sbaggroBold: ['"SBAggroBold"', 'sans-serif'], // 700 굵기
+        sans: ['"Noto Sans KR"'], // 기본 폰트 설정
+        jalnan: ['"JalnanGothic"', 'sans-serif'], // 포인트 폰트 설정
       },
       colors: {
         brand: {

@@ -16,10 +16,12 @@ const PartnerRecruitment: React.FC = () => {
       </div>
       {/* 히어로 섹션 */}
       <section className="text-center my-12">
-        <h1 className="text-4xl font-bold">깔끔한 방과 함께 성장하세요!</h1>
-        <p className="text-lg text-gray-600 mt-4">
-          우리와 함께 청소 서비스를 제공할 파트너를 모집합니다.
-        </p>
+        <div className="font-[JalnanGothic]">
+          <h1 className="text-4xl">깔끔한 방과 함께 성장하세요!</h1>
+          <p className="text-lg text-gray-600 mt-4">
+            우리와 함께 청소 서비스를 제공할 파트너를 모집합니다.
+          </p>
+        </div>
         <div className="mt-6">
           <button
             className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md m-2"
@@ -32,34 +34,29 @@ const PartnerRecruitment: React.FC = () => {
 
       {/* 파트너 혜택 섹션 */}
       <section className="text-center my-12">
-        <div className="bg-gray-100 p-8 rounded-3xl">
-          <h2 className="text-3xl font-bold">파트너가 되는 이유</h2>
+        <div className="bg-gray-100 p-8 rounded-3xl font-[JalnanGothic]">
+          <h2 className="text-4xl">파트너가 되는 이유</h2>
           <p className="text-lg text-gray-600 mt-4">
             깔끔한 방 파트너만의 특별한 혜택
           </p>
         </div>
         <ul className="list-disc list-inside mt-4 text-left max-w-md mx-auto">
           <li className="mb-2">
-            더 많은 고객 확보: 다양한 고객이 청소 서비스를 의뢰하여 더 많은
-            비즈니스 기회를 얻으세요.
+            더 많은 고객 확보: 고객 매칭으로 누리는 더 많은 비즈니스 기회
           </li>
           <li className="mb-2">
-            안정적인 수익: 정기적인 청소 요청을 통해 안정적인 수익을 창출하세요.
+            안정적인 수익: 합리적인 청소 견적을 통해 안정적인 수익 창출
           </li>
           <li className="mb-2">
-            유연한 업무 일정: 원하는 시간과 장소에서 자유롭게 작업 일정을
-            조정하세요.
-          </li>
-          <li className="mb-2">
-            전문 교육 및 지원: 최신 청소 기술 및 고객 서비스 교육을 제공합니다.
+            유연한 업무 일정: 원하는 시간과 장소 등 자유로운 일정 조율
           </li>
         </ul>
       </section>
 
       {/* 파트너 모집 절차 */}
       <section className="my-12">
-        <div className="bg-gray-100 p-8 rounded-3xl">
-          <h2 className="text-3xl font-bold text-center">파트너 가입 절차</h2>
+        <div className="bg-gray-100 p-8 rounded-3xl font-[JalnanGothic]">
+          <h2 className="text-4xl text-center">파트너 가입 절차</h2>
           <p className="text-lg text-gray-600 mt-4 text-center">
             간단한 절차로 깔끔한 방의 파트너가 되세요
           </p>
@@ -73,9 +70,6 @@ const PartnerRecruitment: React.FC = () => {
             심사 및 승인: 제출된 서류를 검토하고 승인을 받으세요.
           </li>
           <li className="mb-2">
-            교육 및 등록: 파트너 교육을 완료하고 정식 등록하세요.
-          </li>
-          <li className="mb-2">
             서비스 시작: 청소 서비스를 시작하고 고객 요청을 받으세요.
           </li>
         </ul>
@@ -83,13 +77,13 @@ const PartnerRecruitment: React.FC = () => {
 
       {/* 성공 사례 섹션 */}
       <section className="my-12">
-        <div className="bg-gray-100 p-8 rounded-3xl">
-          <h2 className="text-3xl font-bold text-center">파트너 성공 사례</h2>
+        <div className="bg-gray-100 p-8 rounded-3xl font-[JalnanGothic]">
+          <h2 className="text-4xl text-center">파트너 성공 사례</h2>
           <p className="text-lg text-gray-600 mt-4 text-center">
             깔끔한 방과 함께 성공한 파트너들의 이야기
           </p>
         </div>
-        <div className="space-y-4 max-w-md mx-auto mt-8">
+        <div className="space-y-4 mt-6 text-center">
           <div className="p-4 border rounded-lg shadow-md">
             <p className="text-gray-600">
               "ABC 청소업체: 깔끔한 방과 함께 매출이 50% 증가했습니다." - 김사장
@@ -112,8 +106,8 @@ const PartnerRecruitment: React.FC = () => {
 
       {/* FAQ 섹션 */}
       <section className="my-12">
-        <div className="bg-gray-100 p-8 rounded-3xl">
-          <h2 className="text-3xl font-bold text-center">자주 묻는 질문</h2>
+        <div className="bg-gray-100 p-8 rounded-3xl font-[JalnanGothic]">
+          <h2 className="text-4xl text-center">자주 묻는 질문</h2>
           <p className="text-lg text-gray-600 mt-4 text-center">
             파트너 가입과 관련된 궁금한 점을 확인하세요.
           </p>
@@ -124,18 +118,10 @@ const PartnerRecruitment: React.FC = () => {
               파트너 가입 조건은 무엇인가요?
             </h3>
             <p className="text-gray-600 mt-2">
-              필요한 서류와 청소 경력을 갖춘 업체라면 누구나 신청할 수 있습니다.
+              전문자격을 갖춘 업체라면 누구나 신청할 수 있습니다.
             </p>
           </div>
-          <div className="p-4 border rounded-lg shadow-md">
-            <h3 className="text-lg font-bold">
-              가입 후 교육은 어떻게 진행되나요?
-            </h3>
-            <p className="text-gray-600 mt-2">
-              온라인 교육과 오프라인 워크숍을 통해 청소 기술과 고객 서비스
-              교육을 제공합니다.
-            </p>
-          </div>
+
           <div className="p-4 border rounded-lg shadow-md">
             <h3 className="text-lg font-bold">수수료는 어떻게 되나요?</h3>
             <p className="text-gray-600 mt-2">
@@ -156,8 +142,8 @@ const PartnerRecruitment: React.FC = () => {
 
       {/* CTA 섹션 */}
       <section className="text-center my-12">
-        <div className="bg-gray-100 p-8 rounded-3xl">
-          <h2 className="text-3xl font-bold">지금 바로 파트너로 가입하세요!</h2>
+        <div className="bg-gray-100 p-8 rounded-3xl font-[JalnanGothic]">
+          <h2 className="text-4xl">지금 바로 파트너로 가입하세요!</h2>
           <p className="text-lg text-gray-600 mt-4">
             깔끔한 방과 함께 더 많은 고객에게 다가가세요.
           </p>

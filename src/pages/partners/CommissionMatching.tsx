@@ -190,7 +190,7 @@ const CommissionMatching: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-xl mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">
+      <h1 className="text-4xl text-center mb-8 font-[JalnanGothic]">
         견적 매칭 확인하기
       </h1>
       <div className="bg-gray-100 border border-gray-300 shadow-lg rounded-lg p-4">

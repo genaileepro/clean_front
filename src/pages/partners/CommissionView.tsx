@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getCommissionList } from '../../api/estimate';
 import { Commission } from '../../types/estimate';
 
@@ -8,6 +8,7 @@ const CommissionView: React.FC = () => {
   const commissionId = id ? parseInt(id, 10) : null;
   const [commission, setCommission] = useState<Commission | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const navigate = useNavigate(); // 추가: 내비게이트를 위해 useNavigate 훅 사용
 
   useEffect(() => {
     const fetchCommission = async () => {
@@ -27,7 +28,6 @@ const CommissionView: React.FC = () => {
   }, [commissionId]);
 
   useEffect(() => {
-    // Kakao 지도 스크립트 로드 여부 확인
     const isKakaoMapScriptLoaded = () => !!window.kakao && !!window.kakao.maps;
 
     const loadKakaoMapScript = () => {
@@ -37,7 +37,8 @@ const CommissionView: React.FC = () => {
       }
 
       const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services`;
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services`;
+
       script.async = true;
       document.head.appendChild(script);
 
@@ -64,18 +65,19 @@ const CommissionView: React.FC = () => {
       const geocoder = new window.kakao.maps.services.Geocoder();
 
       geocoder.addressSearch(commission.address, (result, status) => {
+        console.log('Commission Address:', commission.address); // 이 라인이 먼저 실행되는지 확인
+        console.log('Geocoding Result:', result); // 추가
+        console.log('Geocoding Status:', status); // 추가
         if (status === window.kakao.maps.services.Status.OK) {
           const coords = new window.kakao.maps.LatLng(
             parseFloat(result[0].y),
             parseFloat(result[0].x),
           );
-
           // 마커 객체를 생성하고 지도에 표시
           new window.kakao.maps.Marker({
             map: map,
             position: coords,
           });
-
           // 지도의 중심을 설정
           map.setCenter(coords);
         } else {
@@ -91,7 +93,9 @@ const CommissionView: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-lg mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">의뢰 상세 보기</h1>
+      <h1 className="text-4xl text-center mb-8 font-[JalnanGothic]">
+        의뢰 상세 보기
+      </h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
         {/* 이미지 표시 */}
         {commission.image && (
@@ -117,7 +121,18 @@ const CommissionView: React.FC = () => {
         <p className="text-gray-600 mb-4">
           <strong>희망 날짜:</strong> {commission.desiredDate}
         </p>
+        {/* 지도 표시 */}
         <div id="map" style={{ width: '100%', height: '400px' }}></div>
+
+        {/* 추가된 버튼 */}
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => navigate(`/writeestimate/${commissionId}`)}
+            className="bg-brand text-white py-3 px-6 rounded-lg font-bold hover:bg-brand-dark"
+          >
+            견적 작성하기
+          </button>
+        </div>
       </div>
     </div>
   );

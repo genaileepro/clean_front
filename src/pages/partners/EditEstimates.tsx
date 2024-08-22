@@ -77,7 +77,9 @@ const EditEstimates: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-md mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">견적 수정</h1>
+      <h1 className="text-4xl text-center mb-8 font-[JalnanGothic]">
+        견적 수정
+      </h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4">의뢰 상세 정보</h2>
         {/* 이미지 표시 */}
