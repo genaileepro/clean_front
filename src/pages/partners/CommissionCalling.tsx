@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCommissionList } from '../../api/estimate';
 import { Commission } from '../../types/estimate';
+import noHistoryImage from '../../assets/noHistory.png'; // 이미지 경로 임포트
 
 const CommissionCalling: React.FC = () => {
   const [commissions, setCommissions] = useState<Commission[]>([]);
@@ -45,7 +46,6 @@ const CommissionCalling: React.FC = () => {
   }, [commissions, page]);
 
   const handleWriteEstimate = (commission: Commission) => {
-    // commission 데이터를 상태로 넘겨줍니다.
     navigate(`/commissionview/${commission.id}`, { state: { commission } });
   };
 
@@ -68,51 +68,62 @@ const CommissionCalling: React.FC = () => {
   return (
     <div className="container mx-auto max-w-screen-xl mt-12">
       <h1 className="text-4xl font-bold text-center mb-8">회원 새 의뢰 보기</h1>
-      <div className="flex flex-wrap justify-center">
-        {visibleCommissions.map((commission, index) => (
-          <div
-            key={commission.id}
-            ref={
-              visibleCommissions.length === index + 1
-                ? lastCommissionElementRef
-                : null
-            }
-            className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
-          >
-            {commission.image && (
-              <img
-                src={commission.image}
-                alt="Commission"
-                className="w-full h-40 object-cover rounded-md mb-4"
-              />
-            )}
-            <h3 className="text-xl font-bold mb-2">청소 견적의뢰</h3>
-            <p className="text-gray-600 mb-2">
-              <strong>회원 닉네임:</strong> {commission.memberNick}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>주소:</strong> {commission.address}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>집 종류:</strong> {commission.houseType}
-            </p>
-            <p className="text-gray-600 mb-2">
-              <strong>청소 종류:</strong> {commission.cleanType}
-            </p>
-            <p className="text-gray-600 mb-4">
-              <strong>희망 날짜:</strong> {commission.desiredDate}
-            </p>
-            <button
-              onClick={() => handleWriteEstimate(commission)}
-              className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md"
+      {visibleCommissions.length > 0 ? (
+        <div className="flex flex-wrap justify-center">
+          {visibleCommissions.map((commission, index) => (
+            <div
+              key={commission.id}
+              ref={
+                visibleCommissions.length === index + 1
+                  ? lastCommissionElementRef
+                  : null
+              }
+              className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
             >
-              상세 보기
-            </button>
-          </div>
-        ))}
-      </div>
+              {commission.image && (
+                <img
+                  src={commission.image}
+                  alt="Commission"
+                  className="w-full h-40 object-cover rounded-md mb-4"
+                />
+              )}
+              <h3 className="text-xl font-bold mb-2">청소 견적의뢰</h3>
+              <p className="text-gray-600 mb-2">
+                <strong>회원 닉네임:</strong> {commission.memberNick}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>주소:</strong> {commission.address}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>집 종류:</strong> {commission.houseType}
+              </p>
+              <p className="text-gray-600 mb-2">
+                <strong>청소 종류:</strong> {commission.cleanType}
+              </p>
+              <p className="text-gray-600 mb-4">
+                <strong>희망 날짜:</strong> {commission.desiredDate}
+              </p>
+              <button
+                onClick={() => handleWriteEstimate(commission)}
+                className="bg-[#0bb8f9] text-white py-2 px-4 rounded-md"
+              >
+                상세 보기
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // 의뢰 내역이 없을 때 이미지 표시
+        <div className="flex flex-col items-center mt-8">
+          <img
+            src={noHistoryImage}
+            alt="No history available"
+            className="w-64 h-64 object-contain"
+          />
+        </div>
+      )}
       {isLoading && <p className="text-center mt-4">Loading...</p>}
-      {!isLoading && !hasMore && (
+      {!isLoading && !hasMore && visibleCommissions.length > 0 && (
         <p className="text-center mt-4">No more commissions available.</p>
       )}
     </div>

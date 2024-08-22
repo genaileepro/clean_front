@@ -198,7 +198,7 @@ const SignUp: React.FC = () => {
                 onClick={() => navigate(`/login`)}
                 type="button"
               >
-                로그인하러가기
+                취소
               </button>
             </div>
           </form>
