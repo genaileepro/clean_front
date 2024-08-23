@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState } from "react";
 
 declare global {
   interface Window {
@@ -6,38 +6,24 @@ declare global {
   }
 }
 
-const MapTest: React.FC = () => {
+const MapContainer = () => {
+  const [map, setMap] = useState<any>();
+  const [marker, setMarker] = useState<any>();
+
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services,clusterer,drawing`;
-    script.async = true;
+    window.kakao.maps.load(() => {
+      const container = document.getElementById('map');
+      const options = {
+        center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3,
+      };
 
-    script.onload = () => {
-      if (window.kakao && window.kakao.maps) {
-        window.kakao.maps.load(() => {
-          const container = document.getElementById('map') as HTMLElement;
-          const options = {
-            center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-            level: 3,
-          };
-
-          const map = new window.kakao.maps.Map(container, options);
-
-          new window.kakao.maps.Marker({
-            position: new window.kakao.maps.LatLng(33.450701, 126.570667),
-            map: map,
-          });
-        });
-      }
-    };
-
-    script.onerror = () => {
-      console.error('Kakao Maps script failed to load.');
-    };
-
-    document.head.appendChild(script);
+      setMap(new window.kakao.maps.Map(container, options));
+      setMarker(new window.kakao.maps.Marker());
+    });
   }, []);
-  return <div id="map" style={{ width: '100%', height: '400px' }} />;
+
+  return <div id="map" style={{ width: '100%', height: '400px' }}></div>;
 };
 
-export default MapTest;
+export default MapContainer;
