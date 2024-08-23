@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getCommissionList } from '../../api/estimate';
 import { Commission } from '../../types/estimate';
+
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 const CommissionView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const commissionId = id ? parseInt(id, 10) : null;
   const [commission, setCommission] = useState<Commission | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCommission = async () => {
@@ -27,63 +34,76 @@ const CommissionView: React.FC = () => {
   }, [commissionId]);
 
   useEffect(() => {
-    // Kakao 지도 스크립트 로드 여부 확인
-    const isKakaoMapScriptLoaded = () => !!window.kakao && !!window.kakao.maps;
-
     const loadKakaoMapScript = () => {
-      if (isKakaoMapScriptLoaded()) {
-        setIsMapLoaded(true);
-        return;
-      }
+      return new Promise<void>((resolve, reject) => {
+        if (window.kakao && window.kakao.maps) {
+          resolve();
+          return;
+        }
 
-      const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services`;
-      script.async = true;
-      document.head.appendChild(script);
+        const script = document.createElement('script');
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services,clusterer,drawing`;
+        script.async = true;
+        document.head.appendChild(script);
 
-      script.onload = () => setIsMapLoaded(true);
+        script.onload = () => resolve();
+        script.onerror = () =>
+          reject(new Error('Kakao Maps script failed to load'));
+      });
     };
 
-    loadKakaoMapScript();
-  }, []);
-
-  useEffect(() => {
-    if (isMapLoaded && commission) {
-      const mapContainer = document.getElementById('map'); // 지도가 표시될 div 요소
-      if (!mapContainer) {
-        console.error('Map container not found');
-        return;
-      }
-
-      const mapOption = {
-        center: new window.kakao.maps.LatLng(33.450701, 126.570667), // 기본 지도 중심
-        level: 3,
-      };
-
-      const map = new window.kakao.maps.Map(mapContainer, mapOption);
-      const geocoder = new window.kakao.maps.services.Geocoder();
-
-      geocoder.addressSearch(commission.address, (result, status) => {
-        if (status === window.kakao.maps.services.Status.OK) {
-          const coords = new window.kakao.maps.LatLng(
-            parseFloat(result[0].y),
-            parseFloat(result[0].x),
-          );
-
-          // 마커 객체를 생성하고 지도에 표시
-          new window.kakao.maps.Marker({
-            map: map,
-            position: coords,
-          });
-
-          // 지도의 중심을 설정
-          map.setCenter(coords);
-        } else {
-          console.error('Failed to fetch coordinates for address');
+    const initializeMap = () => {
+      if (window.kakao && window.kakao.maps && commission) {
+        const mapContainer = document.getElementById('map') as HTMLElement;
+        if (!mapContainer) {
+          console.error('Map container not found');
+          return;
         }
-      });
+
+        const mapOption = {
+          center: new window.kakao.maps.LatLng(33.450701, 126.570667), // 기본 지도 중심
+          level: 3,
+        };
+
+        const map = new window.kakao.maps.Map(mapContainer, mapOption);
+        const geocoder = new window.kakao.maps.services.Geocoder();
+
+        geocoder.addressSearch(
+          commission.address,
+          (
+            result: { x: string; y: string }[],
+            status: (typeof window.kakao.maps.services.Status)[keyof typeof window.kakao.maps.services.Status],
+          ) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const coords = new window.kakao.maps.LatLng(
+                parseFloat(result[0].y),
+                parseFloat(result[0].x),
+              );
+
+              new window.kakao.maps.Marker({
+                map: map,
+                position: coords,
+              });
+
+              map.setCenter(coords);
+            } else {
+              console.error('Failed to fetch coordinates for address');
+            }
+          },
+        );
+      }
+    };
+
+    // 스크립트 로드 후 의존성 조건에 따라 지도 초기화
+    if (commission) {
+      loadKakaoMapScript()
+        .then(() => {
+          setIsMapLoaded(true); // 맵 로드 상태 업데이트
+          initializeMap();
+        })
+        .catch((error) => console.error('Error loading Kakao Maps:', error));
     }
-  }, [isMapLoaded, commission]);
+  }, [commission]);
 
   if (!commission) {
     return <p>Loading commission details...</p>;
@@ -91,9 +111,10 @@ const CommissionView: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-lg mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8">의뢰 상세 보기</h1>
+      <h1 className="text-4xl text-center mb-8 font-[JalnanGothic]">
+        의뢰 상세 보기
+      </h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
-        {/* 이미지 표시 */}
         {commission.image && (
           <img
             src={commission.image}
@@ -118,6 +139,14 @@ const CommissionView: React.FC = () => {
           <strong>희망 날짜:</strong> {commission.desiredDate}
         </p>
         <div id="map" style={{ width: '100%', height: '400px' }}></div>
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => navigate(`/writeestimate/${commissionId}`)}
+            className="bg-brand text-white py-3 px-6 rounded-lg font-bold hover:bg-brand-dark"
+          >
+            견적 작성하기
+          </button>
+        </div>
       </div>
     </div>
   );

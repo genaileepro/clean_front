@@ -210,7 +210,7 @@ const PartnerSignUp: React.FC = () => {
           />
         </div>
         <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">파트너 회원가입</h2>
+          <h2 className="text-2xl mb-4 font-[JalnanGothic]">파트너 회원가입</h2>
           {errors.general && (
             <div
               className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
@@ -301,7 +301,7 @@ const PartnerSignUp: React.FC = () => {
                 onClick={() => navigate(`/ptlogin`)}
                 type="button"
               >
-                로그인하러가기
+                취소
               </button>
             </div>
           </form>
