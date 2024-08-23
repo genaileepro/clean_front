@@ -20,7 +20,7 @@ export enum Status {
 export interface Commission {
   commissionId: number;
   memberNick: string;
-  image?: string;
+  image?: string; // 이미지 파일명 또는 식별자
   size: number;
   houseType: HouseType;
   cleanType: CleanType;

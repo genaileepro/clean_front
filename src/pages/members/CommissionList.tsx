@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   useCommissions,
   useDeleteCommission,
+  useCommissionImage,
 } from '../../hooks/useCommissions';
 import { showErrorNotification } from '../../utils/errorHandler';
 import noImages from '../../assets/noImages.png';
@@ -14,6 +15,28 @@ import {
   Status,
 } from '../../types/commission';
 import toast from 'react-hot-toast';
+
+const CommissionImage: React.FC<{ filename: string }> = ({ filename }) => {
+  const { data: imageUrl, isLoading, isError } = useCommissionImage(filename);
+
+  if (isLoading) return <div>이미지 로딩 중...</div>;
+  if (isError)
+    return (
+      <img
+        src={noImages}
+        alt="Commission"
+        className="w-full h-full object-cover"
+      />
+    );
+
+  return (
+    <img
+      src={imageUrl || noImages}
+      alt="Commission"
+      className="w-full h-full object-cover"
+    />
+  );
+};
 
 const CommissionList: React.FC = () => {
   const navigate = useNavigate();
@@ -67,11 +90,7 @@ const CommissionList: React.FC = () => {
               >
                 <div className="flex">
                   <div className="w-32 h-32 flex-shrink-0">
-                    <img
-                      src={commission.image || noImages}
-                      alt={`Commission ${commission.commissionId}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <CommissionImage filename={commission.image || ''} />
                   </div>
                   <div className="flex-1 p-3">
                     <h2 className="text-lg font-semibold mb-1">

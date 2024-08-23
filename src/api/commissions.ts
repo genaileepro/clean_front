@@ -54,3 +54,27 @@ export const updateCommission = async ({
 export const deleteCommission = async (id: number): Promise<void> => {
   await api.delete(`/commission?commissionId=${id}`);
 };
+
+export const uploadCommissionImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await api.post<{ fileName: string; message: string }>(
+    '/commission/upload',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
+
+  return response.data.fileName;
+};
+
+export const getCommissionImage = async (filename: string): Promise<string> => {
+  const response = await api.get(`/api/commission?images=${filename}`, {
+    responseType: 'blob',
+  });
+  return URL.createObjectURL(response.data);
+};

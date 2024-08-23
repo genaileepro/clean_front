@@ -70,3 +70,21 @@ export const useDeleteCommission = () => {
     },
   });
 };
+
+export const useUploadCommissionImage = () => {
+  return useMutation({
+    mutationFn: api.uploadCommissionImage,
+    onError: (error: Error) => {
+      showErrorNotification(error.message);
+    },
+  });
+};
+
+export const useCommissionImage = (filename: string) => {
+  return useQuery({
+    queryKey: ['commissionImage', filename],
+    queryFn: () => api.getCommissionImage(filename),
+    staleTime: Infinity, // 이미지는 자주 변경되지 않으므로 staleTime을 Infinity로 설정
+    gcTime: 1000 * 60 * 60 * 24, // 24시간 동안 캐시 유지
+  });
+};
