@@ -3,6 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getCommissionList } from '../../api/estimate';
 import { Commission } from '../../types/estimate';
 
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
+
 const CommissionView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const commissionId = id ? parseInt(id, 10) : null;
@@ -62,23 +68,29 @@ const CommissionView: React.FC = () => {
         const map = new window.kakao.maps.Map(mapContainer, mapOption);
         const geocoder = new window.kakao.maps.services.Geocoder();
 
-        geocoder.addressSearch(commission.address, (result, status) => {
-          if (status === window.kakao.maps.services.Status.OK) {
-            const coords = new window.kakao.maps.LatLng(
-              parseFloat(result[0].y),
-              parseFloat(result[0].x),
-            );
+        geocoder.addressSearch(
+          commission.address,
+          (
+            result: { x: string; y: string }[],
+            status: (typeof window.kakao.maps.services.Status)[keyof typeof window.kakao.maps.services.Status],
+          ) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const coords = new window.kakao.maps.LatLng(
+                parseFloat(result[0].y),
+                parseFloat(result[0].x),
+              );
 
-            new window.kakao.maps.Marker({
-              map: map,
-              position: coords,
-            });
+              new window.kakao.maps.Marker({
+                map: map,
+                position: coords,
+              });
 
-            map.setCenter(coords);
-          } else {
-            console.error('Failed to fetch coordinates for address');
-          }
-        });
+              map.setCenter(coords);
+            } else {
+              console.error('Failed to fetch coordinates for address');
+            }
+          },
+        );
       }
     };
 

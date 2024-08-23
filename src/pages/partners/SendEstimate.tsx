@@ -53,7 +53,7 @@ const SendEstimate: React.FC = () => {
       const updatedEstimate: Partial<Estimate> = {
         ...estimate,
         tmpPrice: finalPrice,
-        status: 'CONTACT', // 상태를 SEND로 설정
+        status: 'CONTACT', // 상태를 CONTACT로 설정
       };
 
       await updateEstimate(estimate.id, updatedEstimate);

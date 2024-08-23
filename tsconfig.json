@@ -25,5 +25,7 @@
     },
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src", "vite-env.d.ts"]
+  "include": ["src", "vite-env.d.ts"],
+  "files": ["src/types/kakaomap/index.d.ts"],
+  "types": ["kakao.maps.d.ts"]
 }
