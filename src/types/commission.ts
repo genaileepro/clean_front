@@ -20,11 +20,11 @@ export enum Status {
 export interface Commission {
   commissionId: number;
   memberNick: string;
+  addressId: number;
   image?: string; // 이미지 파일명 또는 식별자
   size: number;
   houseType: HouseType;
   cleanType: CleanType;
-  address: string;
   desiredDate: string;
   significant?: string;
   status: Status;
@@ -53,14 +53,15 @@ export interface Estimate {
   fixedDate: string;
   statement: string;
   approved: boolean;
-  ststus: Status;
+  status: Status;
   partnerId: number;
   partnerName: string;
 }
 
 export interface CommissionConfirmedResponse {
   content: {
-    id: number;
+    commissionId: number;
+    addressId: number;
     size: number;
     houseType: HouseType;
     cleanType: CleanType;
@@ -97,19 +98,6 @@ export interface CommissionConfirmedResponse {
   empty: boolean;
 }
 
-export interface CommissionConfirmDetailResponse {
-  commissionId: number;
-  size: number;
-  houseType: HouseType;
-  cleanType: CleanType;
-  addressId: number;
-  desiredDate: string;
-  significant: string;
-  image: string;
-  status: Status;
-  estimatedStatus: Status;
-  tmpPrice: number;
-  statement: string;
-  fixedDate: string;
-  price: number;
+export interface CommissionSendDetail extends Commission {
+  estimates: Estimate[];
 }

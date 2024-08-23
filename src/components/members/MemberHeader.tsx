@@ -57,7 +57,13 @@ const MemberHeader: React.FC = () => {
             의뢰작성하기
           </button>
           <button className="h-btn" onClick={() => navigate('/commissionlist')}>
-            의뢰목록
+            의뢰 목록
+          </button>
+          <button
+            className="h-btn"
+            onClick={() => navigate('/commissionsendlist')}
+          >
+            발송 목록
           </button>
         </div>
 
@@ -149,6 +155,15 @@ const MemberHeader: React.FC = () => {
                 }}
               >
                 <span className="text-black text-xl">의뢰목록</span>
+              </div>
+              <div
+                className="w-full p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                  navigate('/commissionsendlist');
+                  toggleMenu();
+                }}
+              >
+                <span className="text-black text-xl">발송 목록</span>
               </div>
               {isAuthenticated ? (
                 <>

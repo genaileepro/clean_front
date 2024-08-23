@@ -1,7 +1,8 @@
 import api from './axiosConfig';
 import {
   Commission,
-  CommissionConfirmDetailResponse,
+  CommissionSendDetail,
+  Estimate,
 } from '../types/commission';
 
 export const fetchCommissions = async (): Promise<Commission[]> => {
@@ -9,23 +10,20 @@ export const fetchCommissions = async (): Promise<Commission[]> => {
   return response.data;
 };
 
-export const fetchCommissionConfirm = async (
+export const fetchCommissionConfirmed = async (
   commissionId: number,
-): Promise<Commission> => {
-  const response = await api.get<Commission[]>(
-    `/commission/confirmed?id=${commissionId}`,
+): Promise<CommissionSendDetail> => {
+  const response = await api.get<CommissionSendDetail>(
+    `/commission/confirmed?commissionId=${commissionId}`,
   );
-  if (response.data.length === 0) {
-    throw new Error('Commission not found');
-  }
-  return response.data[0]; // 배열의 첫 번째 요소만 반환
+  return response.data;
 };
 
-export const fetchCommissionConfirmDetail = async (
+export const fetchCommissionSendDetail = async (
   commissionId: number,
-): Promise<CommissionConfirmDetailResponse> => {
-  const response = await api.get<CommissionConfirmDetailResponse>(
-    `/commission/confirmdetail?id=${commissionId}`,
+): Promise<CommissionSendDetail> => {
+  const response = await api.get<CommissionSendDetail>(
+    `/commission/confirmed?commissionId=${commissionId}`,
   );
   return response.data;
 };
@@ -37,22 +35,31 @@ export const createCommission = async (
   return response.data;
 };
 
-export const updateCommission = async ({
-  commissionId,
-  commission,
-}: {
-  commissionId: number;
-  commission: Partial<Commission>;
-}): Promise<Commission> => {
-  const response = await api.patch<Commission>(
-    `/commission?id=${commissionId}`,
-    commission,
-  );
+export const updateCommission = async (
+  commissionId: number,
+  addressId?: number,
+  commission?: Partial<Commission>,
+): Promise<Commission> => {
+  const url = addressId
+    ? `/commission/confirmed?commissionId=${commissionId}&addressId=${addressId}`
+    : `/commission/confirmed?commissionId=${commissionId}`;
+
+  const response = await api.patch<Commission>(url, commission);
   return response.data;
 };
 
 export const deleteCommission = async (id: number): Promise<void> => {
   await api.delete(`/commission?commissionId=${id}`);
+};
+
+export const updateCommissionStatus = async (
+  commission: Partial<Commission>,
+): Promise<Commission> => {
+  const response = await api.patch<Commission>(
+    `/commission?commissionId=${commission.commissionId}&addressId=${commission.addressId}`,
+    commission,
+  );
+  return response.data;
 };
 
 export const uploadCommissionImage = async (file: File): Promise<string> => {
@@ -73,8 +80,19 @@ export const uploadCommissionImage = async (file: File): Promise<string> => {
 };
 
 export const getCommissionImage = async (filename: string): Promise<string> => {
-  const response = await api.get(`/api/commission?images=${filename}`, {
+  const response = await api.get(`/commission/upload?file=${filename}`, {
     responseType: 'blob',
   });
   return URL.createObjectURL(response.data);
+};
+
+export const fetchEstimateDetail = async (
+  estimateId: number,
+): Promise<Estimate> => {
+  const response = await api.get<Estimate>(`/estimate/detail?id=${estimateId}`);
+  return response.data;
+};
+
+export const approveEstimate = async (estimateId: number): Promise<void> => {
+  await api.post(`/api/estimate/approve?id=${estimateId}`);
 };

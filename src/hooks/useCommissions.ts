@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from '../api/commissions';
 import {
   Commission,
-  CommissionConfirmDetailResponse,
+  CommissionSendDetail,
+  Estimate,
 } from '../types/commission';
 import { showErrorNotification } from '../utils/errorHandler';
 
@@ -13,18 +14,18 @@ export const useCommissions = () => {
   });
 };
 
-export const useCommissionConfirm = (commissionId: number) => {
-  return useQuery<Commission, Error>({
-    queryKey: ['commissionConfirm', commissionId],
-    queryFn: () => api.fetchCommissionConfirm(commissionId),
+export const useCommissionConfirmed = (commissionId: number) => {
+  return useQuery<CommissionSendDetail, Error>({
+    queryKey: ['commissionConfirmed', commissionId],
+    queryFn: () => api.fetchCommissionConfirmed(commissionId),
     enabled: !!commissionId,
   });
 };
 
-export const useCommissionConfirmDetail = (commissionId: number) => {
-  return useQuery<CommissionConfirmDetailResponse, Error>({
-    queryKey: ['commissionConfirmDetail', commissionId],
-    queryFn: () => api.fetchCommissionConfirmDetail(commissionId),
+export const useCommissionSendDetail = (commissionId: number) => {
+  return useQuery<CommissionSendDetail, Error>({
+    queryKey: ['commissionSendDetail', commissionId],
+    queryFn: () => api.fetchCommissionSendDetail(commissionId),
     enabled: !!commissionId,
   });
 };
@@ -45,11 +46,19 @@ export const useCreateCommission = () => {
 export const useUpdateCommission = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: api.updateCommission,
+    mutationFn: ({
+      commissionId,
+      addressId,
+      commission,
+    }: {
+      commissionId: number;
+      addressId?: number;
+      commission: Partial<Commission>;
+    }) => api.updateCommission(commissionId, addressId, commission),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['commissions'] });
       queryClient.invalidateQueries({
-        queryKey: ['commissionConfirm', data.commissionId],
+        queryKey: ['commissionConfirmed', data.commissionId],
       });
     },
     onError: (error: Error) => {
@@ -71,6 +80,21 @@ export const useDeleteCommission = () => {
   });
 };
 
+export const useUpdateCommissionStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (commission: Commission) =>
+      api.updateCommissionStatus(commission),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['commissions'] });
+      queryClient.invalidateQueries({ queryKey: ['commissionConfirmed'] });
+    },
+    onError: (error: Error) => {
+      showErrorNotification(error.message);
+    },
+  });
+};
+
 export const useUploadCommissionImage = () => {
   return useMutation({
     mutationFn: api.uploadCommissionImage,
@@ -84,7 +108,14 @@ export const useCommissionImage = (filename: string) => {
   return useQuery({
     queryKey: ['commissionImage', filename],
     queryFn: () => api.getCommissionImage(filename),
-    staleTime: Infinity, // 이미지는 자주 변경되지 않으므로 staleTime을 Infinity로 설정
-    gcTime: 1000 * 60 * 60 * 24, // 24시간 동안 캐시 유지
+    enabled: !!filename,
+  });
+};
+
+export const useEstimateDetail = (estimateId: number) => {
+  return useQuery<Estimate, Error>({
+    queryKey: ['estimateDetail', estimateId],
+    queryFn: () => api.fetchEstimateDetail(estimateId),
+    enabled: !!estimateId,
   });
 };
