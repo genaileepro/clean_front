@@ -50,7 +50,7 @@ export const validatePassword = createValidator(
     /^(?=.*[a-z])(?=.*\d)(?=.*[~!@$%^&*_])[a-zA-Z\d~!@$%^&*_]{8,}$/.test(
       password,
     ),
-  '최소 8자 이상, 대소문자, 숫자, 특수 문자를 포함해야 합니다.',
+  '8자 이상, 대소문자, 숫자, 특수 문자를 포함해야 합니다.',
 );
 
 export const validateConfirmPassword = (
@@ -79,7 +79,7 @@ export const validateConfirmPassword = (
 
 export const validateNickName = createValidator(
   (nick) => /^[a-zA-Z0-9가-힣_-]{1,15}$/.test(nick),
-  '닉네임은 숫자, 대문자, 소문자, 한글, 밑줄(_), 대시(-)만 포함할 수 있으며, 길이는 1자에서 15자 사이여야 합니다.',
+  '닉네임은 1~15자로, 숫자/영문/한글/특수문자(_,-)만 사용 가능합니다.',
 );
 
 export const validatePhoneNumber = createValidator(
