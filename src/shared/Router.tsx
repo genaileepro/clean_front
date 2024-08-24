@@ -11,6 +11,10 @@ import SignUp from '../pages/members/SignUp';
 import CommissionWrite from '../pages/members/CommissionWrite';
 import CommissionList from '../pages/members/CommissionList';
 import CommissionDetail from '../pages/members/CommissionDetail';
+import CommissionEdit from '../pages/members/CommissionEdit';
+import CommissionSendList from '../pages/members/CommissionSendList ';
+import CommissionSendDetail from '../pages/members/CommissionSendDetail ';
+import EstimateDetail from '../pages/members/EstimateDetail';
 import UserOrders from '../pages/members/UserOrders';
 import MemberInfo from '../pages/members/MemberInfo';
 import MemberEdit from '../pages/members/MemberEdit';
@@ -26,7 +30,6 @@ import PartnerInfo from '../pages/partners/PartnerInfo';
 import PartnerEdit from '../pages/partners/PartnerEdit';
 import MyEstimates from '../pages/partners/MyEstimates';
 import WriteEstimate from '../pages/partners/WriteEstimate';
-import EstimateDetail from '../pages/members/EstimateDetail';
 import EditEstimates from '../pages/partners/EditEstimates';
 import SendEstimate from '../pages/partners/SendEstimate';
 import BusinessStatusCheck from '../pages/partners/PartnerCheck';
@@ -84,6 +87,12 @@ const Router: React.FC = () => {
           <Route path="/commissionwrite" element={<CommissionWrite />} />
           <Route path="/commissionlist" element={<CommissionList />} />
           <Route path="/commissiondetail" element={<CommissionDetail />} />
+          <Route path="/commissionedit" element={<CommissionEdit />} />
+          <Route path="/commissionsendlist" element={<CommissionSendList />} />
+          <Route
+            path="/commissionsenddetail"
+            element={<CommissionSendDetail />}
+          />
           <Route path="/estimatedetail" element={<EstimateDetail />} />
           <Route path="/userorders" element={<UserOrders />} />
         </Route>
