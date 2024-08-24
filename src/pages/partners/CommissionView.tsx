@@ -13,7 +13,6 @@ const CommissionView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const commissionId = id ? parseInt(id, 10) : null;
   const [commission, setCommission] = useState<Commission | null>(null);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,24 +33,6 @@ const CommissionView: React.FC = () => {
   }, [commissionId]);
 
   useEffect(() => {
-    const loadKakaoMapScript = () => {
-      return new Promise<void>((resolve, reject) => {
-        if (window.kakao && window.kakao.maps) {
-          resolve();
-          return;
-        }
-
-        const script = document.createElement('script');
-        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_API_KEY}&libraries=services,clusterer,drawing`;
-        script.async = true;
-        document.head.appendChild(script);
-
-        script.onload = () => resolve();
-        script.onerror = () =>
-          reject(new Error('Kakao Maps script failed to load'));
-      });
-    };
-
     const initializeMap = () => {
       if (window.kakao && window.kakao.maps && commission) {
         const mapContainer = document.getElementById('map') as HTMLElement;
@@ -94,14 +75,13 @@ const CommissionView: React.FC = () => {
       }
     };
 
-    // 스크립트 로드 후 의존성 조건에 따라 지도 초기화
+    // 지도 초기화
     if (commission) {
-      loadKakaoMapScript()
-        .then(() => {
-          setIsMapLoaded(true); // 맵 로드 상태 업데이트
-          initializeMap();
-        })
-        .catch((error) => console.error('Error loading Kakao Maps:', error));
+      if (window.kakao && window.kakao.maps) {
+        initializeMap();
+      } else {
+        console.error('Kakao Maps script is not loaded.');
+      }
     }
   }, [commission]);
 
