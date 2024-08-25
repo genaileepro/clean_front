@@ -64,6 +64,14 @@ const Login: React.FC = () => {
     }
   };
 
+  const REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+  const link = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
+  const handleKakaoLogin = () => {
+    window.location.href = link;
+  };
+
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
       <div className="grid bg-white shadow-md rounded-lg overflow-hidden">
@@ -107,20 +115,44 @@ const Login: React.FC = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
-            <div className="flex justify-center space-x-4">
+            <div className="flex flex-col space-y-4">
               <button
-                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded"
+                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded w-full"
                 type="submit"
               >
                 로그인
               </button>
-              <button
-                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={() => navigate('/signup')}
-                type="button"
-              >
-                회원가입
-              </button>
+              <div className="text-center text-sm">
+                <span>계정이 없으신가요? </span>
+                <a
+                  href="/signup"
+                  className="text-blue-500 hover:underline"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate('/signup');
+                  }}
+                >
+                  회원 가입
+                </a>
+              </div>
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-2 text-sm text-gray-500">
+                    또는
+                  </span>
+                </div>
+              </div>
+              <div>
+                <img
+                  src="/kakao_login_medium_wide.png"
+                  alt="카카오 로그인"
+                  className="w-full h-auto cursor-pointer"
+                  onClick={handleKakaoLogin}
+                />
+              </div>
             </div>
           </form>
         </div>
