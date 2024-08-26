@@ -67,14 +67,6 @@ const PartnerLogin: React.FC = () => {
     }
   };
 
-  const REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
-  const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
-  const link = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-
-  const handleKakaoLogin = () => {
-    window.location.href = link;
-  };
-
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
       <div className="grid bg-white shadow-md rounded-lg overflow-hidden">
@@ -137,24 +129,6 @@ const PartnerLogin: React.FC = () => {
                 >
                   회원 가입
                 </a>
-              </div>
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-2 text-sm text-gray-500">
-                    또는
-                  </span>
-                </div>
-              </div>
-              <div>
-                <img
-                  src="/kakao_login_medium_wide.png"
-                  alt="카카오 로그인"
-                  className="w-full h-auto cursor-pointer"
-                  onClick={handleKakaoLogin}
-                />
               </div>
             </div>
           </form>
