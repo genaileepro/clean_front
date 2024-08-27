@@ -149,7 +149,7 @@ const Login: React.FC = () => {
                 <img
                   src="/kakao_login_medium_wide.png"
                   alt="카카오 로그인"
-                  className="w-full h-auto cursor-pointer"
+                  className="w-full h-12 cursor-pointer"
                   onClick={handleKakaoLogin}
                 />
               </div>
