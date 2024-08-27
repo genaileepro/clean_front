@@ -112,7 +112,7 @@ const PartnerLogin: React.FC = () => {
             </div>
             <div className="flex flex-col space-y-4">
               <button
-                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded w-full"
+                className="bg-[#144156] text-white py-2 px-4 rounded w-full"
                 type="submit"
               >
                 로그인
@@ -120,11 +120,11 @@ const PartnerLogin: React.FC = () => {
               <div className="text-center text-sm">
                 <span>계정이 없으신가요? </span>
                 <a
-                  href="/signup"
+                  href="/ptsignup"
                   className="text-blue-500 hover:underline"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate('/signup');
+                    navigate('/ptsignup');
                   }}
                 >
                   회원 가입
