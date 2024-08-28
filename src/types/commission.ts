@@ -60,7 +60,7 @@ export interface Estimate {
 
 export interface CommissionConfirmedResponse {
   content: {
-    commissionId: number;
+    commissionId: number; // 프론트엔드에서 사용하는 필드
     addressId: number;
     size: number;
     houseType: HouseType;

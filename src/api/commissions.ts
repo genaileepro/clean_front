@@ -37,15 +37,18 @@ export const createCommission = async (
 
 export const updateCommission = async (
   commissionId: number,
-  addressId?: number,
-  commission?: Partial<Commission>,
+  addressId: number,
+  commission: Partial<Commission>,
 ): Promise<Commission> => {
-  const url = addressId
-    ? `/commission/confirmed?commissionId=${commissionId}&addressId=${addressId}`
-    : `/commission/confirmed?commissionId=${commissionId}`;
+  const url = `/commission?commissionId=${commissionId}&addressId=${addressId}`;
 
-  const response = await api.patch<Commission>(url, commission);
-  return response.data;
+  try {
+    const response = await api.patch<Commission>(url, commission);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating commission:', error);
+    throw new Error('Failed to update commission');
+  }
 };
 
 export const deleteCommission = async (id: number): Promise<void> => {

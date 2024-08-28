@@ -52,7 +52,7 @@ export const useUpdateCommission = () => {
       commission,
     }: {
       commissionId: number;
-      addressId?: number;
+      addressId: number;
       commission: Partial<Commission>;
     }) => api.updateCommission(commissionId, addressId, commission),
     onSuccess: (data) => {
@@ -61,8 +61,10 @@ export const useUpdateCommission = () => {
         queryKey: ['commissionConfirmed', data.commissionId],
       });
     },
-    onError: (error: Error) => {
-      showErrorNotification(error.message);
+    onError: (error: unknown) => {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unknown error occurred';
+      showErrorNotification(`의뢰 수정에 실패했습니다: ${errorMessage}`);
     },
   });
 };

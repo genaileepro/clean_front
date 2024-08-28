@@ -35,6 +35,7 @@ import SendEstimate from '../pages/partners/SendEstimate';
 import BusinessStatusCheck from '../pages/partners/PartnerCheck';
 import CommissionView from '../pages/partners/CommissionView';
 import MapTest from '../pages/partners/MapTest';
+import PaymentPage from '../pages/members/PaymentPage';
 
 const ProtectedRoute: React.FC<{ allowedRole: 'member' | 'partner' }> = ({
   allowedRole,
@@ -94,6 +95,7 @@ const Router: React.FC = () => {
             element={<CommissionSendDetail />}
           />
           <Route path="/estimatedetail" element={<EstimateDetail />} />
+          <Route path="/payment" element={<PaymentPage />} />
           <Route path="/userorders" element={<UserOrders />} />
         </Route>
       </Route>

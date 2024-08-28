@@ -37,10 +37,10 @@ const CommissionSendList: React.FC = () => {
                 }
               >
                 <div className="flex">
-                  <div className="w-32 h-32 flex-shrink-0">
+                  <div className="w-36 h-full flex-shrink-0">
                     <CommissionImage
                       filename={commission.image || ''}
-                      className="w-full h-64 object-cover rounded-lg mb-4"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="flex-1 p-3">
