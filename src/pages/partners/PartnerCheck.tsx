@@ -8,6 +8,7 @@ const BusinessStatusCheck: React.FC = () => {
   const [pNm, setPNm] = useState<string>('');
   const [bNm, setBNm] = useState<string>('');
   const [bType, setBType] = useState<string>('');
+  const [bSector, setBSector] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
@@ -23,6 +24,7 @@ const BusinessStatusCheck: React.FC = () => {
           p_nm: pNm,
           b_nm: bNm,
           b_type: bType,
+          b_sector: bSector,
         },
       ],
     };
@@ -81,7 +83,14 @@ const BusinessStatusCheck: React.FC = () => {
       <br />
       <input
         type="text"
-        placeholder="사업 유형"
+        placeholder="업태"
+        value={bSector}
+        onChange={(e) => setBSector(e.target.value)}
+      />
+      <br />
+      <input
+        type="text"
+        placeholder="업종"
         value={bType}
         onChange={(e) => setBType(e.target.value)}
       />
