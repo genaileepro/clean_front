@@ -171,13 +171,25 @@ const PartnerHome: React.FC = () => {
             견적매칭 확인하기
           </button>
         </nav>
+        <div className="mb-4">
+          <p>
+            <strong>상호명:</strong> 아이크(AIC) | <strong>대표자명:</strong>{' '}
+            이대성 | <strong>사업장주소:</strong> 강원 특별자치도 춘천시 영서로
+            2922
+          </p>
+          <p>
+            <strong>사업자등록번호:</strong> 822-15-01913 |{' '}
+            <strong>대표전화번호:</strong> 070-7954-3805 |{' '}
+            <strong>대표이메일:</strong>{' '}
+            <a href="leepro@ai-c.kr" className="text-white underline">
+              leepro@ai-c.kr
+            </a>
+          </p>
+        </div>
         <p className="mb-4">
-          고객 센터: 123-456-7890 | 이메일:{' '}
-          <a
-            href="mailto:support@cleanroom.com"
-            className="text-white underline"
-          >
-            support@cleanroom.com
+          고객 센터: 070-7954-3805 | 이메일:{' '}
+          <a href="leepro@ai-c.kr" className="text-white underline">
+            leepro@ai-c.kr
           </a>
         </p>
       </footer>
