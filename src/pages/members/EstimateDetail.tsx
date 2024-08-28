@@ -64,7 +64,7 @@ const EstimateDetail: React.FC = () => {
             className="bg-brand text-white py-2 px-4 rounded hover:bg-brand-dark transition-colors"
             disabled={estimate.status !== 'CHECK'}
           >
-            견적 승인
+            견적 승인 및 결제
           </button>
           <button
             onClick={() => navigate(-1)}

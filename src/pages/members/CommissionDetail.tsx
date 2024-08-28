@@ -38,10 +38,6 @@ const CommissionDetail: React.FC = () => {
   if (!commission)
     return <div className="text-center">의뢰를 찾을 수 없습니다.</div>;
 
-  console.log('isLoading:', isLoading);
-  console.log('error:', error);
-  console.log('commission:', commission);
-
   const handleSendCommission = () => {
     setIsConfirmOpen(true);
   };
@@ -54,15 +50,7 @@ const CommissionDetail: React.FC = () => {
       }
 
       const updatedCommission: Commission = {
-        commissionId: commission.commissionId,
-        addressId: commission.addressId,
-        memberNick: commission.memberNick,
-        image: commission.image || 'string',
-        size: commission.size,
-        houseType: commission.houseType,
-        cleanType: commission.cleanType,
-        desiredDate: commission.desiredDate,
-        significant: commission.significant || 'string',
+        ...commission,
         status: Status.SEND,
       };
 
@@ -114,10 +102,9 @@ const CommissionDetail: React.FC = () => {
             </button>
           )}
           <button
-            key={commission.commissionId}
             onClick={() =>
               navigate(
-                `/commissionedit?commissionId=${commission?.commissionId}&addressId=${commission.addressId}`,
+                `/commissionedit?commissionId=${commission.commissionId}&addressId=${commission.addressId}`,
               )
             }
             className="bg-brand text-white px-6 py-2 rounded hover:bg-brand-dark transition-colors"
