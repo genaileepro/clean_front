@@ -20,11 +20,6 @@ const CommissionEdit: React.FC = () => {
   } = useCommissionConfirmed(commissionId);
   const updateCommissionMutation = useUpdateCommission();
 
-  console.log('Commission ID:', commissionId);
-  console.log('Commission Data:', commission);
-  console.log('Loading:', isLoading);
-  console.log('Error:', error);
-
   const [editedCommission, setEditedCommission] = useState<Partial<Commission>>(
     {},
   );
@@ -47,9 +42,8 @@ const CommissionEdit: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      console.log('Edited Commission:', editedCommission); // 로그 유지
       if (!editedCommission.commissionId || !editedCommission.addressId) {
-        throw new Error('Invalid commission id or address id');
+        throw new Error('Invalid commissionId or addressId');
       }
       await updateCommissionMutation.mutateAsync({
         commissionId: editedCommission.commissionId,

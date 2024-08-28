@@ -98,44 +98,63 @@ const CommissionList: React.FC = () => {
             {checkCommissions.map((commission: Commission) => (
               <div
                 key={commission.commissionId}
-                className="bg-gray-50 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-102"
+                className="bg-gray-50 rounded-lg shadow-sm overflow-hidden cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-102 h-36" // 높이를 h-36으로 다시 줄임
                 onClick={() =>
                   navigate(
                     `/commissiondetail?commissionId=${commission.commissionId}`,
                   )
                 }
               >
-                <div className="flex">
-                  <div className="w-32 h-32 flex-shrink-0">
-                    <CommissionImage filename={commission.image || ''} />
+                <div className="flex h-full">
+                  <div className="w-36 h-full flex-shrink-0">
+                    {' '}
+                    {/* 너비를 w-36으로 다시 줄임 */}
+                    <CommissionImage
+                      filename={commission.image || ''}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <div className="flex-1 p-3">
-                    <h2 className="text-lg font-semibold mb-1">
-                      {HouseType[commission.houseType]} 청소
-                    </h2>
-                    <div className="grid grid-cols-2 gap-1 text-sm">
-                      <p>
-                        <span className="font-medium">평수:</span>{' '}
-                        {commission.size} 평
-                      </p>
-                      <p>
-                        <span className="font-medium">청소 등급:</span>{' '}
-                        {CleanType[commission.cleanType]}
-                      </p>
-                      <p>
-                        <span className="font-medium">희망일:</span>{' '}
-                        {new Date(commission.desiredDate).toLocaleDateString()}
-                      </p>
-                      <p>
-                        <span className="font-medium">상태:</span>{' '}
-                        {getStatusText(commission.status)}
+                  <div className="flex-1 p-3 flex flex-col justify-between">
+                    {' '}
+                    {/* 패딩을 p-3로 줄임 */}
+                    <div>
+                      <h2 className="text-lg font-semibold mb-1">
+                        {' '}
+                        {/* 마진 하단 줄임 */}
+                        {HouseType[commission.houseType]} 청소
+                      </h2>
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
+                        {' '}
+                        {/* 세로 간격 줄임 */}
+                        <p>
+                          <span className="font-medium">평수:</span>{' '}
+                          {commission.size} 평
+                        </p>
+                        <p>
+                          <span className="font-medium">청소 등급:</span>{' '}
+                          {CleanType[commission.cleanType]}
+                        </p>
+                        <p>
+                          <span className="font-medium">희망일:</span>{' '}
+                          {new Date(
+                            commission.desiredDate,
+                          ).toLocaleDateString()}
+                        </p>
+                        <p>
+                          <span className="font-medium">상태:</span>{' '}
+                          {getStatusText(commission.status)}
+                        </p>
+                      </div>
+                      <p className="text-sm mt-1">
+                        {' '}
+                        {/* 마진 상단 줄임 */}
+                        <span className="font-medium">요청사항:</span>{' '}
+                        {commission.significant || '없음'}
                       </p>
                     </div>
-                    <p className="text-sm mt-1">
-                      <span className="font-medium">요청사항:</span>{' '}
-                      {commission.significant || '없음'}
-                    </p>
-                    <div className="mt-2 flex justify-end space-x-2">
+                    <div className="flex justify-end space-x-2 mt-1">
+                      {' '}
+                      {/* 마진 상단만 남기고 패딩 제거 */}
                       <button
                         onClick={(e) => handleSendCommission(commission, e)}
                         className="bg-blue-500 text-white px-2 py-1 text-sm rounded hover:bg-blue-600 transition-colors"
