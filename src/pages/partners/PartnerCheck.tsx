@@ -1,41 +1,39 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { BusinessStatusResponse } from '../../types/business';
+import { validateBusinessNumber } from '../../api/estimate';
+import { BusinessValidationRequest } from '../../types/business';
 
 const BusinessStatusCheck: React.FC = () => {
   const [businessNumber, setBusinessNumber] = useState<string>('');
+  const [startDt, setStartDt] = useState<string>('');
+  const [pNm, setPNm] = useState<string>('');
+  const [bNm, setBNm] = useState<string>('');
+  const [bType, setBType] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
   );
 
   const checkBusinessStatus = async () => {
-    const serviceKey = import.meta.env.VITE_PUBLIC_API_KEY; // 환경 변수에서 API 키 가져오기
-    const apiUrl = `https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey=${serviceKey}`;
-
-    const requestData = {
-      b_no: [businessNumber],
+    const requestData: BusinessValidationRequest = {
+      service_key: import.meta.env.VITE_PUBLIC_API_KEY,
+      businesses: [
+        {
+          b_no: businessNumber,
+          start_dt: startDt,
+          p_nm: pNm,
+          b_nm: bNm,
+          b_type: bType,
+        },
+      ],
     };
 
     try {
-      const response = await axios.post<BusinessStatusResponse>(
-        apiUrl,
-        requestData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      );
-
-      const businessInfo = response.data.data[0];
+      const response = await validateBusinessNumber(requestData);
+      const businessInfo = response.data[0];
 
       // 사업자 상태 확인
-      if (
-        businessInfo.tax_type === '국세청에 등록되지 않은 사업자등록번호입니다.'
-      ) {
-        setValidationMessage(businessInfo.tax_type); // 오류 메시지 설정
+      if (businessInfo.valid === 'N') {
+        setValidationMessage(businessInfo.valid_msg); // 유효하지 않은 경우 메시지 설정
       } else {
         setValidationMessage('유효한 사업자등록번호입니다.');
       }
@@ -47,6 +45,7 @@ const BusinessStatusCheck: React.FC = () => {
       );
       setValidationMessage(null);
     }
+    console.log(requestData);
   };
 
   return (
@@ -54,11 +53,42 @@ const BusinessStatusCheck: React.FC = () => {
       <h1>사업자 상태 조회</h1>
       <input
         type="text"
-        placeholder="- 를 제외하고 입력"
+        placeholder="사업자등록번호"
         value={businessNumber}
         onChange={(e) => setBusinessNumber(e.target.value)}
       />
-      <button onClick={checkBusinessStatus}>조회</button>
+      <br />
+      <input
+        type="text"
+        placeholder="사업 시작일 (YYYYMMDD)"
+        value={startDt}
+        onChange={(e) => setStartDt(e.target.value)}
+      />
+      <br />
+      <input
+        type="text"
+        placeholder="대표자명"
+        value={pNm}
+        onChange={(e) => setPNm(e.target.value)}
+      />
+      <br />
+      <input
+        type="text"
+        placeholder="상호명"
+        value={bNm}
+        onChange={(e) => setBNm(e.target.value)}
+      />
+      <br />
+      <input
+        type="text"
+        placeholder="사업 유형"
+        value={bType}
+        onChange={(e) => setBType(e.target.value)}
+      />
+      <br />
+      <button onClick={checkBusinessStatus} className="btn">
+        조회
+      </button>
 
       {validationMessage && <p>{validationMessage}</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
