@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCurrentMember, useUpdateMember } from '../../hooks/useMembers';
 import {
-  validateConfirmPassword,
   validateNickName,
   validatePassword,
   validatePhoneNumber,
+  validateConfirmPassword,
 } from '../../utils/validationUtils';
 import { FormEvent, useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
@@ -14,8 +14,8 @@ import {
 } from '../../utils/errorHandler';
 
 interface FormErrors {
-  password: string;
-  confirmPassword: string;
+  password?: string;
+  confirmPassword?: string;
   nick: string;
   phoneNumber: string;
   general?: string;
@@ -35,12 +35,9 @@ const MemberEdit: React.FC = () => {
     phoneNumber: '',
   });
   const [errors, setErrors] = useState<FormErrors>({
-    password: '',
-    confirmPassword: '',
     nick: '',
     phoneNumber: '',
   });
-  const [originalPassword, setOriginalPassword] = useState('');
 
   useEffect(() => {
     if (member) {
@@ -51,13 +48,14 @@ const MemberEdit: React.FC = () => {
         password: '',
         confirmPassword: '',
       });
-      setOriginalPassword(member.password);
     }
   }, [member]);
 
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러 발생: {error.message}</div>;
   if (!member) return <div>회원 정보를 찾을 수 없습니다.</div>;
+
+  const isKakaoUser = member.isKakaoUser; // 가정: 서버에서 이 정보를 제공한다고 가정
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,7 +66,7 @@ const MemberEdit: React.FC = () => {
       validationResult = validateNickName(value);
     } else if (name === 'phoneNumber') {
       validationResult = validatePhoneNumber(value);
-    } else if (name === 'password') {
+    } else if (name === 'password' && !isKakaoUser) {
       validationResult = value
         ? validatePassword(value)
         : { isValid: true, message: '' };
@@ -82,7 +80,7 @@ const MemberEdit: React.FC = () => {
           confirmPassword: confirmResult.message,
         }));
       }
-    } else if (name === 'confirmPassword') {
+    } else if (name === 'confirmPassword' && !isKakaoUser) {
       validationResult = value
         ? validateConfirmPassword(formData.password, value)
         : { isValid: true, message: '' };
@@ -101,7 +99,7 @@ const MemberEdit: React.FC = () => {
     if (
       errors.nick ||
       errors.phoneNumber ||
-      (formData.password && (errors.password || errors.confirmPassword))
+      (!isKakaoUser && (errors.password || errors.confirmPassword))
     ) {
       setErrors((prev) => ({
         ...prev,
@@ -110,7 +108,11 @@ const MemberEdit: React.FC = () => {
       return;
     }
 
-    if (formData.password && formData.password !== formData.confirmPassword) {
+    if (
+      !isKakaoUser &&
+      formData.password &&
+      formData.password !== formData.confirmPassword
+    ) {
       setErrors((prev) => ({
         ...prev,
         confirmPassword: '비밀번호가 일치하지 않습니다.',
@@ -121,8 +123,10 @@ const MemberEdit: React.FC = () => {
 
     try {
       const dataToUpdate = {
-        ...formData,
-        password: formData.password || originalPassword,
+        nick: formData.nick,
+        phoneNumber: formData.phoneNumber,
+        ...(!isKakaoUser &&
+          formData.password && { password: formData.password }),
       };
       await updateMemberMutation.mutateAsync(dataToUpdate);
       navigate(`/member/${email}`);
@@ -166,48 +170,52 @@ const MemberEdit: React.FC = () => {
             회원 아이디 : {member.email}
           </label>
         </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="password"
-          >
-            새 비밀번호
-          </label>
-          <input
-            className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-            id="password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="변경하려면 입력하세요"
-          />
-          {errors.password && (
-            <p className="text-red-500 text-xs italic">{errors.password}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="confirmPassword"
-          >
-            비밀번호 확인
-          </label>
-          <input
-            className={`shadow appearance-none border ${errors.confirmPassword ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-            id="confirmPassword"
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="비밀번호를 다시 입력하세요"
-          />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-xs italic">
-              {errors.confirmPassword}
-            </p>
-          )}
-        </div>
+        {!isKakaoUser && (
+          <>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="password"
+              >
+                새 비밀번호
+              </label>
+              <input
+                className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+                id="password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="변경하려면 입력하세요"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs italic">{errors.password}</p>
+              )}
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="confirmPassword"
+              >
+                비밀번호 확인
+              </label>
+              <input
+                className={`shadow appearance-none border ${errors.confirmPassword ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+                id="confirmPassword"
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="비밀번호를 다시 입력하세요"
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs italic">
+                  {errors.confirmPassword}
+                </p>
+              )}
+            </div>
+          </>
+        )}
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"

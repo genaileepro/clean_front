@@ -13,7 +13,7 @@ export enum CleanType {
 export enum Status {
   CHECK = 'CHECK',
   SEND = 'SEND',
-  CONTECT = 'CONTECT',
+  CONTACT = 'CONTACT',
   FINISH = 'FINISH',
 }
 
@@ -100,4 +100,22 @@ export interface CommissionConfirmedResponse {
 
 export interface CommissionSendDetail extends Commission {
   estimates: Estimate[];
+}
+
+export interface EstimateDetail {
+  id: number;
+  commissionId: number;
+  partnerId: number;
+  price: number;
+  fixedDate: string;
+  statement: string;
+  status: Status;
+  cleanType: CleanType;
+  size: number;
+  desiredDate: string;
+  significant: string;
+  commissionStatus: Status;
+  phoneNumber: string;
+  managerName: string;
+  companyName: string;
 }
