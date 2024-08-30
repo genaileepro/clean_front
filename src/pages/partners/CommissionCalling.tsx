@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCommissionList } from '../../api/estimate';
 import { Commission } from '../../types/estimate';
-import noHistoryImage from '../../assets/noHistory.png'; // 이미지 경로 임포트
+import noHistoryImage from '../../assets/noHistory.png';
+import CommissionImage from '../../components/common/CommissionImage';
 
 const CommissionCalling: React.FC = () => {
   const [commissions, setCommissions] = useState<Commission[]>([]);
@@ -19,13 +20,13 @@ const CommissionCalling: React.FC = () => {
     const fetchCommissions = async () => {
       setIsLoading(true);
       try {
-        const data = await getCommissionList(); // API 요청으로 모든 Commission 데이터 가져오기
-        // status가 'SEND'인 경우만 필터링
+        const data = await getCommissionList();
         const filteredData = data.filter(
           (commission) => commission.status === 'SEND',
         );
+        console.log(filteredData);
         setCommissions(filteredData);
-        setVisibleCommissions(filteredData.slice(0, 9)); // 초기 로드 시 첫 페이지의 9개 데이터만 표시
+        setVisibleCommissions(filteredData.slice(0, 9));
         setHasMore(filteredData.length > 9);
       } catch (err) {
         console.error('Error fetching commissions', err);
@@ -56,7 +57,7 @@ const CommissionCalling: React.FC = () => {
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          loadMore(); // 마지막 요소가 보이면 더 많은 데이터를 로드
+          loadMore();
         }
       });
 
@@ -83,10 +84,10 @@ const CommissionCalling: React.FC = () => {
               className="bg-white border rounded-lg shadow-lg m-4 p-6 w-80"
             >
               {commission.image && (
-                <img
-                  src={commission.image}
-                  alt="Commission"
+                <CommissionImage
+                  filename={commission.image}
                   className="w-full h-40 object-cover rounded-md mb-4"
+                  isPartner={true}
                 />
               )}
               <h3 className="text-xl font-bold mb-2">청소 견적의뢰</h3>
@@ -115,7 +116,6 @@ const CommissionCalling: React.FC = () => {
           ))}
         </div>
       ) : (
-        // 의뢰 내역이 없을 때 이미지 표시
         <div className="flex flex-col items-center mt-8">
           <img
             src={noHistoryImage}

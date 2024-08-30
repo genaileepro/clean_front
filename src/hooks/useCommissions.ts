@@ -3,7 +3,7 @@ import * as api from '../api/commissions';
 import {
   Commission,
   CommissionSendDetail,
-  Estimate,
+  EstimateDetail,
 } from '../types/commission';
 import { showErrorNotification } from '../utils/errorHandler';
 
@@ -114,8 +114,16 @@ export const useCommissionImage = (filename: string) => {
   });
 };
 
+export const usePartnerCommissionImage = (filename: string) => {
+  return useQuery({
+    queryKey: ['partnerCommissionImage', filename],
+    queryFn: () => api.getPartnerCommissionImage(filename),
+    enabled: !!filename,
+  });
+};
+
 export const useEstimateDetail = (estimateId: number) => {
-  return useQuery<Estimate, Error>({
+  return useQuery<EstimateDetail, Error>({
     queryKey: ['estimateDetail', estimateId],
     queryFn: () => api.fetchEstimateDetail(estimateId),
     enabled: !!estimateId,

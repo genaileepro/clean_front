@@ -1,76 +1,57 @@
 import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEstimateDetail } from '../../hooks/useCommissions';
-import { approveEstimate } from '../../api/commissions';
-import { showErrorNotification } from '../../utils/errorHandler';
-import toast from 'react-hot-toast';
+import { Status } from '../../types/commission';
 
 const EstimateDetail: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const estimateId = searchParams.get('id');
-  const parsedEstimateId = estimateId ? Number(estimateId) : undefined;
+  const estimateId = Number(searchParams.get('id'));
 
-  const {
-    data: estimate,
-    isLoading,
-    error,
-    refetch,
-  } = useEstimateDetail(parsedEstimateId!);
+  const { data, isLoading, error } = useEstimateDetail(estimateId);
 
-  if (isLoading) return <div className="text-center">로딩 중...</div>;
+  if (isLoading) return <div className="text-center py-8">로딩 중...</div>;
   if (error)
     return (
-      <div className="text-center text-red-500">
-        에러: {(error as Error).message}
-      </div>
+      <div className="text-center py-8 text-red-500">에러: {error.message}</div>
     );
-  if (!estimate)
-    return <div className="text-center">견적을 찾을 수 없습니다.</div>;
+  if (!data)
+    return <div className="text-center py-8">견적을 찾을 수 없습니다.</div>;
 
-  const handleApproveEstimate = async () => {
-    try {
-      await approveEstimate(estimate.id);
-      toast.success('견적이 승인되었습니다.');
-      refetch(); // 견적 정보를 다시 불러옵니다.
-    } catch (error) {
-      showErrorNotification('견적 승인에 실패했습니다.');
-    }
+  const handlePaymentNavigation = () => {
+    navigate('/payment', { state: { estimateId: data.id } });
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
       <h1 className="text-3xl font-bold mb-6 text-center">견적 상세</h1>
       <div className="bg-white shadow-md rounded-lg p-6">
-        <p>
-          <span className="font-semibold">견적 ID:</span> {estimate.id}
-        </p>
-        <p>
-          <span className="font-semibold">견적 금액:</span> {estimate.price}원
-        </p>
-        <p>
-          <span className="font-semibold">작업 가능일:</span>{' '}
-          {new Date(estimate.fixedDate).toLocaleDateString()}
-        </p>
-        <p>
-          <span className="font-semibold">견적 설명:</span> {estimate.statement}
-        </p>
-        <p>
-          <span className="font-semibold">상태:</span> {estimate.status}
-        </p>
-        <div className="mt-6 flex justify-center space-x-4">
+        <h2 className="text-xl font-semibold mb-4">견적 정보</h2>
+        <p>견적 ID: {data.id}</p>
+        <p>금액: {data.price.toLocaleString()}원</p>
+        <p>작업 날짜: {new Date(data.fixedDate).toLocaleString()}</p>
+        <p>설명: {data.statement}</p>
+        <p>상태: {data.status}</p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-4">의뢰 정보</h2>
+        <p>의뢰 ID: {data.commissionId}</p>
+        <p>청소 종류: {data.cleanType}</p>
+        <p>희망 날짜: {new Date(data.desiredDate).toLocaleDateString()}</p>
+        <p>크기: {data.size} 평</p>
+        <p>특이사항: {data.significant || '없음'}</p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-4">파트너 정보</h2>
+        <p>회사명: {data.companyName}</p>
+        <p>담당자: {data.managerName}</p>
+        <p>연락처: {data.phoneNumber}</p>
+
+        <div className="mt-6 flex justify-center">
           <button
-            onClick={handleApproveEstimate}
-            className="bg-brand text-white py-2 px-4 rounded hover:bg-brand-dark transition-colors"
-            disabled={estimate.status !== 'CHECK'}
+            onClick={handlePaymentNavigation}
+            className="bg-brand text-white py-2 px-6 rounded-full hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={data.status !== Status.CONTACT}
           >
-            견적 승인 및 결제
-          </button>
-          <button
-            onClick={() => navigate(-1)}
-            className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition-colors"
-          >
-            뒤로 가기
+            {data.status === Status.CONTACT ? '결제 진행하기' : '결제 불가'}
           </button>
         </div>
       </div>

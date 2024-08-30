@@ -74,7 +74,7 @@ const CommissionList: React.FC = () => {
         return '확인 중';
       case Status.SEND:
         return '전송됨';
-      case Status.CONTECT:
+      case Status.CONTACT:
         return '연락 중';
       case Status.FINISH:
         return '완료';

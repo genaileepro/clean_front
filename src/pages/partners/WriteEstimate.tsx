@@ -7,6 +7,7 @@ import {
   validateDesiredDate,
   validateSignificant,
 } from '../../utils/validationUtils';
+import CommissionImage from '../../components/common/CommissionImage';
 
 const WriteEstimate: React.FC = () => {
   const { id } = useParams<{ id: string }>(); // URL에서 commission ID 가져오기
@@ -112,16 +113,15 @@ const WriteEstimate: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-screen-md mt-12">
-      <h1 className="text-4xl font-bold text-center mb-8  font-[JalnanGothic]">
+      <h1 className="text-4xl font-bold text-center mb-8 font-[JalnanGothic]">
         견적 작성
       </h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
-        {/* 이미지 표시 */}
         {commission.image && (
-          <img
-            src={commission.image}
-            alt="Commission"
+          <CommissionImage
+            filename={commission.image}
             className="w-full h-40 object-cover rounded-lg mb-4"
+            isPartner={true}
           />
         )}
         <h2 className="text-2xl font-bold mb-4">의뢰 상세 정보</h2>

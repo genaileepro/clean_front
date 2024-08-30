@@ -1,8 +1,9 @@
 import api from './axiosConfig';
+import partnerApiInstance from './partnerAxiosConfig';
 import {
   Commission,
   CommissionSendDetail,
-  Estimate,
+  EstimateDetail,
 } from '../types/commission';
 
 export const fetchCommissions = async (): Promise<Commission[]> => {
@@ -83,19 +84,43 @@ export const uploadCommissionImage = async (file: File): Promise<string> => {
 };
 
 export const getCommissionImage = async (filename: string): Promise<string> => {
-  const response = await api.get(`/commission/upload?file=${filename}`, {
-    responseType: 'blob',
-  });
-  return URL.createObjectURL(response.data);
+  try {
+    const response = await api.get(`/commission/upload?file=${filename}`, {
+      responseType: 'blob',
+    });
+    return URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error('Error fetching commission image:', error);
+    throw error;
+  }
+};
+
+export const getPartnerCommissionImage = async (
+  filename: string,
+): Promise<string> => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await partnerApiInstance.get(
+      `/partner/upload?file=${filename}`,
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error('Error fetching partner commission image:', error);
+    throw error;
+  }
 };
 
 export const fetchEstimateDetail = async (
   estimateId: number,
-): Promise<Estimate> => {
-  const response = await api.get<Estimate>(`/estimate/detail?id=${estimateId}`);
+): Promise<EstimateDetail> => {
+  const response = await api.get<EstimateDetail>(
+    `/estimate/detail?id=${estimateId}`,
+  );
   return response.data;
-};
-
-export const approveEstimate = async (estimateId: number): Promise<void> => {
-  await api.post(`/api/estimate/approve?id=${estimateId}`);
 };
