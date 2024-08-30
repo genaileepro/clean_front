@@ -1,5 +1,6 @@
 import partnerApiInstance from './partnerAxiosConfig';
 import { Estimate, Commission } from '../types/estimate';
+import { NewBusinessStatusResponse, BusinessValidationRequest } from '../types/business';
 
 // 새로운 견적 생성
 export const createEstimate = async (
@@ -38,6 +39,28 @@ export const getConfirmList = async (): Promise<Estimate[]> => {
     return response.data;
   } catch (error) {
     console.error('Error fetching confirm list:', error);
+    throw error;
+  }
+};
+
+// 사업자 상태 조회 API 추가
+export const validateBusinessNumber = async (
+  requestData: BusinessValidationRequest,
+): Promise<NewBusinessStatusResponse> => {
+  try {
+    const response = await partnerApiInstance.post<NewBusinessStatusResponse>(
+      '/partner/validate',
+      requestData,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error validating business number:', error);
     throw error;
   }
 };
