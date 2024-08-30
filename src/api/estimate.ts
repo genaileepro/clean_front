@@ -69,13 +69,13 @@ export const validateBusinessNumber = async (
 export const updateEstimateStatus = async (
   id: number,
   status: 'SEND' | 'CHECK' | 'FINISH' | 'CONTACT',
-  commissionStatus?: 'SEND' | 'CHECK' | 'FINISH' | 'CONTACT', // commissionStatus에 'CONTACT' 추가
+  commissionStatus?: 'SEND' | 'CHECK' | 'FINISH' | 'CONTACT',
 ): Promise<Estimate> => {
   const token = localStorage.getItem('token');
   try {
     const response = await partnerApiInstance.patch<Estimate>(
       `/partner/estimate?id=${id}`,
-      { status, commissionStatus }, // commissionStatus 포함
+      { status, commissionStatus },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -167,6 +167,46 @@ export const updateEstimate = async (
     return response.data;
   } catch (error) {
     console.error('Error updating estimate:', error);
+    throw error;
+  }
+};
+
+// 견적 상세 조회
+export const fetchEstimateDetail = async (
+  estimateId: number,
+): Promise<Estimate> => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await partnerApiInstance.get<Estimate>(
+      `/partner/estimate/detail?id=${estimateId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching estimate detail:', error);
+    throw error;
+  }
+};
+
+// 견적 승인
+export const approveEstimate = async (estimateId: number): Promise<void> => {
+  const token = localStorage.getItem('token');
+  try {
+    await partnerApiInstance.post(
+      `/partner/estimate/approve?id=${estimateId}`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  } catch (error) {
+    console.error('Error approving estimate:', error);
     throw error;
   }
 };

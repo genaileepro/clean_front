@@ -1,75 +1,77 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useEstimateDetail } from '../../hooks/useCommissions';
 
 const PaymentPage: React.FC = () => {
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const location = useLocation();
   const navigate = useNavigate();
+  const { estimateId } = location.state as { estimateId: number };
+  const { data, isLoading, error } = useEstimateDetail(estimateId);
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
+
+  if (isLoading) return <div className="text-center py-8">로딩 중...</div>;
+  if (error)
+    return (
+      <div className="text-center py-8 text-red-500">에러: {error.message}</div>
+    );
+  if (!data)
+    return <div className="text-center py-8">데이터를 찾을 수 없습니다.</div>;
 
   const handlePaymentMethodChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    setPaymentMethod(event.target.value);
+    setPaymentMethod(e.target.value);
   };
 
-  const handlePayment = async () => {
-    if (!paymentMethod) {
-      alert('결제 수단을 선택해주세요.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // 결제 API 호출 로직
-      // await apiCallToPaymentEndpoint({ method: paymentMethod });
-
-      setLoading(false);
-      alert('결제가 완료되었습니다.');
-      navigate('/payment-success'); // 결제 성공 시 이동할 페이지
-    } catch (error) {
-      setLoading(false);
-      alert('결제에 실패했습니다. 다시 시도해주세요.');
-    }
+  const handlePayment = () => {
+    // 여기에 결제 로직을 구현합니다.
+    console.log('결제 진행:', paymentMethod);
+    // 결제 완료 후 처리 (예: 확인 페이지로 이동)
+    // navigate('/payment-confirmation', { state: { estimateId: data.id } });
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">결제</h1>
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <h1 className="text-3xl font-bold mb-6 text-center">결제 페이지</h1>
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-4">견적 정보</h2>
+        <p>견적 ID: {data.id}</p>
+        <p>금액: {data.price.toLocaleString()}원</p>
+        <p>작업 날짜: {new Date(data.fixedDate).toLocaleString()}</p>
+        <p>청소 종류: {data.cleanType}</p>
+        <p>크기: {data.size} 평</p>
 
-      {/* 상품 및 가격 정보 섹션 */}
-      <div className="bg-white shadow-md rounded p-4 mb-6">
-        <h2 className="text-xl font-semibold">상품 정보</h2>
-        <p>상품 이름: 클리닝 서비스</p>
-        <p>가격: 100,000원</p>
-      </div>
+        <h2 className="text-xl font-semibold mt-6 mb-4">의뢰 정보</h2>
+        <p>의뢰 ID: {data.commissionId}</p>
+        <p>희망 날짜: {new Date(data.desiredDate).toLocaleDateString()}</p>
+        <p>특이사항: {data.significant || '없음'}</p>
 
-      {/* 결제 수단 선택 섹션 */}
-      <div className="bg-white shadow-md rounded p-4 mb-6">
-        <h2 className="text-xl font-semibold mb-2">결제 수단 선택</h2>
-        <select
-          className="w-full p-2 border rounded"
-          value={paymentMethod}
-          onChange={handlePaymentMethodChange}
-        >
-          <option value="" disabled>
-            결제 수단을 선택하세요
-          </option>
-          <option value="credit_card">신용카드</option>
-          <option value="bank_transfer">계좌이체</option>
-          <option value="kakao_pay">카카오 페이</option>
-          {/* 추가 결제 수단은 여기에서 더 추가 가능합니다 */}
-        </select>
-      </div>
+        <h2 className="text-xl font-semibold mt-6 mb-4">파트너 정보</h2>
+        <p>회사명: {data.companyName}</p>
+        <p>담당자: {data.managerName}</p>
+        <p>연락처: {data.phoneNumber}</p>
 
-      {/* 결제하기 버튼 */}
-      <div className="text-right">
-        <button
-          className={`bg-blue-500 text-white font-bold py-2 px-4 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={handlePayment}
-          disabled={loading || !paymentMethod}
-        >
-          {loading ? '결제 중...' : '결제하기'}
-        </button>
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-2">결제 수단 선택</h2>
+          <select
+            value={paymentMethod}
+            onChange={handlePaymentMethodChange}
+            className="w-full p-2 border rounded mb-4"
+          >
+            <option value="">결제 수단을 선택하세요</option>
+            <option value="card">신용카드</option>
+            <option value="transfer">계좌이체</option>
+            <option value="virtualAccount">가상계좌</option>
+          </select>
+
+          <button
+            onClick={handlePayment}
+            disabled={!paymentMethod}
+            className="w-full bg-brand text-white py-2 px-4 rounded-full hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {data.price.toLocaleString()}원 결제하기
+          </button>
+        </div>
       </div>
     </div>
   );

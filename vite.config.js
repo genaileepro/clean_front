@@ -8,11 +8,11 @@ export default defineConfig({
       '/api': {
         target: 'https://mb.clean-room.co.kr',
         changeOrigin: true,
+        secure: false,
       },
       '/partner': {
         target: 'https://pt.clean-room.co.kr',
         changeOrigin: true,
-        // rewrite: (path) => path.replace(/^\/partner/, ''),
       },
     },
   },

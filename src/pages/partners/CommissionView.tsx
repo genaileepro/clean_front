@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCommissionList } from '../../api/estimate';
 import { Commission } from '../../types/estimate';
+import CommissionImage from '../../components/common/CommissionImage';
 
 declare global {
   interface Window {
@@ -96,10 +97,10 @@ const CommissionView: React.FC = () => {
       </h1>
       <div className="bg-white border rounded-lg shadow-lg p-6">
         {commission.image && (
-          <img
-            src={commission.image}
-            alt="Commission"
+          <CommissionImage
+            filename={commission.image}
             className="w-full h-60 object-cover rounded-lg mb-4"
+            isPartner={true}
           />
         )}
         <h2 className="text-2xl font-bold mb-4">의뢰 상세 정보</h2>

@@ -3,6 +3,7 @@ export interface Member {
   nick: string;
   phoneNumber: string;
   password: string;
+  isKakaoUser: boolean;
 }
 
 export interface LoginCredentials {
