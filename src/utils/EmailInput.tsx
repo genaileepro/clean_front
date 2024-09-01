@@ -66,20 +66,28 @@ const EmailInput: React.FC<EmailInputProps> = ({
 
   return (
     <div>
-      <label className="block mb-1">이메일</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        이메일
+      </label>
       <div className="flex">
         <input
           type="text"
           value={localPart}
           onChange={handleLocalPartChange}
           placeholder="이메일 아이디"
-          className={`w-1/2 p-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-l`}
+          className={`w-1/2 p-2 border ${
+            emailError ? 'border-red-500' : 'border-gray-300'
+          } rounded-l-md focus:outline-none focus:ring-brand focus:border-brand`}
         />
-        <span className="p-2 bg-gray-100 border-t border-b">@</span>
+        <span className="p-2 bg-gray-100 border-t border-b border-gray-300">
+          @
+        </span>
         <select
           value={domain}
           onChange={handleDomainChange}
-          className={`w-1/2 p-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-r`}
+          className={`w-1/2 p-2 border ${
+            emailError ? 'border-red-500' : 'border-gray-300'
+          } rounded-r-md focus:outline-none focus:ring-brand focus:border-brand`}
         >
           <option value="">선택해주세요</option>
           {commonDomains.map((d) => (
@@ -96,10 +104,12 @@ const EmailInput: React.FC<EmailInputProps> = ({
           value={customDomain}
           onChange={handleCustomDomainChange}
           placeholder="도메인을 입력해주세요"
-          className={`w-full mt-2 p-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded`}
+          className={`w-full mt-2 p-2 border ${
+            emailError ? 'border-red-500' : 'border-gray-300'
+          } rounded-md focus:outline-none focus:ring-brand focus:border-brand`}
         />
       )}
-      {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+      {emailError && <p className="mt-2 text-sm text-red-600">{emailError}</p>}
     </div>
   );
 };

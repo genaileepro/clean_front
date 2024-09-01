@@ -1,3 +1,4 @@
+import React, { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCurrentMember, useUpdateMember } from '../../hooks/useMembers';
 import {
@@ -6,12 +7,13 @@ import {
   validatePhoneNumber,
   validateConfirmPassword,
 } from '../../utils/validationUtils';
-import { FormEvent, useEffect, useState } from 'react';
-import logo from '../../assets/logo.png';
 import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
+import logo from '../../assets/logo.png';
+import LoadingSpinner from '../../utils/LoadingSpinner';
+import { User, Phone, Lock } from 'lucide-react';
 
 interface FormErrors {
   password?: string;
@@ -51,11 +53,15 @@ const MemberEdit: React.FC = () => {
     }
   }, [member]);
 
-  if (isLoading) return <div>로딩 중...</div>;
-  if (error) return <div>에러 발생: {error.message}</div>;
-  if (!member) return <div>회원 정보를 찾을 수 없습니다.</div>;
+  if (isLoading) return <LoadingSpinner size="large" />;
+  if (error)
+    return (
+      <div className="text-center text-red-500">에러 발생: {error.message}</div>
+    );
+  if (!member)
+    return <div className="text-center">회원 정보를 찾을 수 없습니다.</div>;
 
-  const isKakaoUser = member.isKakaoUser; // 가정: 서버에서 이 정보를 제공한다고 가정
+  const isKakaoUser = member.isKakaoUser;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -141,34 +147,33 @@ const MemberEdit: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <div className="p-6 hidden sm:block">
-        <img
-          src={logo}
-          alt="깔끔한방 로고"
-          className="w-full h-auto max-h-[200px] object-contain"
-        />
+    <div className="max-w-md mx-auto mt-10 px-4">
+      <div className="mb-8 text-center">
+        <img src={logo} alt="깔끔한방 로고" className="mx-auto w-48 h-auto" />
       </div>
-      <h2 className="text-2xl font-bold mb-4">회원 정보 수정</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        회원 정보 수정
+      </h2>
       {errors.general && (
         <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+          className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6"
           role="alert"
         >
-          <span className="block sm:inline">{errors.general}</span>
+          <p>{errors.general}</p>
         </div>
       )}
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        className="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4"
       >
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="email"
           >
-            회원 아이디 : {member.email}
+            회원 아이디
           </label>
+          <p className="text-gray-700">{member.email}</p>
         </div>
         {!isKakaoUser && (
           <>
@@ -179,15 +184,21 @@ const MemberEdit: React.FC = () => {
               >
                 새 비밀번호
               </label>
-              <input
-                className={`shadow appearance-none border ${errors.password ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-                id="password"
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="변경하려면 입력하세요"
-              />
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  className={`pl-10 shadow appearance-none border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="변경하려면 입력하세요"
+                />
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-xs italic">{errors.password}</p>
               )}
@@ -199,15 +210,21 @@ const MemberEdit: React.FC = () => {
               >
                 비밀번호 확인
               </label>
-              <input
-                className={`shadow appearance-none border ${errors.confirmPassword ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="비밀번호를 다시 입력하세요"
-              />
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  className={`pl-10 shadow appearance-none border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+                  id="confirmPassword"
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="비밀번호를 다시 입력하세요"
+                />
+              </div>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-xs italic">
                   {errors.confirmPassword}
@@ -223,46 +240,58 @@ const MemberEdit: React.FC = () => {
           >
             닉네임
           </label>
-          <input
-            className={`shadow appearance-none border ${errors.nick ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-            id="nick"
-            type="text"
-            name="nick"
-            value={formData.nick}
-            onChange={handleChange}
-          />
+          <div className="relative">
+            <User
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              className={`pl-10 shadow appearance-none border ${errors.nick ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+              id="nick"
+              type="text"
+              name="nick"
+              value={formData.nick}
+              onChange={handleChange}
+            />
+          </div>
           {errors.nick && (
             <p className="text-red-500 text-xs italic">{errors.nick}</p>
           )}
         </div>
-        <div className="mb-4">
+        <div className="mb-6">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="phoneNumber"
           >
             전화번호
           </label>
-          <input
-            className={`shadow appearance-none border ${errors.phoneNumber ? 'border-red-500' : ''} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-            id="phoneNumber"
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-          />
+          <div className="relative">
+            <Phone
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              className={`pl-10 shadow appearance-none border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+              id="phoneNumber"
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+            />
+          </div>
           {errors.phoneNumber && (
             <p className="text-red-500 text-xs italic">{errors.phoneNumber}</p>
           )}
         </div>
         <div className="flex items-center justify-between">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
             type="submit"
           >
             수정 완료
           </button>
           <button
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300"
             type="button"
             onClick={() => navigate(`/member/${email}`)}
           >

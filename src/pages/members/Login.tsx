@@ -10,6 +10,8 @@ import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
+import { motion } from 'framer-motion';
+import { Lock, LogIn } from 'lucide-react';
 
 interface LoginForm {
   email: Member['email'];
@@ -73,78 +75,109 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-      <div className="grid bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="p-6 hidden sm:block">
-          <img
-            src={logo}
-            alt="깔끔한방 로고"
-            className="w-full h-auto max-h-[300px] object-contain"
-          />
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <motion.div
+        className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div>
+          <img className="mx-auto h-24 w-auto" src={logo} alt="깔끔한방 로고" />
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            회원 로그인
+          </h2>
         </div>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">회원 로그인</h2>
-          {errors.general && (
-            <div
-              className="border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <span className="block sm:inline">{errors.general}</span>
-            </div>
-          )}
-          <form onSubmit={loginSubmit} className="space-y-4">
-            <EmailInput
-              email={formData.email}
-              setEmail={(email) => setFormData((prev) => ({ ...prev, email }))}
-              emailError={errors.email}
-              setEmailError={(error) =>
-                setErrors((prev) => ({ ...prev, email: error }))
-              }
-            />
-            <div>
-              <label className="block mb-1">비밀번호</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handlePasswordChange}
-                placeholder="비밀번호를 입력해주세요"
-                className={`w-full p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded`}
+        {errors.general && (
+          <div
+            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded"
+            role="alert"
+          >
+            <p>{errors.general}</p>
+          </div>
+        )}
+        <form className="mt-8 space-y-6" onSubmit={loginSubmit}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div className="mb-4">
+              <EmailInput
+                email={formData.email}
+                setEmail={(email) =>
+                  setFormData((prev) => ({ ...prev, email }))
+                }
+                emailError={errors.email}
+                setEmailError={(error) =>
+                  setErrors((prev) => ({ ...prev, email: error }))
+                }
               />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                비밀번호
+              </label>
+              <div className="relative">
+                <Lock
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${
+                    errors.password ? 'border-red-500' : 'border-gray-300'
+                  } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-brand focus:border-brand focus:z-10 sm:text-sm pl-10`}
+                  placeholder="비밀번호"
+                  value={formData.password}
+                  onChange={handlePasswordChange}
+                />
+              </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                <p className="mt-2 text-sm text-red-600">{errors.password}</p>
               )}
             </div>
-            <div className="flex flex-col space-y-4">
-              <button
-                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded w-full"
-                type="submit"
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand"
+            >
+              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                <LogIn
+                  className="h-5 w-5 text-brand-light group-hover:text-brand-dark"
+                  aria-hidden="true"
+                />
+              </span>
+              로그인
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              <a
+                href="/signup"
+                className="font-medium text-brand hover:text-brand-dark"
               >
-                로그인
-              </button>
-              <div className="text-center text-sm">
-                <span>계정이 없으신가요? </span>
-                <a
-                  href="/signup"
-                  className="text-blue-500 hover:underline"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/signup');
-                  }}
-                >
-                  회원 가입
-                </a>
+                회원가입
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
               </div>
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-2 text-sm text-gray-500">
-                    또는
-                  </span>
-                </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
+            </div>
+
+            <div className="mt-6">
               <div>
                 <img
                   src="/kakao_login_medium_wide.png"
@@ -154,9 +187,9 @@ const Login: React.FC = () => {
                 />
               </div>
             </div>
-          </form>
-        </div>
-      </div>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 };

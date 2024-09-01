@@ -1,8 +1,8 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import logo from '../../assets/logo.png';
 import EmailInput from '../../utils/EmailInput';
+import EmailVerification from '../../components/common/EmailVerification';
 import { useSignup } from '../../hooks/useMembers';
 import { Member } from '../../types/member';
 import {
@@ -15,9 +15,10 @@ import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
+import { motion } from 'framer-motion';
+import { User, Lock, Phone } from 'lucide-react';
 
 interface SignUpForm extends Omit<Member, 'id'> {
-  password: string;
   confirmPassword: string;
 }
 
@@ -45,6 +46,7 @@ const SignUp: React.FC = () => {
     confirmPassword: '',
     nick: '',
     phoneNumber: '',
+    isKakaoUser: false,
   });
   const [errors, setErrors] = useState<FormErrors>({
     email: '',
@@ -54,6 +56,11 @@ const SignUp: React.FC = () => {
     phoneNumber: '',
     general: '',
   });
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const navigate = useNavigate();
+  const signupMutation = useSignup();
+
   const resetErrors = () => {
     setErrors({
       email: '',
@@ -64,8 +71,6 @@ const SignUp: React.FC = () => {
       general: '',
     });
   };
-  const navigate = useNavigate();
-  const signupMutation = useSignup();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -85,7 +90,7 @@ const SignUp: React.FC = () => {
       );
       setErrors((prev) => ({
         ...prev,
-        confirmpassword: confirmResult.message,
+        confirmPassword: confirmResult.message,
       }));
     }
   };
@@ -93,15 +98,15 @@ const SignUp: React.FC = () => {
   const signUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetErrors();
-    if (Object.values(errors).some((err) => err !== '')) {
+    if (Object.values(errors).some((err) => err !== '') || !isEmailVerified) {
       setErrors((prev) => ({
         ...prev,
+        general: '모든 필드를 올바르게 입력하고 이메일 인증을 완료해주세요.',
       }));
       return;
     }
 
     try {
-      // confirmPassword를 제외한 데이터만 서버로 전송
       const { confirmPassword, ...submitData } = formData;
       await signupMutation.mutateAsync(submitData);
       navigate(`/login`);
@@ -116,38 +121,54 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-      <div className="grid bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="p-6 hidden sm:block">
-          <img
-            src={logo}
-            alt="깔끔한방 로고"
-            className="w-full h-auto max-h-[300px] object-contain"
-          />
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <motion.div
+        className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div>
+          <img className="mx-auto h-24 w-auto" src={logo} alt="깔끔한방 로고" />
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            회원가입
+          </h2>
         </div>
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">회원가입</h2>
-          {errors.general && (
-            <div
-              className="border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <span className="block sm:inline">{errors.general}</span>
+        {errors.general && (
+          <div
+            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded"
+            role="alert"
+          >
+            <p>{errors.general}</p>
+          </div>
+        )}
+        <form className="mt-8 space-y-6" onSubmit={signUpSubmit}>
+          <div className="space-y-6">
+            <div className="mb-4">
+              <EmailInput
+                email={formData.email}
+                setEmail={(email) =>
+                  setFormData((prev) => ({ ...prev, email }))
+                }
+                emailError={errors.email}
+                setEmailError={(error) =>
+                  setErrors((prev) => ({ ...prev, email: error }))
+                }
+              />
             </div>
-          )}
-          <form onSubmit={signUpSubmit} className="space-y-4">
-            <EmailInput
-              email={formData.email}
-              setEmail={(email) => setFormData((prev) => ({ ...prev, email }))}
-              emailError={errors.email}
-              setEmailError={(error) =>
-                setErrors((prev) => ({ ...prev, email: error }))
-              }
-            />
+            <div className="mb-4">
+              <EmailVerification
+                email={formData.email}
+                onVerificationComplete={setIsEmailVerified}
+              />
+            </div>
             {['password', 'confirmPassword', 'nick', 'phoneNumber'].map(
               (field) => (
-                <div key={field}>
-                  <label className="block mb-1">
+                <div key={field} className="mb-4">
+                  <label
+                    htmlFor={field}
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     {field === 'password'
                       ? '비밀번호'
                       : field === 'confirmPassword'
@@ -156,54 +177,73 @@ const SignUp: React.FC = () => {
                           ? '닉네임'
                           : '전화번호'}
                   </label>
-                  <input
-                    type={
-                      field === 'password'
-                        ? 'password'
-                        : field === 'confirmPassword'
-                          ? 'password'
-                          : 'text'
-                    }
-                    name={field}
-                    value={formData[field as keyof SignUpForm]}
-                    onChange={handleChange}
-                    placeholder={`${
-                      field === 'password'
-                        ? '비밀번호를 입력해주세요.'
-                        : field === 'confirmPassword'
-                          ? '비밀번호를 입력해주세요'
-                          : field === 'nick'
-                            ? '닉네임을 입력해주세요.'
-                            : "전화번호를 입력해주세요('-' 제외)"
-                    }`}
-                    className="w-full p-2 border border-gray-300 rounded"
-                  />
+                  <div className="relative">
+                    {field === 'password' || field === 'confirmPassword' ? (
+                      <Lock
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
+                    ) : field === 'nick' ? (
+                      <User
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
+                    ) : (
+                      <Phone
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
+                    )}
+                    <input
+                      id={field}
+                      name={field}
+                      type={field.includes('password') ? 'password' : 'text'}
+                      required
+                      className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${
+                        errors[field as keyof FormErrors]
+                          ? 'border-red-500'
+                          : 'border-gray-300'
+                      } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-brand focus:border-brand focus:z-10 sm:text-sm pl-10`}
+                      placeholder={
+                        field === 'password'
+                          ? '비밀번호를 입력해주세요.'
+                          : field === 'confirmPassword'
+                            ? '비밀번호를 다시 입력해주세요'
+                            : field === 'nick'
+                              ? '닉네임을 입력해주세요.'
+                              : "전화번호를 입력해주세요('-' 제외)"
+                      }
+                      value={formData[field as keyof SignUpForm]}
+                      onChange={handleChange}
+                    />
+                  </div>
                   {errors[field as keyof FormErrors] && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="mt-2 text-sm text-red-600">
                       {errors[field as keyof FormErrors]}
                     </p>
                   )}
                 </div>
               ),
             )}
-            <div className="flex justify-center space-x-4">
-              <button
-                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded"
-                type="submit"
-              >
-                회원가입하기
-              </button>
-              <button
-                className="btn hover:bg-blue-500 text-white py-2 px-4 rounded"
-                onClick={() => navigate(`/login`)}
-                type="button"
-              >
-                취소
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+          </div>
+
+          <div className="flex justify-center space-x-4">
+            <button
+              type="submit"
+              className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand"
+            >
+              회원가입하기
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/login`)}
+              className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-brand bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand"
+            >
+              취소
+            </button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 };
