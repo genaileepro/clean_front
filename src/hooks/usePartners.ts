@@ -62,3 +62,15 @@ export const usePartnerSignup = () => {
     mutationFn: partner.partnerSignup,
   });
 };
+
+export const useRequestPartnerEmailVerification = () => {
+  return useMutation<void, Error, { email: string }>({
+    mutationFn: (data) => partner.requestPartnerEmailVerification(data.email),
+  });
+};
+
+export const useVerifyPartnerEmail = () => {
+  return useMutation<string, Error, { email: string; code: string }>({
+    mutationFn: ({ email, code }) => partner.verifyPartnerEmail(email, code),
+  });
+};

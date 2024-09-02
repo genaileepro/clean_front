@@ -7,6 +7,7 @@ import {
 import { Commission, HouseType, CleanType } from '../../types/commission';
 import { toast } from 'react-hot-toast';
 import { showErrorNotification } from '../../utils/errorHandler';
+import { Save, ArrowLeft } from 'lucide-react';
 
 const CommissionEdit: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -58,22 +59,39 @@ const CommissionEdit: React.FC = () => {
     }
   };
 
-  if (isLoading) return <div className="text-center py-4">로딩 중...</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        로딩 중...
+      </div>
+    );
   if (error)
     return (
-      <div className="text-center py-4 text-red-500">
+      <div className="flex justify-center items-center h-screen text-red-500">
         에러가 발생했습니다: {(error as Error).message}
       </div>
     );
   if (!commission)
-    return <div className="text-center py-4">의뢰를 찾을 수 없습니다.</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        의뢰를 찾을 수 없습니다.
+      </div>
+    );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">의뢰 수정</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="size" className="block mb-2 font-semibold">
+    <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        의뢰 수정
+      </h1>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-lg rounded-lg p-6"
+      >
+        <div className="mb-4">
+          <label
+            htmlFor="size"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             크기 (평)
           </label>
           <input
@@ -82,12 +100,15 @@ const CommissionEdit: React.FC = () => {
             name="size"
             value={editedCommission.size || ''}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
             required
           />
         </div>
-        <div>
-          <label htmlFor="houseType" className="block mb-2 font-semibold">
+        <div className="mb-4">
+          <label
+            htmlFor="houseType"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             집 종류
           </label>
           <select
@@ -95,7 +116,7 @@ const CommissionEdit: React.FC = () => {
             name="houseType"
             value={editedCommission.houseType || ''}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
             required
           >
             <option value="">선택해주세요</option>
@@ -106,8 +127,11 @@ const CommissionEdit: React.FC = () => {
             ))}
           </select>
         </div>
-        <div>
-          <label htmlFor="cleanType" className="block mb-2 font-semibold">
+        <div className="mb-4">
+          <label
+            htmlFor="cleanType"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             청소 종류
           </label>
           <select
@@ -115,7 +139,7 @@ const CommissionEdit: React.FC = () => {
             name="cleanType"
             value={editedCommission.cleanType || ''}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
             required
           >
             <option value="">선택해주세요</option>
@@ -126,8 +150,11 @@ const CommissionEdit: React.FC = () => {
             ))}
           </select>
         </div>
-        <div>
-          <label htmlFor="desiredDate" className="block mb-2 font-semibold">
+        <div className="mb-4">
+          <label
+            htmlFor="desiredDate"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             희망 날짜
           </label>
           <input
@@ -142,12 +169,15 @@ const CommissionEdit: React.FC = () => {
                 : ''
             }
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
             required
           />
         </div>
-        <div>
-          <label htmlFor="significant" className="block mb-2 font-semibold">
+        <div className="mb-6">
+          <label
+            htmlFor="significant"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             특이사항
           </label>
           <textarea
@@ -155,22 +185,24 @@ const CommissionEdit: React.FC = () => {
             name="significant"
             value={editedCommission.significant || ''}
             onChange={handleChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
             rows={4}
           />
         </div>
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between items-center mt-8">
           <button
             type="button"
             onClick={() => navigate('/commissionlist')}
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400 transition-colors"
+            className="flex items-center justify-center bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-colors"
           >
+            <ArrowLeft size={18} className="mr-2" />
             목록으로
           </button>
           <button
             type="submit"
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+            className="flex items-center justify-center bg-brand text-white px-6 py-2 rounded-full hover:bg-brand-dark transition-colors"
           >
+            <Save size={18} className="mr-2" />
             수정 완료
           </button>
         </div>

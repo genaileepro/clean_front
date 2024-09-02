@@ -153,3 +153,8 @@ export const validateBusinessNumber = async (businessNumber: string) => {
     };
   }
 };
+
+export const validateVerificationCode = createValidator(
+  (code) => /^\d{6}$/.test(code),
+  '인증 코드는 6자리 숫자여야 합니다.',
+);

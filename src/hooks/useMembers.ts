@@ -50,3 +50,15 @@ export const useSignup = () => {
     mutationFn: api.signup,
   });
 };
+
+export const useRequestEmailVerification = () => {
+  return useMutation<void, Error, { email: string }>({
+    mutationFn: (data) => api.requestEmailVerification(data.email),
+  });
+};
+
+export const useVerifyEmail = () => {
+  return useMutation<string, Error, { email: string; code: string }>({
+    mutationFn: ({ email, code }) => api.verifyEmail(email, code),
+  });
+};
