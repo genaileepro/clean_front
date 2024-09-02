@@ -3,22 +3,25 @@ import {
   validateEmail,
   validateVerificationCode,
 } from '../../utils/validationUtils';
-import { useVerifyEmail } from '../../hooks/useMembers';
 import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
-import { motion } from 'framer-motion';
-import { Send, Check } from 'lucide-react';
 
 interface EmailVerificationProps {
   email: string;
   onVerificationComplete: (isVerified: boolean) => void;
+  requestEmailVerification: (email: string) => Promise<void>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  userType: 'member' | 'partner'; // 새로운 prop 추가
 }
 
 const EmailVerification: React.FC<EmailVerificationProps> = ({
   email,
   onVerificationComplete,
+  requestEmailVerification,
+  verifyEmail,
+  userType, // 새로운 prop 사용
 }) => {
   const [isVerificationSent, setIsVerificationSent] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -26,7 +29,12 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
 
-  const verifyEmailMutation = useVerifyEmail();
+  // 버튼 색상 결정 함수
+  const getButtonColorClass = () => {
+    return userType === 'member'
+      ? 'bg-brand hover:bg-brand-dark'
+      : 'bg-[#144156] hover:bg-[#1c5f7b]';
+  };
 
   const handleSendVerification = async () => {
     const emailValidation = validateEmail(email);
@@ -35,11 +43,17 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
       return;
     }
 
-    // TODO: Implement email verification code sending logic
-    // For now, we'll just simulate sending the code
-    setIsVerificationSent(true);
-    setTimer(180); // 3 minutes
-    setError('');
+    try {
+      await requestEmailVerification(email);
+      setIsVerificationSent(true);
+      setTimer(600); // 10 minutes
+      setError('');
+      showErrorNotification('인증 이메일이 발송되었습니다.');
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
+      setError(errorMessage);
+    }
   };
 
   const handleVerifyEmail = async () => {
@@ -50,10 +64,11 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     }
 
     try {
-      await verifyEmailMutation.mutateAsync({ email, code: verificationCode });
+      await verifyEmail(email, verificationCode);
       setIsVerified(true);
       onVerificationComplete(true);
       setError('');
+      showErrorNotification('이메일이 성공적으로 인증되었습니다.');
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
@@ -75,15 +90,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
 
   if (isVerified) {
     return (
-      <motion.div
-        className="text-green-500 text-center py-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Check className="inline-block mr-2" size={20} />
-        이메일이 인증되었습니다.
-      </motion.div>
+      <div className="text-green-500 text-center">이메일이 인증되었습니다.</div>
     );
   }
 
@@ -99,21 +106,14 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
             </span>
           </div>
         )}
-        <motion.button
+        <button
           type="button"
           onClick={handleSendVerification}
           disabled={isVerificationSent || !email}
-          className={`flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${
-            isVerificationSent || !email
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-brand hover:bg-brand-dark'
-          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          className={`btn ${getButtonColorClass()} text-white py-2 px-4 rounded ml-auto`}
         >
-          <Send className="mr-2" size={16} />
           인증번호 발송
-        </motion.button>
+        </button>
       </div>
       {isVerificationSent && (
         <div className="flex justify-between items-center space-x-2">
@@ -122,21 +122,18 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
             value={verificationCode}
             onChange={(e) => setVerificationCode(e.target.value)}
             placeholder="인증번호 입력"
-            className="w-2/3 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-brand focus:border-brand"
+            className="w-2/3 p-2 border border-gray-300 rounded"
           />
-          <motion.button
+          <button
             type="button"
             onClick={handleVerifyEmail}
-            className="flex items-center justify-center w-1/3 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-brand hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className={`btn ${getButtonColorClass()} text-white py-2 px-6 rounded`}
           >
-            <Check className="mr-2" size={16} />
             확인
-          </motion.button>
+          </button>
         </div>
       )}
-      {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+      {error && <div className="text-red-500 text-sm">{error}</div>}
     </div>
   );
 };

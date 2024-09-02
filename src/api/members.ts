@@ -72,6 +72,12 @@ export const updateCommission = async (
   return response.data;
 };
 
+export const requestEmailVerification = async (
+  email: string,
+): Promise<void> => {
+  await api.post('/members/request-email-verification', { email });
+};
+
 export const verifyEmail = async (
   email: string,
   code: string,
