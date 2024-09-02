@@ -67,3 +67,22 @@ export const partnerSignup = async (
   );
   return response.data;
 };
+
+export const requestPartnerEmailVerification = async (
+  email: string,
+): Promise<void> => {
+  await partnerApiInstance.post('/partner/request-email-verification', {
+    email,
+  });
+};
+
+export const verifyPartnerEmail = async (
+  email: string,
+  code: string,
+): Promise<string> => {
+  const response = await partnerApiInstance.post('/partner/verify-email', {
+    email,
+    code,
+  });
+  return response.data;
+};

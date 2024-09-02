@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import EmailInput from '../../utils/EmailInput';
 import EmailVerification from '../../components/common/EmailVerification';
-import { useSignup } from '../../hooks/useMembers';
+import {
+  useSignup,
+  useRequestEmailVerification,
+  useVerifyEmail,
+} from '../../hooks/useMembers';
 import { Member } from '../../types/member';
 import {
   validateNickName,
@@ -60,6 +64,8 @@ const SignUp: React.FC = () => {
 
   const navigate = useNavigate();
   const signupMutation = useSignup();
+  const requestEmailVerificationMutation = useRequestEmailVerification();
+  const verifyEmailMutation = useVerifyEmail();
 
   const resetErrors = () => {
     setErrors({
@@ -92,6 +98,27 @@ const SignUp: React.FC = () => {
         ...prev,
         confirmPassword: confirmResult.message,
       }));
+    }
+  };
+
+  const handleRequestEmailVerification = async (email: string) => {
+    try {
+      await requestEmailVerificationMutation.mutateAsync({ email });
+      showErrorNotification('인증 이메일이 발송되었습니다.');
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
+    }
+  };
+
+  const handleVerifyEmail = async (email: string, code: string) => {
+    try {
+      await verifyEmailMutation.mutateAsync({ email, code });
+      setIsEmailVerified(true);
+      showErrorNotification('이메일이 성공적으로 인증되었습니다.');
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
     }
   };
 
@@ -160,6 +187,9 @@ const SignUp: React.FC = () => {
               <EmailVerification
                 email={formData.email}
                 onVerificationComplete={setIsEmailVerified}
+                requestEmailVerification={handleRequestEmailVerification}
+                verifyEmail={handleVerifyEmail}
+                userType="member"
               />
             </div>
             {['password', 'confirmPassword', 'nick', 'phoneNumber'].map(
@@ -197,7 +227,11 @@ const SignUp: React.FC = () => {
                     <input
                       id={field}
                       name={field}
-                      type={field.includes('password') ? 'password' : 'text'}
+                      type={
+                        field === 'password' || field === 'confirmPassword'
+                          ? 'password'
+                          : 'text'
+                      }
                       required
                       className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${
                         errors[field as keyof FormErrors]
@@ -213,7 +247,7 @@ const SignUp: React.FC = () => {
                               ? '닉네임을 입력해주세요.'
                               : "전화번호를 입력해주세요('-' 제외)"
                       }
-                      value={formData[field as keyof SignUpForm]}
+                      value={String(formData[field as keyof SignUpForm])}
                       onChange={handleChange}
                     />
                   </div>

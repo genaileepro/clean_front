@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../../assets/logo.png';
 import EmailInput from '../../utils/EmailInput';
+import EmailVerification from '../../components/common/EmailVerification';
+import {
+  usePartnerSignup,
+  useRequestPartnerEmailVerification,
+  useVerifyPartnerEmail,
+} from '../../hooks/usePartners';
 import { Partner } from '../../types/partner';
 import { BusinessStatusResponse } from '../../types/business';
 import {
@@ -10,11 +16,12 @@ import {
   validatePhoneNumber,
   validateConfirmPassword,
 } from '../../utils/validationUtils';
-import { usePartnerSignup } from '../../hooks/usePartners';
 import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
+import { motion } from 'framer-motion';
+import { User, Lock, Phone, Briefcase, Building } from 'lucide-react';
 
 interface PartnerSignUpForm extends Omit<Partner, 'id'> {
   email: string;
@@ -24,7 +31,7 @@ interface PartnerSignUpForm extends Omit<Partner, 'id'> {
   managerName: string;
   companyName: string;
   businessType: string;
-  businessNumber: string; // 사업자 등록번호 추가
+  businessNumber: string;
   partnerType: 'INDIVIDUAL' | 'CORPORATION' | 'PUBLIC_INSTITUTION';
 }
 
@@ -57,7 +64,7 @@ const PartnerSignUp: React.FC = () => {
     managerName: '',
     companyName: '',
     businessType: '',
-    businessNumber: '', // 사업자 등록번호 추가
+    businessNumber: '',
     partnerType: 'INDIVIDUAL',
   });
   const [errors, setErrors] = useState<FormErrors>({
@@ -75,6 +82,12 @@ const PartnerSignUp: React.FC = () => {
     string | null
   >(null);
   const [isBusinessValid, setIsBusinessValid] = useState<boolean>(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const navigate = useNavigate();
+  const signupMutation = usePartnerSignup();
+  const requestEmailVerificationMutation = useRequestPartnerEmailVerification();
+  const verifyEmailMutation = useVerifyPartnerEmail();
 
   const resetErrors = () => {
     setErrors({
@@ -89,9 +102,6 @@ const PartnerSignUp: React.FC = () => {
       partnerType: '',
     });
   };
-
-  const navigate = useNavigate();
-  const signupMutation = usePartnerSignup();
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -162,14 +172,39 @@ const PartnerSignUp: React.FC = () => {
     }
   };
 
+  const handleRequestEmailVerification = async (email: string) => {
+    try {
+      await requestEmailVerificationMutation.mutateAsync({ email });
+      showErrorNotification('인증 이메일이 발송되었습니다.');
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
+    }
+  };
+
+  const handleVerifyEmail = async (email: string, code: string) => {
+    try {
+      await verifyEmailMutation.mutateAsync({ email, code });
+      setIsEmailVerified(true);
+      showErrorNotification('이메일이 성공적으로 인증되었습니다.');
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      showErrorNotification(errorMessage);
+    }
+  };
+
   const signUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetErrors();
-
-    if (Object.values(errors).some((err) => err !== '') || !isBusinessValid) {
+    if (
+      Object.values(errors).some((err) => err !== '') ||
+      !isBusinessValid ||
+      !isEmailVerified
+    ) {
       setErrors((prev) => ({
         ...prev,
-        general: '입력한 정보를 다시 확인해주세요.',
+        general:
+          '모든 필드를 올바르게 입력하고 이메일 인증 및 사업자 등록번호 확인을 완료해주세요.',
       }));
       return;
     }
@@ -188,38 +223,30 @@ const PartnerSignUp: React.FC = () => {
     }
   };
 
-  const fieldLabels: { [key: string]: string } = {
-    password: '비밀번호',
-    confirmPassword: '비밀번호 확인',
-    phoneNumber: '전화번호',
-    managerName: '담당자명',
-    companyName: '업체명',
-    businessType: '서비스 유형',
-    businessNumber: '사업자 등록번호', // 라벨 추가
-    partnerType: '사업자 유형',
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-5rem)]">
-      <div className="grid bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="p-6 hidden sm:block">
-          <img
-            src={logo}
-            alt="깔끔한방 로고"
-            className="w-full h-auto max-h-[300px] object-contain"
-          />
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+      <motion.div
+        className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div>
+          <img className="mx-auto h-24 w-auto" src={logo} alt="깔끔한방 로고" />
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            파트너 회원가입
+          </h2>
         </div>
-        <div className="p-6">
-          <h2 className="text-2xl mb-4 font-[JalnanGothic]">파트너 회원가입</h2>
-          {errors.general && (
-            <div
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-              role="alert"
-            >
-              <span className="block sm:inline">{errors.general}</span>
-            </div>
-          )}
-          <form onSubmit={signUpSubmit} className="space-y-4">
+        {errors.general && (
+          <div
+            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded"
+            role="alert"
+          >
+            <p>{errors.general}</p>
+          </div>
+        )}
+        <form className="mt-8 space-y-6" onSubmit={signUpSubmit}>
+          <div className="space-y-6">
             <EmailInput
               email={formData.email}
               setEmail={(email) => setFormData((prev) => ({ ...prev, email }))}
@@ -228,6 +255,13 @@ const PartnerSignUp: React.FC = () => {
                 setErrors((prev) => ({ ...prev, email: error }))
               }
             />
+            <EmailVerification
+              email={formData.email}
+              onVerificationComplete={setIsEmailVerified}
+              requestEmailVerification={handleRequestEmailVerification}
+              verifyEmail={handleVerifyEmail}
+              userType="partner"
+            />
             {[
               'password',
               'confirmPassword',
@@ -235,78 +269,144 @@ const PartnerSignUp: React.FC = () => {
               'managerName',
               'companyName',
               'businessType',
-              'businessNumber', // 사업자 등록번호 필드 추가
+              'businessNumber',
             ].map((field) => (
-              <div key={field}>
-                <label className="block mb-1">{fieldLabels[field]}</label>
-                <input
-                  type={
-                    field === 'password' || field === 'confirmPassword'
-                      ? 'password'
-                      : 'text'
-                  }
-                  name={field}
-                  value={formData[field as keyof PartnerSignUpForm]}
-                  onChange={handleChange}
-                  placeholder={`${fieldLabels[field]}를 입력해주세요${
-                    field === 'phoneNumber' ? " ('-' 제외)" : ''
-                  }${field === 'businessNumber' ? " ('-' 제외)" : ''}`} // 사업자 등록번호에 대해서도 특정 메시지 표시
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
+              <div key={field} className="mb-4">
+                <label
+                  htmlFor={field}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {field === 'password'
+                    ? '비밀번호'
+                    : field === 'confirmPassword'
+                      ? '비밀번호 확인'
+                      : field === 'phoneNumber'
+                        ? '전화번호'
+                        : field === 'managerName'
+                          ? '담당자명'
+                          : field === 'companyName'
+                            ? '업체명'
+                            : field === 'businessType'
+                              ? '서비스 유형'
+                              : '사업자 등록번호'}
+                </label>
+                <div className="relative">
+                  {field === 'password' || field === 'confirmPassword' ? (
+                    <Lock
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
+                  ) : field === 'phoneNumber' ? (
+                    <Phone
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
+                  ) : field === 'managerName' ? (
+                    <User
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
+                  ) : (
+                    <Briefcase
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      size={20}
+                    />
+                  )}
+                  <input
+                    id={field}
+                    name={field}
+                    type={
+                      field === 'password' || field === 'confirmPassword'
+                        ? 'password'
+                        : 'text'
+                    }
+                    required
+                    className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${
+                      errors[field as keyof FormErrors]
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#144156] focus:border-[#144156] focus:z-10 sm:text-sm pl-10`}
+                    placeholder={`${
+                      field === 'password'
+                        ? '비밀번호를 입력해주세요.'
+                        : field === 'confirmPassword'
+                          ? '비밀번호를 다시 입력해주세요'
+                          : field === 'phoneNumber'
+                            ? "전화번호를 입력해주세요('-' 제외)"
+                            : field === 'businessNumber'
+                              ? "사업자 등록번호를 입력해주세요('-' 제외)"
+                              : `${field}를 입력해주세요.`
+                    }`}
+                    value={formData[field as keyof PartnerSignUpForm]}
+                    onChange={handleChange}
+                  />
+                </div>
                 {errors[field as keyof FormErrors] && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="mt-2 text-sm text-red-600">
                     {errors[field as keyof FormErrors]}
                   </p>
                 )}
               </div>
             ))}
+            <div className="mb-4">
+              <label
+                htmlFor="partnerType"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                사업자 유형
+              </label>
+              <div className="relative">
+                <Building
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <select
+                  id="partnerType"
+                  name="partnerType"
+                  value={formData.partnerType}
+                  onChange={handleChange}
+                  className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#144156] focus:border-[#144156] focus:z-10 sm:text-sm pl-10"
+                >
+                  <option value="INDIVIDUAL">개인 사업자</option>
+                  <option value="CORPORATION">법인 사업자</option>
+                  <option value="PUBLIC_INSTITUTION">공공 기관</option>
+                </select>
+              </div>
+            </div>
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={checkBusinessStatus}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#144156] hover:bg-[#1c5f7b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#144156]"
+              >
+                사업자 등록번호 확인
+              </button>
+              {businessValidationMessage && (
+                <p
+                  className={`mt-2 text-sm ${isBusinessValid ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {businessValidationMessage}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-center space-x-4">
+            <button
+              type="submit"
+              className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#144156] hover:bg-[#1c5f7b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#144156]"
+            >
+              회원가입하기
+            </button>
             <button
               type="button"
-              className="bg-[#144156] text-white py-2 px-4 rounded mb-4"
-              onClick={checkBusinessStatus} // 사업자 등록번호 확인 버튼 추가
+              onClick={() => navigate(`/ptlogin`)}
+              className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-[#144156] bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#144156]"
             >
-              사업자 등록번호 확인
+              취소
             </button>
-            {businessValidationMessage && (
-              <p
-                className={`text-sm mt-1 ${
-                  isBusinessValid ? 'text-green-500' : 'text-red-500'
-                }`}
-              >
-                {businessValidationMessage}
-              </p>
-            )}
-            <div>
-              <label className="block mb-1">{fieldLabels['partnerType']}</label>
-              <select
-                name="partnerType"
-                value={formData.partnerType}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="INDIVIDUAL">개인 사업자</option>
-                <option value="CORPORATION">법인 사업자</option>
-                <option value="PUBLIC_INSTITUTION">공공 기관</option>
-              </select>
-            </div>
-            <div className="flex justify-center space-x-4">
-              <button
-                className="bg-[#144156] text-white py-2 px-4 rounded"
-                type="submit"
-              >
-                회원가입하기
-              </button>
-              <button
-                className="bg-[#144156] text-white py-2 px-4 rounded"
-                onClick={() => navigate(`/ptlogin`)}
-                type="button"
-              >
-                취소
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 };
