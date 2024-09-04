@@ -10,6 +10,8 @@ import {
   CommissionFormData,
   AddressData,
   Status,
+  CleanTypeKorean,
+  HouseTypeKorean,
 } from '../../types/commission';
 import logo from '../../assets/logo.png';
 import AddressSelector from '../../components/common/AddressSelector';
@@ -179,9 +181,9 @@ const CommissionWrite: React.FC = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">주거형태 선택</option>
-                {Object.entries(HouseType).map(([key, value]) => (
-                  <option key={key} value={value}>
-                    {key}
+                {Object.entries(HouseTypeKorean).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
                   </option>
                 ))}
               </select>
@@ -199,9 +201,9 @@ const CommissionWrite: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">청소 선택</option>
-              {Object.entries(CleanType).map(([key, value]) => (
-                <option key={key} value={value}>
-                  {key}
+              {Object.entries(CleanTypeKorean).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
                 </option>
               ))}
             </select>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEstimateDetail } from '../../hooks/useCommissions';
-import { Status } from '../../types/commission';
+import { CleanTypeKorean, Status } from '../../types/commission';
 import {
   Calendar,
   ClipboardList,
@@ -81,7 +81,7 @@ const EstimateDetail: React.FC = () => {
           <InfoItem
             icon={<ClipboardList size={20} />}
             label="청소 종류"
-            value={data.cleanType}
+            value={CleanTypeKorean[data.cleanType]}
           />
           <p className="text-gray-700">
             <span className="font-semibold">설명:</span> {data.statement}
