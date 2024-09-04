@@ -36,6 +36,7 @@ import BusinessStatusCheck from '../pages/partners/PartnerCheck';
 import CommissionView from '../pages/partners/CommissionView';
 import MapTest from '../pages/partners/MapTest';
 import PaymentPage from '../pages/members/PaymentPage';
+import Redirection from '../pages/members/Redirection';
 
 const ProtectedRoute: React.FC<{ allowedRole: 'member' | 'partner' }> = ({
   allowedRole,
@@ -75,6 +76,8 @@ const Router: React.FC = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/ptlogin" element={<PartnerLogin />} />
           <Route path="/ptsignup" element={<PartnerSignUp />} />
+          <Route path="/oauth/kakao/callback" element={<Redirection />} />
+          
         </Route>
       </Route>
 

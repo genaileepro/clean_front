@@ -640,6 +640,11 @@
   resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
+"@portone/browser-sdk@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@portone/browser-sdk/-/browser-sdk-0.0.9.tgz#3a893acfa573c46a5c2f0460aff03fbc893989bd"
+  integrity sha512-z1HlHE608qvKAOwDN+iQCxQtQ6lkLU/lp+gv9aE4FPM5yEU1z8ucRUf/Bu5bT00k1/VWGAgidId5Sq4Q/Ez5XA==
+
 "@react-aria/ssr@^3.5.0":
   version "3.9.4"
   resolved "https://registry.npmjs.org/@react-aria/ssr/-/ssr-3.9.4.tgz"

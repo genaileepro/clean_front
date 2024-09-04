@@ -125,9 +125,8 @@ const Login: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${
-                    errors.password ? 'border-red-500' : 'border-gray-300'
-                  } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-brand focus:border-brand focus:z-10 sm:text-sm pl-10`}
+                  className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'
+                    } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-brand focus:border-brand focus:z-10 sm:text-sm pl-10`}
                   placeholder="비밀번호"
                   value={formData.password}
                   onChange={handlePasswordChange}

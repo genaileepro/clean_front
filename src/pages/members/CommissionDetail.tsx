@@ -5,10 +5,10 @@ import {
   useUpdateCommissionStatus,
 } from '../../hooks/useCommissions';
 import {
-  HouseType,
-  CleanType,
   Status,
   Commission,
+  CleanTypeKorean,
+  HouseTypeKorean,
 } from '../../types/commission';
 import { showErrorNotification } from '../../utils/errorHandler';
 import toast from 'react-hot-toast';
@@ -89,13 +89,13 @@ const CommissionDetail: React.FC = () => {
             <div className="col-span-2 sm:col-span-1">
               <p className="text-sm text-gray-600">집 종류</p>
               <p className="text-lg font-semibold">
-                {HouseType[commission.houseType]}
+              {HouseTypeKorean[commission.houseType]}
               </p>
             </div>
             <div className="col-span-2 sm:col-span-1">
               <p className="text-sm text-gray-600">청소 종류</p>
               <p className="text-lg font-semibold">
-                {CleanType[commission.cleanType]}
+              {CleanTypeKorean[commission.cleanType]}
               </p>
             </div>
             <div className="col-span-2 sm:col-span-1">

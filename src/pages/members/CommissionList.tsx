@@ -10,9 +10,10 @@ import noHistory from '../../assets/noHistory.png';
 import CommissionImage from '../../components/common/CommissionImage';
 import {
   Commission,
-  HouseType,
-  CleanType,
   Status,
+  StatusKorean,
+  HouseTypeKorean,
+  CleanTypeKorean,
 } from '../../types/commission';
 import toast from 'react-hot-toast';
 import { Home, Trash2, Send, ChevronRight } from 'lucide-react';
@@ -37,18 +38,18 @@ const CommissionCard: React.FC<{
         <div className="w-2/3 p-4 flex flex-col justify-between">
           <div>
             <h2 className="text-xl font-semibold mb-2 text-gray-800">
-              {HouseType[commission.houseType]} 청소
+            {HouseTypeKorean[commission.houseType]} 청소
             </h2>
             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
               <div className="flex items-center">
                 <Home size={16} className="mr-1" />
                 <span>평수: {commission.size} 평</span>
               </div>
-              <div>청소 등급: {CleanType[commission.cleanType]}</div>
+              <div>청소 등급: {CleanTypeKorean[commission.cleanType]}</div>
               <div>
                 희망일: {new Date(commission.desiredDate).toLocaleDateString()}
               </div>
-              <div>상태: {Status[commission.status]}</div>
+              <div>상태: {StatusKorean[commission.status]}</div>
             </div>
           </div>
           <div className="flex justify-between items-center mt-4">
@@ -139,7 +140,7 @@ const CommissionList: React.FC = () => {
     );
 
   const checkCommissions = commissions?.filter(
-    (commission: Commission) => commission.status === Status.CHECK,
+    (commission: Commission) => commission.status === Status.CHECK
   );
 
   return (

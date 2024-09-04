@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCommissions } from '../../hooks/useCommissions';
 import {
   Commission,
-  HouseType,
-  CleanType,
   Status,
+  HouseTypeKorean,
+  CleanTypeKorean,
 } from '../../types/commission';
 import CommissionImage from '../../components/common/CommissionImage';
 import noHistory from '../../assets/noHistory.png';
@@ -34,7 +34,7 @@ const CommissionCard: React.FC<{ commission: Commission }> = ({
         </div>
         <div className="w-2/3 p-4">
           <h2 className="text-xl font-semibold mb-2 text-gray-800">
-            {HouseType[commission.houseType]} 청소
+            {HouseTypeKorean[commission.houseType]} 청소
           </h2>
           <div className="space-y-2">
             <div className="flex items-center text-gray-600">
@@ -43,7 +43,7 @@ const CommissionCard: React.FC<{ commission: Commission }> = ({
             </div>
             <div className="flex items-center text-gray-600">
               <Sparkles size={16} className="mr-2" />
-              <span>청소 등급: {CleanType[commission.cleanType]}</span>
+              <span>청소 등급: {CleanTypeKorean[commission.cleanType]}</span>
             </div>
             <div className="flex items-center text-gray-600">
               <Calendar size={16} className="mr-2" />

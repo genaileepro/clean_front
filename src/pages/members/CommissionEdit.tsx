@@ -4,7 +4,7 @@ import {
   useCommissionConfirmed,
   useUpdateCommission,
 } from '../../hooks/useCommissions';
-import { Commission, HouseType, CleanType } from '../../types/commission';
+import { Commission, HouseTypeKorean, CleanTypeKorean } from '../../types/commission';
 import { toast } from 'react-hot-toast';
 import { showErrorNotification } from '../../utils/errorHandler';
 import { Save, ArrowLeft } from 'lucide-react';
@@ -120,7 +120,7 @@ const CommissionEdit: React.FC = () => {
             required
           >
             <option value="">선택해주세요</option>
-            {Object.entries(HouseType).map(([key, value]) => (
+            {Object.entries(HouseTypeKorean).map(([key, value]) => (
               <option key={key} value={key}>
                 {value}
               </option>
@@ -143,7 +143,7 @@ const CommissionEdit: React.FC = () => {
             required
           >
             <option value="">선택해주세요</option>
-            {Object.entries(CleanType).map(([key, value]) => (
+            {Object.entries(CleanTypeKorean).map(([key, value]) => (
               <option key={key} value={key}>
                 {value}
               </option>

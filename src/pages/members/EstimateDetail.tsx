@@ -1,15 +1,16 @@
 import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useEstimateDetail } from '../../hooks/useCommissions';
-import { Status } from '../../types/commission';
+import { CleanTypeKorean, Status } from '../../types/commission';
 import {
   Calendar,
-  DollarSign,
   ClipboardList,
   Briefcase,
   Phone,
+  MapPin,
 } from 'lucide-react';
 import LoadingSpinner from '../../utils/LoadingSpinner';
+import logo from '../../assets/logo.png';
 
 const EstimateDetail: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -43,105 +44,107 @@ const EstimateDetail: React.FC = () => {
   const InfoItem: React.FC<{
     icon: React.ReactNode;
     label: string;
-    value: string;
+    value: string | React.ReactNode;
   }> = ({ icon, label, value }) => (
-    <div className="flex items-center mb-2">
-      <div className="text-brand mr-2">{icon}</div>
-      <span className="font-semibold mr-2">{label}:</span>
-      <span>{value}</span>
+    <div className="flex items-center mb-4">
+      <div className="text-brand mr-3">{icon}</div>
+      <div>
+        <span className="text-sm text-gray-500">{label}</span>
+        <div className="font-semibold">{value}</div>
+      </div>
     </div>
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        견적 상세
-      </h1>
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-2xl font-semibold mb-4 text-brand">견적 정보</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <div className="mb-8 text-center">
+          <img src={logo} alt="깔끔한방 로고" className="mx-auto w-48 h-auto" />
+        </div>
+        <div className="flex justify-between items-start mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">견적 상세</h1>
+          <div className="text-right">
+            <p className="text-sm text-gray-500">제안 날짜</p>
+            <p className="font-semibold">
+              {new Date(data.fixedDate).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 p-6 rounded-lg mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-blue-700">견적 금액</h2>
+            <p className="text-3xl font-bold text-blue-700">
+              {data.price.toLocaleString()}원
+            </p>
+          </div>
           <InfoItem
             icon={<ClipboardList size={20} />}
-            label="견적 ID"
-            value={data.id.toString()}
+            label="청소 종류"
+            value={CleanTypeKorean[data.cleanType]}
           />
-          <InfoItem
-            icon={<DollarSign size={20} />}
-            label="금액"
-            value={`${data.price.toLocaleString()}원`}
-          />
-          <InfoItem
-            icon={<Calendar size={20} />}
-            label="작업 날짜"
-            value={new Date(data.fixedDate).toLocaleString()}
-          />
-          <p className="mb-2">
+          <p className="text-gray-700">
             <span className="font-semibold">설명:</span> {data.statement}
           </p>
-          <p className="mb-2">
-            <span className="font-semibold">상태:</span> {data.status}
-          </p>
+        </div>
 
-          <h2 className="text-2xl font-semibold mt-6 mb-4 text-brand">
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+            파트너 정보
+          </h2>
+          <div className="bg-gray-50 p-6 rounded-lg">
+            <InfoItem
+              icon={<Briefcase size={20} />}
+              label="회사명"
+              value={data.companyName}
+            />
+            <InfoItem
+              icon={<Briefcase size={20} />}
+              label="담당자"
+              value={data.managerName}
+            />
+            <InfoItem
+              icon={<Phone size={20} />}
+              label="연락처"
+              value={data.phoneNumber}
+            />
+          </div>
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
             의뢰 정보
           </h2>
-          <InfoItem
-            icon={<ClipboardList size={20} />}
-            label="의뢰 ID"
-            value={data.commissionId.toString()}
-          />
-          <InfoItem
-            icon={<Briefcase size={20} />}
-            label="청소 종류"
-            value={data.cleanType}
-          />
-          <InfoItem
-            icon={<Calendar size={20} />}
-            label="희망 날짜"
-            value={new Date(data.desiredDate).toLocaleDateString()}
-          />
-          <InfoItem
-            icon={<ClipboardList size={20} />}
-            label="크기"
-            value={`${data.size} 평`}
-          />
-          <p className="mb-2">
+          <div className="grid grid-cols-2 gap-4">
+            <InfoItem
+              icon={<Calendar size={20} />}
+              label="희망 날짜"
+              value={new Date(data.desiredDate).toLocaleDateString()}
+            />
+            <InfoItem
+              icon={<MapPin size={20} />}
+              label="크기"
+              value={`${data.size} 평`}
+            />
+          </div>
+          <p className="mt-4 text-gray-700">
             <span className="font-semibold">특이사항:</span>{' '}
             {data.significant || '없음'}
           </p>
+        </div>
 
-          <h2 className="text-2xl font-semibold mt-6 mb-4 text-brand">
-            파트너 정보
-          </h2>
-          <InfoItem
-            icon={<Briefcase size={20} />}
-            label="회사명"
-            value={data.companyName}
-          />
-          <InfoItem
-            icon={<Briefcase size={20} />}
-            label="담당자"
-            value={data.managerName}
-          />
-          <InfoItem
-            icon={<Phone size={20} />}
-            label="연락처"
-            value={data.phoneNumber}
-          />
-
-          <div className="mt-8 flex justify-center">
-            <button
-              onClick={handlePaymentNavigation}
-              className={`py-2 px-6 rounded-full text-white font-semibold transition-colors ${
-                data.status === Status.CONTACT
-                  ? 'bg-brand hover:bg-brand-dark'
-                  : 'bg-gray-400 cursor-not-allowed'
-              }`}
-              disabled={data.status !== Status.CONTACT}
-            >
-              {data.status === Status.CONTACT ? '결제 진행하기' : '결제 불가'}
-            </button>
-          </div>
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={handlePaymentNavigation}
+            className={`py-3 px-6 rounded-full text-white font-semibold text-lg transition-colors ${
+              data.status === Status.CONTACT
+                ? 'bg-[#0bb8f9] hover:bg-blue-600'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
+            disabled={data.status !== Status.CONTACT}
+          >
+            {data.status === Status.CONTACT ? '결제 진행하기' : '결제 불가'}
+          </button>
         </div>
       </div>
     </div>
