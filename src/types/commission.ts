@@ -1,27 +1,52 @@
-export enum HouseType {
-  APT = 'APT',
-  ONEROOM = 'ONEROOM',
-  HOUSE = 'HOUSE',
-  TOILET = 'TOILET',
-}
+export const Status = {
+  CHECK: 'CHECK',
+  SEND: 'SEND',
+  CONTACT: 'CONTACT',
+  FINISH: 'FINISH',
+} as const;
 
-export enum CleanType {
-  NORMAL = 'NORMAL',
-  SPECIAL = 'SPECIAL',
-}
+export type Status = typeof Status[keyof typeof Status];
 
-export enum Status {
-  CHECK = 'CHECK',
-  SEND = 'SEND',
-  CONTACT = 'CONTACT',
-  FINISH = 'FINISH',
-}
+export const StatusKorean = {
+  [Status.CHECK]: '대기',
+  [Status.SEND]: '발송 됨',
+  [Status.CONTACT]: '매칭 중',
+  [Status.FINISH]: '완료',
+};
+
+export const HouseType = {
+  APT: 'APT',
+  ONEROOM: 'ONEROOM',
+  HOUSE: 'HOUSE',
+  TOILET: 'TOILET',
+} as const;
+
+export type HouseType = typeof HouseType[keyof typeof HouseType];
+
+export const HouseTypeKorean = {
+  [HouseType.APT]: '아파트',
+  [HouseType.ONEROOM]: '원룸',
+  [HouseType.HOUSE]: '주택',
+  [HouseType.TOILET]: '화장실',
+};
+
+export const CleanType = {
+  NORMAL: 'NORMAL',
+  SPECIAL: 'SPECIAL',
+} as const;
+
+export type CleanType = typeof CleanType[keyof typeof CleanType];
+
+export const CleanTypeKorean = {
+  [CleanType.NORMAL]: '일반 청소',
+  [CleanType.SPECIAL]: '특수 청소',
+};
 
 export interface Commission {
   commissionId: number;
   memberNick: string;
   addressId: number;
-  image?: string; // 이미지 파일명 또는 식별자
+  image?: string;
   size: number;
   houseType: HouseType;
   cleanType: CleanType;

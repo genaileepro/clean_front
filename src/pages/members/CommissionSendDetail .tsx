@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useCommissionSendDetail } from '../../hooks/useCommissions';
-import { HouseType, CleanType, Status, Estimate } from '../../types/commission';
+import { Estimate, HouseTypeKorean, CleanTypeKorean, StatusKorean } from '../../types/commission';
 import CommissionImage from '../../components/common/CommissionImage';
 import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
@@ -55,13 +55,13 @@ const CommissionSendDetail: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">집 종류</p>
               <p className="text-lg font-semibold">
-                {HouseType[commission.houseType]}
+                {HouseTypeKorean[commission.houseType]}
               </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">청소 종류</p>
               <p className="text-lg font-semibold">
-                {CleanType[commission.cleanType]}
+                {CleanTypeKorean[commission.cleanType]}
               </p>
             </div>
             <div>
@@ -73,7 +73,7 @@ const CommissionSendDetail: React.FC = () => {
             <div>
               <p className="text-sm text-gray-600">상태</p>
               <p className="text-lg font-semibold">
-                {Status[commission.status]}
+                {StatusKorean[commission.status]}
               </p>
             </div>
           </div>
