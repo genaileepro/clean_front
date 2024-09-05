@@ -41,12 +41,12 @@ export const createSelectValidator = (
 
 // 로그인 유효성 검사
 export const validateEmail = createValidator(
-  (email) => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
+  email => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email),
   '유효한 이메일 주소를 입력해주세요.',
 );
 
 export const validatePassword = createValidator(
-  (password) =>
+  password =>
     /^(?=.*[a-z])(?=.*\d)(?=.*[~!@$%^&*_])[a-zA-Z\d~!@$%^&*_]{8,}$/.test(
       password,
     ),
@@ -78,45 +78,59 @@ export const validateConfirmPassword = (
 };
 
 export const validateNickName = createValidator(
-  (nick) => /^[a-zA-Z0-9가-힣_-]{1,15}$/.test(nick),
+  nick => /^[a-zA-Z0-9가-힣_-]{1,15}$/.test(nick),
   '닉네임은 1~15자로, 숫자/영문/한글/특수문자(_,-)만 사용 가능합니다.',
 );
 
 export const validatePhoneNumber = createValidator(
-  (phoneNumber) => /^01\d{9}$/.test(phoneNumber),
+  phoneNumber => /^01\d{9}$/.test(phoneNumber),
   '전화번호는 01012345678 형식이어야 합니다.',
 );
 
 // 의뢰 유효성검사
 export const validateSize = createValidator(
-  (size) => !isNaN(Number(size)) && Number(size) > 0,
+  size => !isNaN(Number(size)) && Number(size) > 0,
   '크기는 양수여야 합니다.',
 );
 
 export const validateHouseType = createSelectValidator(
-  (houseType) => houseType.length > 0,
+  houseType => houseType.length > 0,
   '집 유형을 입력해주세요.',
 );
 
 export const validateCleanType = createSelectValidator(
-  (cleanType) => cleanType.length > 0,
+  cleanType => cleanType.length > 0,
   '청소 유형을 입력해주세요.',
 );
 
 export const validateDesiredDate = createValidator(
-  (date) => !isNaN(Date.parse(date)),
+  date => !isNaN(Date.parse(date)),
   '유효한 날짜를 입력해주세요.',
 );
 
 export const validateSignificant = createValidator(
-  (significant) => significant.length > 0 && significant.length <= 500,
+  significant => significant.length > 0 && significant.length <= 500,
   '특이사항은 500자 이내로 입력해주세요.',
 );
 
-export interface ValidationResult {
-  isValid: boolean;
-  message: string;
-}
+// 주소 유효성 검사
+export const validateAddress = (addressData: any): ValidationResult => {
+  if (!addressData || !addressData.address || !addressData.addressDetail) {
+    return {
+      isValid: false,
+      message: '주소를 선택하고 상세주소를 입력해주세요.',
+    };
+  }
+  return { isValid: true, message: '' };
+};
+
+// 이미지 업로드 유효성 검사
+export const validateImage = (image: string): ValidationResult => {
+  if (!image) {
+    return { isValid: false, message: '이미지를 업로드해주세요.' };
+  }
+  return { isValid: true, message: '' };
+};
 
 // 공공 API를 이용한 사업자 등록번호 유효성 검사 함수
 export const validateBusinessNumber = async (businessNumber: string) => {
@@ -155,6 +169,6 @@ export const validateBusinessNumber = async (businessNumber: string) => {
 };
 
 export const validateVerificationCode = createValidator(
-  (code) => /^\d{6}$/.test(code),
+  code => /^\d{6}$/.test(code),
   '인증 코드는 6자리 숫자여야 합니다.',
 );

@@ -27,6 +27,7 @@ const Redirection: React.FC = () => {
         const { accessToken, refreshToken } = response.data;
 
         login(accessToken, refreshToken, false);
+        console.log(accessToken, refreshToken);
         navigate('/memberhome');
       } catch (error) {
         const errorMessage = handleApiError(error);

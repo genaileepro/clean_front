@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   useCreateCommission,
   useUploadCommissionImage,
@@ -21,8 +22,9 @@ import {
   validateCleanType,
   validateDesiredDate,
   validateSignificant,
+  validateAddress,
+  validateImage,
 } from '../../utils/validationUtils';
-import { showErrorNotification } from '../../utils/errorHandler';
 import { Home, Camera, Calendar, FileText, MapPin } from 'lucide-react';
 
 const CommissionWrite: React.FC = () => {
@@ -43,12 +45,12 @@ const CommissionWrite: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(
     null,
   );
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddressSelect = (addressData: AddressData) => {
-    setForm((prev) => ({ ...prev, addressId: addressData.id }));
+    setForm(prev => ({ ...prev, addressId: addressData.id }));
     setSelectedAddress(addressData);
   };
 
@@ -58,67 +60,89 @@ const CommissionWrite: React.FC = () => {
     >,
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
+    setForm(prev => ({
       ...prev,
       [name]: name === 'size' ? (value === '' ? null : Number(value)) : value,
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 4 * 1024 * 1024) {
-        showErrorNotification('파일 크기는 4MB를 초과할 수 없습니다.');
+        toast.error('파일 크기는 4MB를 초과할 수 없습니다.');
         return;
       }
 
       const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!validTypes.includes(file.type)) {
-        showErrorNotification(
-          'JPG, PNG, GIF 형식의 이미지만 업로드 가능합니다.',
-        );
+        toast.error('JPG, PNG, GIF 형식의 이미지만 업로드 가능합니다.');
         return;
       }
-
-      setSelectedFile(file);
 
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      await handleUpload(file);
     }
   };
 
-  const handleUpload = async () => {
-    if (selectedFile) {
-      try {
-        const fileName = await uploadImageMutation.mutateAsync(selectedFile);
-        setForm((prev) => ({ ...prev, image: fileName }));
-      } catch (error) {
-        console.error('Failed to upload image:', error);
-      }
+  const handleUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const fileName = await uploadImageMutation.mutateAsync(file);
+      setForm(prev => ({ ...prev, image: fileName }));
+      toast.success('이미지가 성공적으로 업로드되었습니다.');
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      toast.error('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsUploading(false);
     }
+  };
+
+  const validateForm = (): boolean => {
+    let isValid = true;
+    const validations = [
+      validateSize(form.size?.toString() || ''),
+      validateHouseType(form.houseType),
+      validateCleanType(form.cleanType),
+      validateAddress(selectedAddress),
+      validateImage(form.image),
+      validateDesiredDate(form.desiredDate),
+      validateSignificant(form.significant),
+    ];
+
+    Object.entries(validations).forEach(([field, validation]) => {
+      if (!validation.isValid) {
+        toast.error(`${getFieldName(field)}: ${validation.message}`);
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  };
+
+  const getFieldName = (field: string): string => {
+    const fieldNames: { [key: string]: string } = {
+      size: '평수',
+      houseType: '주거 형태',
+      cleanType: '청소 종류',
+      address: '주소',
+      image: '이미지',
+      desiredDate: '희망 날짜',
+      significant: '특이사항',
+    };
+    return fieldNames[field] || field;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const sizeValidation = validateSize(form.size?.toString() || '');
-    const houseTypeValidation = validateHouseType(form.houseType);
-    const cleanTypeValidation = validateCleanType(form.cleanType);
-    const desiredDateValidation = validateDesiredDate(form.desiredDate);
-    const significantValidation = validateSignificant(form.significant);
-
-    if (
-      !sizeValidation.isValid ||
-      !houseTypeValidation.isValid ||
-      !cleanTypeValidation.isValid ||
-      !desiredDateValidation.isValid ||
-      !significantValidation.isValid ||
-      !form.image
-    ) {
-      showErrorNotification('모든 필드를 올바르게 입력해주세요.');
+    if (!validateForm()) {
       return;
     }
 
@@ -135,9 +159,11 @@ const CommissionWrite: React.FC = () => {
       };
 
       await createCommissionMutation.mutateAsync(newCommission);
+      toast.success('의뢰가 성공적으로 작성되었습니다.');
       navigate('/commissionlist');
     } catch (error) {
       console.error('Failed to create commission:', error);
+      toast.error('의뢰 작성에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -164,7 +190,6 @@ const CommissionWrite: React.FC = () => {
                   value={form.size === null ? '' : form.size}
                   onChange={handleChange}
                   placeholder="평수를 입력해주세요"
-                  required
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -177,7 +202,6 @@ const CommissionWrite: React.FC = () => {
                 name="houseType"
                 value={form.houseType}
                 onChange={handleChange}
-                required
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">주거형태 선택</option>
@@ -197,7 +221,6 @@ const CommissionWrite: React.FC = () => {
               name="cleanType"
               value={form.cleanType}
               onChange={handleChange}
-              required
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">청소 선택</option>
@@ -276,29 +299,12 @@ const CommissionWrite: React.FC = () => {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                disabled={isUploading}
               >
                 <Camera className="mr-2" size={20} />
-                이미지 선택
-              </button>
-              <button
-                type="button"
-                onClick={handleUpload}
-                disabled={!selectedFile || uploadImageMutation.isPending}
-                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:bg-gray-400"
-              >
-                {uploadImageMutation.isPending
-                  ? '업로드 중...'
-                  : '이미지 업로드'}
+                {isUploading ? '업로드 중...' : '이미지 선택'}
               </button>
             </div>
-            {uploadImageMutation.isPending && (
-              <p className="text-sm text-gray-500 mt-1">이미지 업로드 중...</p>
-            )}
-            {form.image && (
-              <p className="text-sm text-green-500 mt-1">
-                업로드 완료: {form.image}
-              </p>
-            )}
             {preview && (
               <div className="mt-4">
                 <img
@@ -320,7 +326,6 @@ const CommissionWrite: React.FC = () => {
                 name="desiredDate"
                 value={form.desiredDate}
                 onChange={handleChange}
-                required
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -335,7 +340,6 @@ const CommissionWrite: React.FC = () => {
                 name="significant"
                 value={form.significant}
                 onChange={handleChange}
-                required
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 rows={4}
               />
@@ -351,11 +355,6 @@ const CommissionWrite: React.FC = () => {
               : '의뢰 작성 완료하기'}
           </button>
         </form>
-        {createCommissionMutation.isError && (
-          <div className="mt-4 text-red-500 text-center">
-            의뢰 작성에 실패했습니다. 다시 시도해주세요.
-          </div>
-        )}
       </div>
     </div>
   );

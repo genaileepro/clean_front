@@ -36,16 +36,16 @@ const Login: React.FC = () => {
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
     let validationResult = validatePassword(value);
-    setErrors((prev) => ({ ...prev, [name]: validationResult.message }));
+    setErrors(prev => ({ ...prev, [name]: validationResult.message }));
   };
 
   const loginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (errors.email || errors.password) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         general: '입력한 정보를 다시 확인해주세요.',
       }));
@@ -59,7 +59,7 @@ const Login: React.FC = () => {
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         general: '이메일과 비밀번호를 확인해주세요.',
       }));
@@ -101,12 +101,10 @@ const Login: React.FC = () => {
             <div className="mb-4">
               <EmailInput
                 email={formData.email}
-                setEmail={(email) =>
-                  setFormData((prev) => ({ ...prev, email }))
-                }
+                setEmail={email => setFormData(prev => ({ ...prev, email }))}
                 emailError={errors.email}
-                setEmailError={(error) =>
-                  setErrors((prev) => ({ ...prev, email: error }))
+                setEmailError={error =>
+                  setErrors(prev => ({ ...prev, email: error }))
                 }
               />
             </div>
@@ -125,8 +123,9 @@ const Login: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'
-                    } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-brand focus:border-brand focus:z-10 sm:text-sm pl-10`}
+                  className={`appearance-none rounded-md relative block w-full px-3 py-2 border ${
+                    errors.password ? 'border-red-500' : 'border-gray-300'
+                  } placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-brand focus:border-brand focus:z-10 sm:text-sm pl-10`}
                   placeholder="비밀번호"
                   value={formData.password}
                   onChange={handlePasswordChange}
