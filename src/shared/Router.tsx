@@ -15,7 +15,6 @@ import CommissionEdit from '../pages/members/CommissionEdit';
 import CommissionSendList from '../pages/members/CommissionSendList ';
 import CommissionSendDetail from '../pages/members/CommissionSendDetail ';
 import EstimateDetail from '../pages/members/EstimateDetail';
-import UserOrders from '../pages/members/UserOrders';
 import MemberInfo from '../pages/members/MemberInfo';
 import MemberEdit from '../pages/members/MemberEdit';
 import PartnerHome from '../pages/partners/PartnerHome';
@@ -99,7 +98,6 @@ const Router: React.FC = () => {
           />
           <Route path="/estimatedetail" element={<EstimateDetail />} />
           <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/userorders" element={<UserOrders />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
         </Route>
       </Route>

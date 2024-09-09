@@ -86,3 +86,14 @@ export const verifyPartnerEmail = async (
   });
   return response.data;
 };
+
+export const withdrawPartner = async (): Promise<{
+  id: number;
+  message: string;
+}> => {
+  const response = await partnerApiInstance.patch<{
+    id: number;
+    message: string;
+  }>('/partner/delete');
+  return response.data;
+};

@@ -105,18 +105,25 @@ const CommissionWrite: React.FC = () => {
   };
 
   const validateForm = (): boolean => {
-    let isValid = true;
     const validations = [
-      validateSize(form.size?.toString() || ''),
-      validateHouseType(form.houseType),
-      validateCleanType(form.cleanType),
-      validateAddress(selectedAddress),
-      validateImage(form.image),
-      validateDesiredDate(form.desiredDate),
-      validateSignificant(form.significant),
+      { field: 'size', validation: validateSize(form.size?.toString() || '') },
+      { field: 'houseType', validation: validateHouseType(form.houseType) },
+      { field: 'cleanType', validation: validateCleanType(form.cleanType) },
+      { field: 'address', validation: validateAddress(selectedAddress) },
+      { field: 'image', validation: validateImage(form.image) },
+      {
+        field: 'desiredDate',
+        validation: validateDesiredDate(form.desiredDate),
+      },
+      {
+        field: 'significant',
+        validation: validateSignificant(form.significant),
+      },
     ];
 
-    Object.entries(validations).forEach(([field, validation]) => {
+    let isValid = true;
+
+    validations.forEach(({ field, validation }) => {
       if (!validation.isValid) {
         toast.error(`${getFieldName(field)}: ${validation.message}`);
         isValid = false;

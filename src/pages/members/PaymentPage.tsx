@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useCompletePayment } from '../../hooks/usePayment';
 import {
   CreditCard,
   Building,
@@ -7,18 +8,26 @@ import {
   Smartphone,
   CreditCard as SimplePayIcon,
 } from 'lucide-react';
-// import { getPaymentData } from '../../api/payment';
-// import { validatePhoneNumber, validateEmail } from '../../utils/validationUtils';
 import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
 import LoadingSpinner from '../../utils/LoadingSpinner';
-import { PayMethod, RequestPayParams } from '../../types/portone';
+import {
+  PayMethod,
+  RequestPayParams,
+  RequestPayResponse,
+} from '../../types/portone';
 import SimplePaySection from '../../components/members/SimplePayButton';
+import { getPaymentData } from '../../api/payment';
+import { v4 as uuidv4 } from 'uuid';
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { estimateId } = location.state as { estimateId: number };
+
+  const completePaymentMutation = useCompletePayment();
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [simplePayMethod, setSimplePayMethod] = useState<string>('');
@@ -26,21 +35,16 @@ const PaymentPage: React.FC = () => {
   const [buyerName, setBuyerName] = useState<string>('');
   const [buyerTel, setBuyerTel] = useState<string>('');
   const [buyerEmail, setBuyerEmail] = useState<string>('');
-  const [buyerAddr, setBuyerAddr] = useState<string>('');
-  const [buyerPostcode, setBuyerPostcode] = useState<string>('');
 
   useEffect(() => {
     const fetchPaymentData = async () => {
       try {
         setLoading(true);
-        const orderId = 'some-order-id'; // 이 부분은 실제 주문 ID로 대체해야 합니다
-        const data = await getPaymentData(orderId);
+        const data = await getPaymentData(estimateId);
         setAmount(data.amount);
-        setBuyerName(data.buyerName);
-        setBuyerTel(data.buyerTel);
-        setBuyerEmail(data.buyerEmail);
-        setBuyerAddr(data.buyerAddr);
-        setBuyerPostcode(data.buyerPostcode);
+        setBuyerName(data.buyer_name);
+        setBuyerTel(data.buyer_tel);
+        setBuyerEmail(data.buyer_email);
       } catch (error) {
         showErrorNotification(handleApiError(error));
       } finally {
@@ -54,7 +58,7 @@ const PaymentPage: React.FC = () => {
     const jquery = document.createElement('script');
     jquery.src = 'https://code.jquery.com/jquery-1.12.4.min.js';
     const iamport = document.createElement('script');
-    iamport.src = 'https://cdn.iamport.kr/js/iamport.payment-1.2.0.js';
+    iamport.src = 'https://cdn.iamport.kr/v1/iamport.js';
     document.head.appendChild(jquery);
     document.head.appendChild(iamport);
 
@@ -62,7 +66,7 @@ const PaymentPage: React.FC = () => {
       document.head.removeChild(jquery);
       document.head.removeChild(iamport);
     };
-  }, []);
+  }, [estimateId]);
 
   const getPayMethod = (): PayMethod => {
     if (paymentMethod === 'SIMPLE_PAY') {
@@ -81,27 +85,30 @@ const PaymentPage: React.FC = () => {
     IMP.init(import.meta.env.VITE_IMP_KEY);
 
     const data: RequestPayParams = {
-      pg: 'smartro_v2',
+      pg: 'smartro.iamport01m',
       pay_method: getPayMethod(),
-      merchant_uid: `mid_${new Date().getTime()}`,
+      merchant_uid: uuidv4().replace(/-/g, '').substring(0, 8),
       amount: amount,
-      name: '깔끔한방 청소 서비스',
       buyer_name: buyerName,
       buyer_tel: buyerTel,
       buyer_email: buyerEmail,
-      buyer_addr: buyerAddr,
-      buyer_postcode: buyerPostcode,
     };
 
     IMP.request_pay(data, callback);
   };
 
-  const callback = (response: any) => {
-    const { success, error_msg } = response;
+  const callback = async (response: RequestPayResponse) => {
+    const { success, error_msg, imp_uid } = response;
 
-    if (success) {
-      showErrorNotification('결제 성공');
-      navigate('/payment-success'); // 결제 성공 페이지로 이동
+    if (success && imp_uid) {
+      try {
+        const result = await completePaymentMutation.mutateAsync(imp_uid);
+        navigate('/payment-success', {
+          state: { paymentInfo: result.response },
+        });
+      } catch (error) {
+        showErrorNotification('결제 완료 처리 중 오류가 발생했습니다.');
+      }
     } else {
       showErrorNotification(`결제 실패: ${error_msg}`);
     }
