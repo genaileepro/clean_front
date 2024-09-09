@@ -26,7 +26,7 @@ export const useUpdatePartner = () => {
   return useMutation<Partner, Error, Partial<Partner>>({
     mutationFn: (updatePartner: Partial<Partner>) =>
       partner.updatePartner(updatePartner),
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.setQueryData(['currentPartner'], data);
       queryClient.invalidateQueries({ queryKey: ['currentPartner'] });
     },
@@ -46,7 +46,7 @@ export const useDeletePartner = () => {
 
 export const usePartnerLogin = () => {
   return useMutation<PartnerLoginResponse, Error, PartnerLoginCredentials>({
-    mutationFn: async (formData) => {
+    mutationFn: async formData => {
       const response = await partnerLogin(formData); // Login API 호출
       return response; // 여기에서 바로 response를 반환합니다.
     },
@@ -65,12 +65,22 @@ export const usePartnerSignup = () => {
 
 export const useRequestPartnerEmailVerification = () => {
   return useMutation<void, Error, { email: string }>({
-    mutationFn: (data) => partner.requestPartnerEmailVerification(data.email),
+    mutationFn: data => partner.requestPartnerEmailVerification(data.email),
   });
 };
 
 export const useVerifyPartnerEmail = () => {
   return useMutation<string, Error, { email: string; code: string }>({
     mutationFn: ({ email, code }) => partner.verifyPartnerEmail(email, code),
+  });
+};
+
+export const useWithdrawPartner = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ id: number; message: string }, Error>({
+    mutationFn: partner.withdrawPartner,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentPartner'] });
+    },
   });
 };

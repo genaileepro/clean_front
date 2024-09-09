@@ -1,5 +1,9 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCurrentPartner, useUpdatePartner } from '../../hooks/usePartners';
+import {
+  useCurrentPartner,
+  useUpdatePartner,
+  useWithdrawPartner,
+} from '../../hooks/usePartners';
 import {
   validatePassword,
   validatePhoneNumber,
@@ -7,6 +11,7 @@ import {
 } from '../../utils/validationUtils';
 import { FormEvent, useEffect, useState } from 'react';
 import logo from '../../assets/logo.png';
+import { UserX } from 'lucide-react';
 
 interface PartnerEditForm {
   email: string;
@@ -35,6 +40,7 @@ const PartnerEdit: React.FC = () => {
   const navigate = useNavigate();
   const { data: partner, isLoading, error } = useCurrentPartner();
   const updatePartnerMutation = useUpdatePartner();
+  const withdrawPartnerMutation = useWithdrawPartner();
 
   const [formData, setFormData] = useState<PartnerEditForm>({
     email: email || '',
@@ -82,7 +88,7 @@ const PartnerEdit: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
     let validationResult;
     if (name === 'phoneNumber') {
@@ -94,7 +100,7 @@ const PartnerEdit: React.FC = () => {
           value,
           formData.confirmPassword,
         );
-        setErrors((prev) => ({
+        setErrors(prev => ({
           ...prev,
           confirmPassword: confirmResult.message,
         }));
@@ -104,9 +110,9 @@ const PartnerEdit: React.FC = () => {
     }
 
     if (validationResult) {
-      setErrors((prev) => ({ ...prev, [name]: validationResult.message }));
+      setErrors(prev => ({ ...prev, [name]: validationResult.message }));
     } else {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -119,7 +125,7 @@ const PartnerEdit: React.FC = () => {
       errors.confirmPassword ||
       (formData.password && formData.password !== formData.confirmPassword)
     ) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         general: '입력한 정보를 다시 확인해주세요.',
       }));
@@ -135,10 +141,29 @@ const PartnerEdit: React.FC = () => {
       navigate(`/pt/${email}`);
     } catch (error) {
       console.error('Update Error:', error);
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         general: '회원 정보 수정에 실패했습니다.',
       }));
+    }
+  };
+
+  const handleWithdraw = async () => {
+    const isConfirmed = window.confirm(
+      '정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+    );
+    if (isConfirmed) {
+      try {
+        await withdrawPartnerMutation.mutateAsync();
+        alert('회원 탈퇴가 완료되었습니다.');
+        // 로그아웃 처리 및 홈 페이지로 리다이렉트
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        navigate('/');
+      } catch (error) {
+        console.error('Withdrawal Error:', error);
+        alert('회원 탈퇴에 실패했습니다.');
+      }
     }
   };
 
@@ -342,6 +367,15 @@ const PartnerEdit: React.FC = () => {
           </button>
         </div>
       </form>
+      <div className="text-right mt-4">
+        <button
+          onClick={handleWithdraw}
+          className="text-gray-500 hover:text-gray-700 text-sm flex items-center justify-end w-full"
+        >
+          <UserX className="w-4 h-4 mr-1" />
+          회원탈퇴
+        </button>
+      </div>
     </div>
   );
 };

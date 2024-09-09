@@ -7,6 +7,7 @@ import {
   handleApiError,
   showErrorNotification,
 } from '../../utils/errorHandler';
+import toast from 'react-hot-toast';
 
 interface EmailVerificationProps {
   email: string;
@@ -48,7 +49,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
       setIsVerificationSent(true);
       setTimer(600); // 10 minutes
       setError('');
-      showErrorNotification('인증 이메일이 발송되었습니다.');
+      toast.success('인증 이메일이 발송되었습니다.');
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
@@ -68,7 +69,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
       setIsVerified(true);
       onVerificationComplete(true);
       setError('');
-      showErrorNotification('이메일이 성공적으로 인증되었습니다.');
+      toast.success('이메일이 성공적으로 인증되었습니다.');
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
@@ -80,7 +81,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
     let interval: NodeJS.Timeout;
     if (timer > 0) {
       interval = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
+        setTimer(prevTimer => prevTimer - 1);
       }, 1000);
     } else if (timer === 0) {
       setIsVerificationSent(false);
@@ -120,7 +121,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
           <input
             type="text"
             value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
+            onChange={e => setVerificationCode(e.target.value)}
             placeholder="인증번호 입력"
             className="w-2/3 p-2 border border-gray-300 rounded"
           />

@@ -24,14 +24,20 @@ const Redirection: React.FC = () => {
 
       try {
         const response = await api.post('/members/kakao-login', { code });
+        console.log('API Response:', response.data); // 전체 응답 구조 확인
         const { accessToken, refreshToken } = response.data;
+        if (!accessToken || !refreshToken) {
+          throw new Error('Tokens are missing in the API response');
+        }
 
         login(accessToken, refreshToken, false);
+        console.log('Login successful:', { accessToken, refreshToken });
         navigate('/memberhome');
       } catch (error) {
+        console.error('Login error:', error);
         const errorMessage = handleApiError(error);
         showErrorNotification(errorMessage);
-        setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해 주세요.');
+        setError(`로그인 처리 중 오류가 발생했습니다: ${errorMessage}`);
       } finally {
         setIsLoading(false);
       }

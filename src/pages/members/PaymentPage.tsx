@@ -1,104 +1,163 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useEstimateDetail } from '../../hooks/useCommissions';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useCompletePayment } from '../../hooks/usePayment';
 import {
   CreditCard,
   Building,
   Wallet,
   Smartphone,
-  CreditCard as SimplePayIcon
+  CreditCard as SimplePayIcon,
 } from 'lucide-react';
-import logo from '../../assets/logo.png';
+import {
+  handleApiError,
+  showErrorNotification,
+} from '../../utils/errorHandler';
 import LoadingSpinner from '../../utils/LoadingSpinner';
-
-declare global {
-  interface Window {
-    IMP: any;
-  }
-}
+import {
+  PayMethod,
+  RequestPayParams,
+  RequestPayResponse,
+} from '../../types/portone';
+import SimplePaySection from '../../components/members/SimplePayButton';
+import { getPaymentData } from '../../api/payment';
+import { v4 as uuidv4 } from 'uuid';
 
 const PaymentPage: React.FC = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { estimateId } = location.state as { estimateId: number };
-  const { data, isLoading, error } = useEstimateDetail(estimateId);
+
+  const completePaymentMutation = useCompletePayment();
+  const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [simplePayMethod, setSimplePayMethod] = useState<string>('');
+  const [amount, setAmount] = useState<number>(0);
+  const [buyerName, setBuyerName] = useState<string>('');
+  const [buyerTel, setBuyerTel] = useState<string>('');
+  const [buyerEmail, setBuyerEmail] = useState<string>('');
 
   useEffect(() => {
-    const IMP = window.IMP;
-    IMP.init(import.meta.env.VITE_IMP_KEY); // 가맹점 식별코드 입력
-  }, []);
+    const fetchPaymentData = async () => {
+      try {
+        setLoading(true);
+        const data = await getPaymentData(estimateId);
+        setAmount(data.amount);
+        setBuyerName(data.buyer_name);
+        setBuyerTel(data.buyer_tel);
+        setBuyerEmail(data.buyer_email);
+      } catch (error) {
+        showErrorNotification(handleApiError(error));
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (isLoading) return <div className="flex justify-center items-center h-screen"><LoadingSpinner /></div>;
-  if (error) return <div className="text-center py-8 text-red-500">에러: {error.message}</div>;
-  if (!data) return <div className="text-center py-8">데이터를 찾을 수 없습니다.</div>;
+    fetchPaymentData();
 
-  const handlePaymentMethodChange = (method: string) => {
-    setPaymentMethod(method);
+    // IMP 초기화
+    const jquery = document.createElement('script');
+    jquery.src = 'https://code.jquery.com/jquery-1.12.4.min.js';
+    const iamport = document.createElement('script');
+    iamport.src = 'https://cdn.iamport.kr/v1/iamport.js';
+    document.head.appendChild(jquery);
+    document.head.appendChild(iamport);
+
+    return () => {
+      document.head.removeChild(jquery);
+      document.head.removeChild(iamport);
+    };
+  }, [estimateId]);
+
+  const getPayMethod = (): PayMethod => {
+    if (paymentMethod === 'SIMPLE_PAY') {
+      return simplePayMethod as PayMethod;
+    }
+    return paymentMethod as PayMethod;
   };
 
-  const handlePayment = () => {
-    if (!paymentMethod) return;
+  const onClickPayment = () => {
+    if (!window.IMP) {
+      showErrorNotification('결제 모듈을 불러오는데 실패했습니다.');
+      return;
+    }
 
-    const IMP = window.IMP;
-    IMP.request_pay({
-      pg: "kcp",
-      pay_method: paymentMethod.toLowerCase(),
-      merchant_uid: `ORD${Date.now()}`,
-      name: "깔끔한방 청소 서비스",
-      amount: data.price,
-      buyer_email: "buyer@example.com",
-      buyer_name: "구매자",
-      buyer_tel: "010-1234-5678",
-      buyer_addr: "서울특별시 강남구 삼성동",
-      buyer_postcode: "123-456",
-    }, function (rsp: any) {
-      if (rsp.success) {
-        console.log("결제 성공", rsp);
-        // 결제 성공 시 백엔드에 결제 정보 전송
-        // 백엔드에서 결제 검증 후 결과에 따라 처리
-        navigate('/payment-confirmation', { state: { estimateId: data.id, paymentInfo: rsp } });
-      } else {
-        console.log("결제 실패", rsp);
-        alert(`결제에 실패하였습니다. 에러 내용: ${rsp.error_msg}`);
+    const { IMP } = window;
+    IMP.init(import.meta.env.VITE_IMP_KEY);
+
+    const data: RequestPayParams = {
+      pg: 'smartro.iamport01m',
+      pay_method: getPayMethod(),
+      merchant_uid: uuidv4().replace(/-/g, '').substring(0, 8),
+      amount: amount,
+      buyer_name: buyerName,
+      buyer_tel: buyerTel,
+      buyer_email: buyerEmail,
+    };
+
+    IMP.request_pay(data, callback);
+  };
+
+  const callback = async (response: RequestPayResponse) => {
+    const { success, error_msg, imp_uid } = response;
+
+    if (success && imp_uid) {
+      try {
+        const result = await completePaymentMutation.mutateAsync(imp_uid);
+        navigate('/payment-success', {
+          state: { paymentInfo: result.response },
+        });
+      } catch (error) {
+        showErrorNotification('결제 완료 처리 중 오류가 발생했습니다.');
       }
-    });
+    } else {
+      showErrorNotification(`결제 실패: ${error_msg}`);
+    }
   };
 
   const paymentMethods = [
-    { id: 'CARD', name: '카드 결제', icon: <CreditCard size={24} /> },
-    { id: 'BANK_TRANSFER', name: '계좌 이체', icon: <Building size={24} /> },
-    { id: 'VIRTUAL_ACCOUNT', name: '가상 계좌', icon: <Wallet size={24} /> },
-    { id: 'PHONE', name: '휴대폰 소액 결제', icon: <Smartphone size={24} /> },
+    { id: 'card', name: '카드 결제', icon: <CreditCard size={24} /> },
+    { id: 'trans', name: '계좌 이체', icon: <Building size={24} /> },
+    { id: 'vbank', name: '가상 계좌', icon: <Wallet size={24} /> },
+    { id: 'phone', name: '휴대폰 소액 결제', icon: <Smartphone size={24} /> },
     { id: 'SIMPLE_PAY', name: '간편 결제', icon: <SimplePayIcon size={24} /> },
   ];
 
-  const simplePay = [
-    '네이버 페이',
-    '카카오 페이',
-    'SSG 페이',
-    '삼성 페이'
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
-        <div className="mb-8 text-center">
-          <img src={logo} alt="깔끔한방 로고" className="mx-auto w-48 h-auto" />
-        </div>
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">결제하기</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          결제하기
+        </h1>
 
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">결제 수단 선택</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            결제 수단 선택
+          </h2>
           <div className="space-y-3">
-            {paymentMethods.map((method) => (
-              <label key={method.id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+            {paymentMethods.map(method => (
+              <label
+                key={method.id}
+                className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="paymentMethod"
                   value={method.id}
                   checked={paymentMethod === method.id}
-                  onChange={() => handlePaymentMethodChange(method.id)}
+                  onChange={() => {
+                    setPaymentMethod(method.id);
+                    if (method.id !== 'SIMPLE_PAY') {
+                      setSimplePayMethod('');
+                    }
+                  }}
                   className="form-radio text-brand"
                 />
                 {method.icon}
@@ -109,31 +168,20 @@ const PaymentPage: React.FC = () => {
         </div>
 
         {paymentMethod === 'SIMPLE_PAY' && (
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-2">간편 결제 선택</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {simplePay.map((method) => (
-                <button
-                  key={method}
-                  className="border border-gray-300 rounded-lg py-2 px-4 text-center hover:bg-gray-50"
-                >
-                  {method}
-                </button>
-              ))}
-            </div>
-          </div>
+          <SimplePaySection
+            simplePayMethod={simplePayMethod}
+            setSimplePayMethod={setSimplePayMethod}
+          />
         )}
 
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">결제 금액</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            결제 금액
+          </h2>
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center text-lg">
               <span>청소 서비스 금액</span>
-              <span className="font-bold">{data.price.toLocaleString()}원</span>
-            </div>
-            <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center text-xl font-bold">
-              <span>총 결제금액</span>
-              <span className="text-brand">{data.price.toLocaleString()}원</span>
+              <span className="font-bold">{amount.toLocaleString()}원</span>
             </div>
           </div>
         </div>
@@ -151,11 +199,14 @@ const PaymentPage: React.FC = () => {
         </div>
 
         <button
-          onClick={handlePayment}
-          disabled={!paymentMethod}
+          onClick={onClickPayment}
+          disabled={
+            !paymentMethod ||
+            (paymentMethod === 'SIMPLE_PAY' && !simplePayMethod)
+          }
           className="w-full bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-bold"
         >
-          {data.price.toLocaleString()}원 결제하기
+          {amount.toLocaleString()}원 결제하기
         </button>
       </div>
     </div>
