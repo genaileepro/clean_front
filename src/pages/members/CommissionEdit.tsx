@@ -4,7 +4,11 @@ import {
   useCommissionConfirmed,
   useUpdateCommission,
 } from '../../hooks/useCommissions';
-import { Commission, HouseTypeKorean, CleanTypeKorean } from '../../types/commission';
+import {
+  Commission,
+  HouseTypeKorean,
+  CleanTypeKorean,
+} from '../../types/commission';
 import { toast } from 'react-hot-toast';
 import { showErrorNotification } from '../../utils/errorHandler';
 import { Save, ArrowLeft } from 'lucide-react';
@@ -27,7 +31,12 @@ const CommissionEdit: React.FC = () => {
 
   useEffect(() => {
     if (commission) {
-      setEditedCommission(commission);
+      setEditedCommission({
+        ...commission,
+        desiredDate: commission.desiredDate
+          ? new Date(commission.desiredDate).toISOString().slice(0, 16)
+          : '',
+      });
     }
   }, [commission]);
 
@@ -37,7 +46,7 @@ const CommissionEdit: React.FC = () => {
     >,
   ) => {
     const { name, value } = e.target;
-    setEditedCommission((prev) => ({ ...prev, [name]: value }));
+    setEditedCommission(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,10 +55,16 @@ const CommissionEdit: React.FC = () => {
       if (!editedCommission.commissionId || !editedCommission.addressId) {
         throw new Error('Invalid commissionId or addressId');
       }
+      const updatedCommission = {
+        ...editedCommission,
+        desiredDate: new Date(
+          editedCommission.desiredDate as string,
+        ).toISOString(),
+      };
       await updateCommissionMutation.mutateAsync({
         commissionId: editedCommission.commissionId,
         addressId: editedCommission.addressId,
-        commission: editedCommission,
+        commission: updatedCommission,
       });
       toast.success('의뢰가 성공적으로 수정되었습니다');
       navigate(`/commissiondetail?commissionId=${commissionId}`);
@@ -155,19 +170,13 @@ const CommissionEdit: React.FC = () => {
             htmlFor="desiredDate"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            희망 날짜
+            희망 날짜 및 시간
           </label>
           <input
-            type="date"
+            type="datetime-local"
             id="desiredDate"
             name="desiredDate"
-            value={
-              editedCommission.desiredDate
-                ? new Date(editedCommission.desiredDate)
-                    .toISOString()
-                    .split('T')[0]
-                : ''
-            }
+            value={editedCommission.desiredDate || ''}
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-brand focus:border-brand"
             required

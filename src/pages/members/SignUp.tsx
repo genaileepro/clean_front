@@ -80,21 +80,21 @@ const SignUp: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
     if (validations[name as keyof typeof validations]) {
       const validationResult = validations[name as keyof typeof validations](
         value,
         formData,
       );
-      setErrors((prev) => ({ ...prev, [name]: validationResult.message }));
+      setErrors(prev => ({ ...prev, [name]: validationResult.message }));
     }
     if (name === 'password' && formData.confirmPassword) {
       const confirmResult = validateConfirmPassword(
         value,
         formData.confirmPassword,
       );
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         confirmPassword: confirmResult.message,
       }));
@@ -102,31 +102,19 @@ const SignUp: React.FC = () => {
   };
 
   const handleRequestEmailVerification = async (email: string) => {
-    try {
-      await requestEmailVerificationMutation.mutateAsync({ email });
-      showErrorNotification('인증 이메일이 발송되었습니다.');
-    } catch (error) {
-      const errorMessage = handleApiError(error);
-      showErrorNotification(errorMessage);
-    }
+    await requestEmailVerificationMutation.mutateAsync({ email });
   };
 
   const handleVerifyEmail = async (email: string, code: string) => {
-    try {
-      await verifyEmailMutation.mutateAsync({ email, code });
-      setIsEmailVerified(true);
-      showErrorNotification('이메일이 성공적으로 인증되었습니다.');
-    } catch (error) {
-      const errorMessage = handleApiError(error);
-      showErrorNotification(errorMessage);
-    }
+    await verifyEmailMutation.mutateAsync({ email, code });
+    setIsEmailVerified(true);
   };
 
   const signUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resetErrors();
-    if (Object.values(errors).some((err) => err !== '') || !isEmailVerified) {
-      setErrors((prev) => ({
+    if (Object.values(errors).some(err => err !== '') || !isEmailVerified) {
+      setErrors(prev => ({
         ...prev,
         general: '모든 필드를 올바르게 입력하고 이메일 인증을 완료해주세요.',
       }));
@@ -140,7 +128,7 @@ const SignUp: React.FC = () => {
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         general: '회원가입에 실패했습니다. 다시 시도해주세요.',
       }));
@@ -174,12 +162,10 @@ const SignUp: React.FC = () => {
             <div className="mb-4">
               <EmailInput
                 email={formData.email}
-                setEmail={(email) =>
-                  setFormData((prev) => ({ ...prev, email }))
-                }
+                setEmail={email => setFormData(prev => ({ ...prev, email }))}
                 emailError={errors.email}
-                setEmailError={(error) =>
-                  setErrors((prev) => ({ ...prev, email: error }))
+                setEmailError={error =>
+                  setErrors(prev => ({ ...prev, email: error }))
                 }
               />
             </div>
@@ -193,7 +179,7 @@ const SignUp: React.FC = () => {
               />
             </div>
             {['password', 'confirmPassword', 'nick', 'phoneNumber'].map(
-              (field) => (
+              field => (
                 <div key={field} className="mb-4">
                   <label
                     htmlFor={field}
