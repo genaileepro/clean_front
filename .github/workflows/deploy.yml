@@ -27,8 +27,8 @@ jobs:
     - name: Build project
       run: npm run build
       env:
-        REACT_APP_API_URL_MEMBER: ${{ secrets.API_URL_MEMBER }} # 환경 변수 설정 (맴버 API)
-        REACT_APP_API_URL_PARTNER: ${{ secrets.API_URL_PARTNER }} # 환경 변수 설정 (파트너 API)
+        VITE_API_URL_MEMBER: ${{ secrets.API_URL_MEMBER }} # 환경 변수 설정 (맴버 API)
+        VITE_API_URL_PARTNER: ${{ secrets.API_URL_PARTNER }} # 환경 변수 설정 (파트너 API)
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
