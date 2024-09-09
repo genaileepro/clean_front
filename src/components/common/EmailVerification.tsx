@@ -69,7 +69,7 @@ const EmailVerification: React.FC<EmailVerificationProps> = ({
       setIsVerified(true);
       onVerificationComplete(true);
       setError('');
-      showErrorNotification('이메일이 성공적으로 인증되었습니다.');
+      toast.success('이메일이 성공적으로 인증되었습니다.');
     } catch (error) {
       const errorMessage = handleApiError(error);
       showErrorNotification(errorMessage);
