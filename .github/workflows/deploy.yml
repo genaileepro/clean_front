@@ -11,36 +11,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20' # 프로젝트에서 사용하는 Node.js 버전
+        node-version: '20'
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-node-
 
     - name: Install dependencies
       run: npm ci
+      continue-on-error: false
 
     - name: Run tests
       run: npm test
+      continue-on-error: false
 
     - name: Build project
       run: npm run build
       env:
-        VITE_API_URL_MEMBER: ${{ secrets.API_URL_MEMBER }} # 환경 변수 설정 (맴버 API)
-        VITE_API_URL_PARTNER: ${{ secrets.API_URL_PARTNER }} # 환경 변수 설정 (파트너 API)
+        VITE_API_URL_MEMBER: ${{ secrets.API_URL_MEMBER }}
+        VITE_API_URL_PARTNER: ${{ secrets.API_URL_PARTNER }}
+      continue-on-error: false
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1 # 사용하는 AWS 리전
+        aws-region: us-east-1
 
     - name: Deploy to S3
       run: |
-        aws s3 sync build/ s3://${{ secrets.S3_BUCKET }} --delete
+        aws s3 sync dist/ s3://${{ secrets.S3_BUCKET }} --delete
+      continue-on-error: false
 
     - name: Invalidate CloudFront cache
       run: |
         aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+      continue-on-error: false
+
+    - name: Notify on failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'Deployment failed!'
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
