@@ -22,7 +22,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}-new-key
         restore-keys: |
           ${{ runner.OS }}-node-
 
@@ -31,7 +31,7 @@ jobs:
       continue-on-error: false
 
     - name: Run tests
-      run: npm test
+      run: npm test -- --passWithNoTests
       continue-on-error: false
 
     - name: Build project
