@@ -37,6 +37,18 @@ jobs:
     - name: Build project
       run: npm run build
       env:
+        VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        VITE_PARTNER_API_URL: ${{ secrets.VITE_PARTNER_API_URL }}
+        VITE_PUBLIC_API_URL: https://api.odcloud.kr/api/nts-businessman/v1/status
+        VITE_PUBLIC_API_KEY: ${{ secrets.VITE_PUBLIC_API_KEY }}
+        VITE_KAKAO_REST_API_KEY: ${{ secrets.VITE_KAKAO_REST_API_KEY }}
+        VITE_KAKAO_REDIRECT_URI: ${{ secrets.VITE_KAKAO_REDIRECT_URI }}
+        VITE_IMP_KEY: ${{ secrets.VITE_IMP_KEY }}
+      continue-on-error: false
+
+    - name: Build project
+      run: npm run build
+      env:
         VITE_API_URL_MEMBER: ${{ secrets.API_URL_MEMBER }}
         VITE_API_URL_PARTNER: ${{ secrets.API_URL_PARTNER }}
       continue-on-error: false
