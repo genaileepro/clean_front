@@ -42,6 +42,22 @@ export const login = async (
   };
 };
 
+export const kakaoLogin = async (code: string): Promise<LoginResponse> => {
+  const response = await api.post('/members/kakao-login', { code });
+
+  const token = response.headers['authorization'];
+  const refreshToken = response.headers['refresh-token'];
+
+  if (!token || !refreshToken) {
+    throw new Error('Token or refresh token not found in response headers');
+  }
+
+  return {
+    token: token.replace('Bearer ', ''),
+    refreshToken: refreshToken.replace('Bearer ', ''),
+  };
+};
+
 export const signup = async (
   member: Omit<Member, 'id'> & { password: string },
 ): Promise<Member> => {

@@ -21,7 +21,7 @@ export const useUpdateMember = () => {
   return useMutation<Member, Error, Partial<Member>>({
     mutationFn: (updataMember: Partial<Member>) =>
       api.updateMember(updataMember),
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.setQueryData(['currentMember'], data);
       queryClient.invalidateQueries({ queryKey: ['currentMember'] });
     },
@@ -41,7 +41,13 @@ export const useDeleteMember = () => {
 
 export const useLogin = () => {
   return useMutation<LoginResponse, Error, LoginCredentials>({
-    mutationFn: (credentials) => api.login(credentials),
+    mutationFn: credentials => api.login(credentials),
+  });
+};
+
+export const useKakaoLogin = () => {
+  return useMutation<LoginResponse, Error, string>({
+    mutationFn: (code: string) => api.kakaoLogin(code),
   });
 };
 
@@ -53,7 +59,7 @@ export const useSignup = () => {
 
 export const useRequestEmailVerification = () => {
   return useMutation<void, Error, { email: string }>({
-    mutationFn: (data) => api.requestEmailVerification(data.email),
+    mutationFn: data => api.requestEmailVerification(data.email),
   });
 };
 
