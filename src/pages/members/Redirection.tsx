@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api/axiosConfig';
 import { useAuth } from '../../hooks/useAuth';
+import { useKakaoLogin } from '../../hooks/useMembers';
 import {
   handleApiError,
   showErrorNotification,
@@ -12,6 +12,7 @@ const Redirection: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const kakaoLoginMutation = useKakaoLogin();
 
   useEffect(() => {
     const kakaoLogin = async () => {
@@ -23,23 +24,15 @@ const Redirection: React.FC = () => {
       }
 
       try {
-        const response = await api.post('/members/kakao-login', { code });
-        console.log('API Response:', response.data); // 전체 응답 구조 확인
-        const { accessToken, refreshToken } = response.data;
-        if (!accessToken || !refreshToken) {
-          throw new Error('Tokens are missing in the API response');
-        }
+        const { token, refreshToken } =
+          await kakaoLoginMutation.mutateAsync(code);
 
         // 토큰 저장 및 로그인 처리
-        localStorage.setItem('token', accessToken);
+        localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', refreshToken);
-        login(accessToken, refreshToken, false);
+        login(token, refreshToken, false);
 
-        console.log('Login successful:', { accessToken, refreshToken });
-
-        // 프로필 정보 가져오기
-        const profileResponse = await api.get('/members/profile');
-        console.log('Profile Response:', profileResponse.data);
+        console.log('Login successful:', { token, refreshToken });
 
         navigate('/memberhome');
       } catch (error) {
@@ -53,7 +46,7 @@ const Redirection: React.FC = () => {
     };
 
     kakaoLogin();
-  }, [navigate, login]);
+  }, [navigate, login, kakaoLoginMutation]);
 
   if (isLoading) {
     return (
