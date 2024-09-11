@@ -30,8 +30,17 @@ const Redirection: React.FC = () => {
           throw new Error('Tokens are missing in the API response');
         }
 
+        // 토큰 저장 및 로그인 처리
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
         login(accessToken, refreshToken, false);
+
         console.log('Login successful:', { accessToken, refreshToken });
+
+        // 프로필 정보 가져오기
+        const profileResponse = await api.get('/members/profile');
+        console.log('Profile Response:', profileResponse.data);
+
         navigate('/memberhome');
       } catch (error) {
         console.error('Login error:', error);
