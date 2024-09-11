@@ -22,14 +22,16 @@ const SendEstimate: React.FC = () => {
           getEstimateList(),
           getCommissionList(),
         ]);
-        const selectedEstimate = estimates.find((e) => e.id === estimateId);
+        const selectedEstimate = estimates.find(e => e.id === estimateId);
         setEstimate(selectedEstimate || null);
 
         if (selectedEstimate) {
           const selectedCommission = commissions.find(
-            (c) => c.id === selectedEstimate.commissionId,
+            c => c.id === selectedEstimate.commissionId,
           );
           setCommission(selectedCommission || null);
+          // Initialize finalPrice with the estimate's tmpPrice
+          setFinalPrice(selectedEstimate.tmpPrice || 0);
         }
       } catch (error) {
         console.error('Error fetching estimate and commission:', error);
@@ -53,7 +55,7 @@ const SendEstimate: React.FC = () => {
       const updatedEstimate: Partial<Estimate> = {
         ...estimate,
         tmpPrice: finalPrice,
-        status: 'CONTACT', // 상태를 CONTACT로 설정
+        status: 'CONTACT',
       };
 
       await updateEstimate(estimate.id, updatedEstimate);
@@ -103,7 +105,7 @@ const SendEstimate: React.FC = () => {
               type="number"
               id="finalPrice"
               value={finalPrice}
-              onChange={(e) => setFinalPrice(parseFloat(e.target.value))}
+              onChange={e => setFinalPrice(Number(e.target.value))}
               className="w-full border rounded-md py-2 px-3 text-gray-700"
               required
             />
