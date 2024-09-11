@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useKakaoLogin } from '../../hooks/useMembers';
@@ -10,31 +10,25 @@ import {
 const Redirection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoginAttempted, setIsLoginAttempted] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const kakaoLoginMutation = useKakaoLogin();
 
-  useEffect(() => {
-    const kakaoLogin = async () => {
-      const code = new URL(window.location.href).searchParams.get('code');
-      if (!code) {
-        setError('카카오 인증 코드가 없습니다.');
-        setIsLoading(false);
-        return;
-      }
+  const performKakaoLogin = useCallback(
+    async (code: string) => {
+      if (isLoginAttempted) return;
+      setIsLoginAttempted(true);
 
       try {
         const { token, refreshToken } =
           await kakaoLoginMutation.mutateAsync(code);
 
-        // 토큰 저장 및 로그인 처리
         localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', refreshToken);
         login(token, refreshToken, false);
 
         console.log('Login successful:', { token, refreshToken });
-
-        navigate('/memberhome');
       } catch (error) {
         console.error('Login error:', error);
         const errorMessage = handleApiError(error);
@@ -43,36 +37,32 @@ const Redirection: React.FC = () => {
       } finally {
         setIsLoading(false);
       }
-    };
+    },
+    [kakaoLoginMutation, login, isLoginAttempted],
+  );
 
-    kakaoLogin();
-  }, [navigate, login, kakaoLoginMutation]);
+  useEffect(() => {
+    const code = new URL(window.location.href).searchParams.get('code');
+    if (code && !isAuthenticated && !isLoginAttempted) {
+      performKakaoLogin(code);
+    } else if (!code) {
+      setError('카카오 인증 코드가 없습니다.');
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, performKakaoLogin, isLoginAttempted]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/memberhome');
+    }
+  }, [isAuthenticated, navigate]);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="mb-4">로그인 처리 중입니다. 잠시만 기다려 주세요...</p>
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-        </div>
-      </div>
-    );
+    return <div>로그인 중...</div>;
   }
 
   if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">{error}</p>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => navigate('/login')}
-          >
-            로그인 페이지로 돌아가기
-          </button>
-        </div>
-      </div>
-    );
+    return <div>{error}</div>;
   }
 
   return null;
