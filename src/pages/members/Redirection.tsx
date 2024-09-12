@@ -24,7 +24,6 @@ const Redirection: React.FC = () => {
         localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', refreshToken);
         login(token, refreshToken, false);
-        console.log('Login successful:', { token, refreshToken });
       } catch (error) {
         console.error('Login error:', error);
         const errorMessage = handleApiError(error);
