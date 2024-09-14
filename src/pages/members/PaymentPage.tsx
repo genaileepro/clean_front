@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCompletePayment } from '../../hooks/usePayment';
+import { adaptEstimateToPayment } from '../../utils/paymentAdapter';
+import {
+  PayMethod,
+  RequestPayParams,
+  RequestPayResponse,
+} from '../../types/portone';
+import LoadingSpinner from '../../utils/LoadingSpinner';
+import { showErrorNotification } from '../../utils/errorHandler';
+import SimplePayButton from '../../components/members/SimplePayButton';
 import {
   CreditCard,
   Building,
@@ -8,53 +17,27 @@ import {
   Smartphone,
   CreditCard as SimplePayIcon,
 } from 'lucide-react';
-import {
-  handleApiError,
-  showErrorNotification,
-} from '../../utils/errorHandler';
-import LoadingSpinner from '../../utils/LoadingSpinner';
-import {
-  PayMethod,
-  RequestPayParams,
-  RequestPayResponse,
-} from '../../types/portone';
-import SimplePaySection from '../../components/members/SimplePayButton';
-import { getPaymentData } from '../../api/payment';
-import { v4 as uuidv4 } from 'uuid';
+
+// Mockup data for testing without backend
+const mockPaymentData = {
+  amount: 10000,
+  buyer_name: '홍길동',
+  buyer_tel: '010-1234-5678',
+  buyer_email: 'test@example.com',
+};
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { estimateId } = location.state as { estimateId: number };
 
-  const completePaymentMutation = useCompletePayment();
-  const [loading, setLoading] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] = useState<PayMethod>('card');
   const [simplePayMethod, setSimplePayMethod] = useState<string>('');
-  const [amount, setAmount] = useState<number>(0);
-  const [buyerName, setBuyerName] = useState<string>('');
-  const [buyerTel, setBuyerTel] = useState<string>('');
-  const [buyerEmail, setBuyerEmail] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  const completePaymentMutation = useCompletePayment();
 
   useEffect(() => {
-    const fetchPaymentData = async () => {
-      try {
-        setLoading(true);
-        const data = await getPaymentData(estimateId);
-        setAmount(data.amount);
-        setBuyerName(data.buyer_name);
-        setBuyerTel(data.buyer_tel);
-        setBuyerEmail(data.buyer_email);
-      } catch (error) {
-        showErrorNotification(handleApiError(error));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPaymentData();
-
-    // IMP 초기화
     const jquery = document.createElement('script');
     jquery.src = 'https://code.jquery.com/jquery-1.12.4.min.js';
     const iamport = document.createElement('script');
@@ -62,18 +45,21 @@ const PaymentPage: React.FC = () => {
     document.head.appendChild(jquery);
     document.head.appendChild(iamport);
 
+    jquery.onload = () => {
+      if (iamport.readyState === 'complete') {
+        setIsLoading(false);
+      } else {
+        iamport.onload = () => setIsLoading(false);
+      }
+    };
+
     return () => {
       document.head.removeChild(jquery);
       document.head.removeChild(iamport);
     };
-  }, [estimateId]);
+  }, []);
 
-  const getPayMethod = (): PayMethod => {
-    if (paymentMethod === 'SIMPLE_PAY') {
-      return simplePayMethod as PayMethod;
-    }
-    return paymentMethod as PayMethod;
-  };
+  if (isLoading) return <LoadingSpinner />;
 
   const onClickPayment = () => {
     if (!window.IMP) {
@@ -84,15 +70,10 @@ const PaymentPage: React.FC = () => {
     const { IMP } = window;
     IMP.init(import.meta.env.VITE_IMP_KEY);
 
-    const data: RequestPayParams = {
-      pg: 'smartro.iamport01m',
-      pay_method: getPayMethod(),
-      merchant_uid: uuidv4().replace(/-/g, '').substring(0, 8),
-      amount: amount,
-      buyer_name: buyerName,
-      buyer_tel: buyerTel,
-      buyer_email: buyerEmail,
-    };
+    const data: RequestPayParams = adaptEstimateToPayment(
+      mockPaymentData,
+      paymentMethod,
+    );
 
     IMP.request_pay(data, callback);
   };
@@ -122,14 +103,6 @@ const PaymentPage: React.FC = () => {
     { id: 'SIMPLE_PAY', name: '간편 결제', icon: <SimplePayIcon size={24} /> },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <LoadingSpinner size="large" />
-      </div>
-    );
-  }
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
@@ -153,7 +126,7 @@ const PaymentPage: React.FC = () => {
                   value={method.id}
                   checked={paymentMethod === method.id}
                   onChange={() => {
-                    setPaymentMethod(method.id);
+                    setPaymentMethod(method.id as PayMethod);
                     if (method.id !== 'SIMPLE_PAY') {
                       setSimplePayMethod('');
                     }
@@ -168,7 +141,7 @@ const PaymentPage: React.FC = () => {
         </div>
 
         {paymentMethod === 'SIMPLE_PAY' && (
-          <SimplePaySection
+          <SimplePayButton
             simplePayMethod={simplePayMethod}
             setSimplePayMethod={setSimplePayMethod}
           />
@@ -181,7 +154,9 @@ const PaymentPage: React.FC = () => {
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex justify-between items-center text-lg">
               <span>청소 서비스 금액</span>
-              <span className="font-bold">{amount.toLocaleString()}원</span>
+              <span className="font-bold">
+                {mockPaymentData.amount.toLocaleString()}원
+              </span>
             </div>
           </div>
         </div>
@@ -206,7 +181,7 @@ const PaymentPage: React.FC = () => {
           }
           className="w-full bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-bold"
         >
-          {amount.toLocaleString()}원 결제하기
+          {mockPaymentData.amount.toLocaleString()}원 결제하기
         </button>
       </div>
     </div>
