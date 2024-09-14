@@ -8,11 +8,36 @@ export type PayMethod =
   | 'samsungpay'
   | 'ssgpay';
 
+export interface EstimateDetail {
+  id: number;
+  commissionId: number;
+  partnerId: number;
+  price: number;
+  fixedDate: string;
+  statement: string;
+  status: string;
+  size: number;
+  desiredDate: string;
+  significant: string;
+  commissionStatus: string;
+  phoneNumber: string;
+  managerName: string;
+  companyName: string;
+}
+
+export interface EstimateAndCommissionResponseDto {
+  estimate_id: number;
+  commission_id: number;
+  estimate_amount: number;
+  member_nick: string;
+  member_phone_number: string;
+  member_email: string;
+}
+
 export interface PaymentRequest {
   pg: string;
-  pay_method: string;
+  pay_method: PayMethod;
   merchant_uid: string;
-  name: string;
   amount: number;
   buyer_name: string;
   buyer_tel: string;
