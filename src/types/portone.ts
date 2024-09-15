@@ -34,10 +34,24 @@ export interface EstimateAndCommissionResponseDto {
   member_email: string;
 }
 
+// 서버와 통신하는 인터페이스 (스네이크 케이스)
 export interface PaymentRequest {
+  pg: string;
+  payMethod: PayMethod;
+  merchantUid: string;
+  name: string;
+  amount: number;
+  buyerName: string;
+  buyerTel: string;
+  buyerEmail: string;
+}
+
+// 포트원 관련 인터페이스 (스네이크 케이스)
+export interface PortonePaymentRequest {
   pg: string;
   pay_method: PayMethod;
   merchant_uid: string;
+  name: string;
   amount: number;
   buyer_name: string;
   buyer_tel: string;

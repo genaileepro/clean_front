@@ -10,8 +10,8 @@ export const adaptEstimateToPayment = (
     pay_method: selectedPayMethod as PayMethod,
     merchant_uid: `ORDER_${uuidv4().replace(/-/g, '')}`,
     amount: paymentData.amount,
-    buyer_name: paymentData.buyer_name,
-    buyer_tel: paymentData.buyer_tel,
-    buyer_email: paymentData.buyer_email,
+    buyer_name: paymentData.buyerName,
+    buyer_tel: paymentData.buyerTel,
+    buyer_email: paymentData.buyerEmail,
   };
 };

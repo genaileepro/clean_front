@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useCompletePayment } from '../../hooks/usePayment';
+import { useGetPaymentData, useCompletePayment } from '../../hooks/usePayment';
 import { adaptEstimateToPayment } from '../../utils/paymentAdapter';
 import {
   PayMethod,
@@ -18,23 +18,22 @@ import {
   CreditCard as SimplePayIcon,
 } from 'lucide-react';
 
-// Mockup data for testing without backend
-const mockPaymentData = {
-  amount: 10000,
-  buyer_name: '홍길동',
-  buyer_tel: '010-1234-5678',
-  buyer_email: 'test@example.com',
-};
+type ExtendedPayMethod = PayMethod | 'SIMPLE_PAY';
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { estimateId } = location.state as { estimateId: number };
 
-  const [paymentMethod, setPaymentMethod] = useState<PayMethod>('card');
+  const [paymentMethod, setPaymentMethod] = useState<ExtendedPayMethod>('card');
   const [simplePayMethod, setSimplePayMethod] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isScriptLoading, setIsScriptLoading] = useState(true);
 
+  const {
+    data: paymentData,
+    isLoading: isDataLoading,
+    error,
+  } = useGetPaymentData(estimateId);
   const completePaymentMutation = useCompletePayment();
 
   useEffect(() => {
@@ -47,9 +46,9 @@ const PaymentPage: React.FC = () => {
 
     jquery.onload = () => {
       if (iamport.readyState === 'complete') {
-        setIsLoading(false);
+        setIsScriptLoading(false);
       } else {
-        iamport.onload = () => setIsLoading(false);
+        iamport.onload = () => setIsScriptLoading(false);
       }
     };
 
@@ -59,7 +58,9 @@ const PaymentPage: React.FC = () => {
     };
   }, []);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isScriptLoading || isDataLoading) return <LoadingSpinner />;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!paymentData) return <div>결제 정보를 불러올 수 없습니다.</div>;
 
   const onClickPayment = () => {
     if (!window.IMP) {
@@ -70,9 +71,11 @@ const PaymentPage: React.FC = () => {
     const { IMP } = window;
     IMP.init(import.meta.env.VITE_IMP_KEY);
 
+    const finalPayMethod =
+      paymentMethod === 'SIMPLE_PAY' ? simplePayMethod : paymentMethod;
     const data: RequestPayParams = adaptEstimateToPayment(
-      mockPaymentData,
-      paymentMethod,
+      paymentData,
+      finalPayMethod as PayMethod,
     );
 
     IMP.request_pay(data, callback);
@@ -126,7 +129,7 @@ const PaymentPage: React.FC = () => {
                   value={method.id}
                   checked={paymentMethod === method.id}
                   onChange={() => {
-                    setPaymentMethod(method.id as PayMethod);
+                    setPaymentMethod(method.id as ExtendedPayMethod);
                     if (method.id !== 'SIMPLE_PAY') {
                       setSimplePayMethod('');
                     }
@@ -155,7 +158,7 @@ const PaymentPage: React.FC = () => {
             <div className="flex justify-between items-center text-lg">
               <span>청소 서비스 금액</span>
               <span className="font-bold">
-                {mockPaymentData.amount.toLocaleString()}원
+                {paymentData.amount.toLocaleString()}원
               </span>
             </div>
           </div>
@@ -181,7 +184,7 @@ const PaymentPage: React.FC = () => {
           }
           className="w-full bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-bold"
         >
-          {mockPaymentData.amount.toLocaleString()}원 결제하기
+          {paymentData.amount.toLocaleString()}원 결제하기
         </button>
       </div>
     </div>
