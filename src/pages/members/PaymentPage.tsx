@@ -6,6 +6,7 @@ import {
   PayMethod,
   RequestPayParams,
   RequestPayResponse,
+  CompletePaymentRequest,
 } from '../../types/portone';
 import LoadingSpinner from '../../utils/LoadingSpinner';
 import { showErrorNotification } from '../../utils/errorHandler';
@@ -23,7 +24,10 @@ type ExtendedPayMethod = PayMethod | 'SIMPLE_PAY';
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { estimateId } = location.state as { estimateId: number };
+  const { estimateId, commissionId } = location.state as {
+    estimateId: number;
+    commissionId: number;
+  };
 
   const [paymentMethod, setPaymentMethod] = useState<ExtendedPayMethod>('card');
   const [simplePayMethod, setSimplePayMethod] = useState<string>('');
@@ -33,8 +37,10 @@ const PaymentPage: React.FC = () => {
     data: paymentData,
     isLoading: isDataLoading,
     error,
-  } = useGetPaymentData(estimateId);
+  } = useGetPaymentData(estimateId, commissionId);
   const completePaymentMutation = useCompletePayment();
+
+  console.log('Payment Data:', paymentData);
 
   useEffect(() => {
     const jquery = document.createElement('script');
@@ -45,7 +51,7 @@ const PaymentPage: React.FC = () => {
     document.head.appendChild(iamport);
 
     jquery.onload = () => {
-      if (iamport.readyState === 'complete') {
+      if ((iamport as any).readyState === 'complete') {
         setIsScriptLoading(false);
       } else {
         iamport.onload = () => setIsScriptLoading(false);
@@ -79,17 +85,43 @@ const PaymentPage: React.FC = () => {
     );
 
     IMP.request_pay(data, callback);
+    console.log(data, callback);
   };
 
   const callback = async (response: RequestPayResponse) => {
-    const { success, error_msg, imp_uid } = response;
+    const {
+      success,
+      error_msg,
+      imp_uid,
+      merchant_uid,
+      pay_method,
+      buyer_email,
+      buyer_tel,
+    } = response;
 
     if (success && imp_uid) {
       try {
-        const result = await completePaymentMutation.mutateAsync(imp_uid);
-        navigate('/payment-success', {
-          state: { paymentInfo: result.response },
+        const paymentData: CompletePaymentRequest = {
+          imp_uid,
+          merchant_uid: merchant_uid || '',
+          pay_method: (pay_method as PayMethod) || 'card',
+          buyer_email: buyer_email || '',
+          buyer_tel: buyer_tel || '',
+        };
+
+        const result = await completePaymentMutation.mutateAsync({
+          impUid: imp_uid,
+          paymentData,
         });
+
+        if (result.code === 0) {
+          // Assuming 0 means success, adjust as needed
+          navigate('/payment-success', {
+            state: { paymentInfo: result.response },
+          });
+        } else {
+          showErrorNotification(`결제 완료 처리 실패: ${result.message}`);
+        }
       } catch (error) {
         showErrorNotification('결제 완료 처리 중 오류가 발생했습니다.');
       }
@@ -158,7 +190,7 @@ const PaymentPage: React.FC = () => {
             <div className="flex justify-between items-center text-lg">
               <span>청소 서비스 금액</span>
               <span className="font-bold">
-                {paymentData.amount.toLocaleString()}원
+                {paymentData.estimate_amount.toLocaleString()}원
               </span>
             </div>
           </div>
@@ -184,7 +216,7 @@ const PaymentPage: React.FC = () => {
           }
           className="w-full bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-bold"
         >
-          {paymentData.amount.toLocaleString()}원 결제하기
+          {paymentData.estimate_amount.toLocaleString()}원 결제하기
         </button>
       </div>
     </div>

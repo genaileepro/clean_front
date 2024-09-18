@@ -1,19 +1,29 @@
 import api from './axiosConfig';
-import { PaymentRequest, PaymentResponse } from '../types/portone';
+import {
+  CompletePaymentRequest,
+  CompletePaymentResponse,
+  PaymentRequest,
+  PaymentResponse,
+} from '../types/portone';
 
 export const getPaymentData = async (
   estimateId: number,
+  commissionId: number,
 ): Promise<PaymentRequest> => {
   const response = await api.get<PaymentRequest>(
-    `/payments/data/${estimateId}`,
+    `/payments/data?estimateId=${estimateId}&commissionId=${commissionId}`,
   );
   return response.data;
 };
 
 export const completePayment = async (
   impUid: string,
-): Promise<PaymentResponse> => {
-  const response = await api.get<PaymentResponse>(`/payments/${impUid}`);
+  paymentData: CompletePaymentRequest,
+): Promise<CompletePaymentResponse> => {
+  const response = await api.post<CompletePaymentResponse>(
+    `/payments/complete/${impUid}`,
+    paymentData,
+  );
   return response.data;
 };
 

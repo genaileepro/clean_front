@@ -8,45 +8,23 @@ export type PayMethod =
   | 'samsungpay'
   | 'ssgpay';
 
-export interface EstimateDetail {
-  id: number;
-  commissionId: number;
-  partnerId: number;
-  price: number;
-  fixedDate: string;
-  statement: string;
-  status: string;
-  size: number;
-  desiredDate: string;
-  significant: string;
-  commissionStatus: string;
-  phoneNumber: string;
-  managerName: string;
-  companyName: string;
+export enum CleanType {
+  NORMAL = 'NORMAL',
+  SPECIAL = 'SPECIAL',
 }
 
-export interface EstimateAndCommissionResponseDto {
+// 서버와 통신하는 인터페이스
+export interface PaymentRequest {
   estimate_id: number;
   commission_id: number;
   estimate_amount: number;
   member_nick: string;
   member_phone_number: string;
   member_email: string;
+  clean_type: CleanType;
 }
 
-// 서버와 통신하는 인터페이스 (스네이크 케이스)
-export interface PaymentRequest {
-  pg: string;
-  payMethod: PayMethod;
-  merchantUid: string;
-  name: string;
-  amount: number;
-  buyerName: string;
-  buyerTel: string;
-  buyerEmail: string;
-}
-
-// 포트원 관련 인터페이스 (스네이크 케이스)
+// 포트원 관련 인터페이스
 export interface PortonePaymentRequest {
   pg: string;
   pay_method: PayMethod;
@@ -56,6 +34,20 @@ export interface PortonePaymentRequest {
   buyer_name: string;
   buyer_tel: string;
   buyer_email: string;
+}
+
+export interface CompletePaymentRequest {
+  imp_uid: string;
+  merchant_uid: string;
+  pay_method: PayMethod;
+  buyer_email: string;
+  buyer_tel: string;
+}
+
+export interface CompletePaymentResponse {
+  code: number;
+  message: string;
+  response: any; // 실제 응답 구조에 맞게 타입을 정의해야 합니다.
 }
 
 export interface PaymentResponse {
