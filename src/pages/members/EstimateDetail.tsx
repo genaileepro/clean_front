@@ -38,7 +38,9 @@ const EstimateDetail: React.FC = () => {
     );
 
   const handlePaymentNavigation = () => {
-    navigate('/payment', { state: { estimateId: data.id } });
+    navigate('/payment', {
+      state: { estimateId: data.id, commissionId: data.commissionId },
+    });
   };
 
   const InfoItem: React.FC<{

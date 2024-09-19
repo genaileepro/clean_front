@@ -37,6 +37,7 @@ import MapTest from '../pages/partners/MapTest';
 import PaymentPage from '../pages/members/PaymentPage';
 import Redirection from '../pages/members/Redirection';
 import PaymentSuccessPage from '../pages/members/PaymentSuccessPage';
+import PaymentCancelPage from '../pages/members/PaymentCancelPage';
 
 const ProtectedRoute: React.FC<{ allowedRole: 'member' | 'partner' }> = ({
   allowedRole,
@@ -99,6 +100,7 @@ const Router: React.FC = () => {
           <Route path="/estimatedetail" element={<EstimateDetail />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/payment-cancel" element={<PaymentCancelPage />} />
         </Route>
       </Route>
 
