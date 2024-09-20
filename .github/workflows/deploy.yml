@@ -22,17 +22,15 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}-new-key
+        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json', '**/package.json') }}
         restore-keys: |
           ${{ runner.OS }}-node-
 
     - name: Install dependencies
       run: npm ci
-      continue-on-error: false
 
     - name: Run tests
-      run: npm test -- --passWithNoTests
-      continue-on-error: false
+      run: npm test
 
     - name: Build project
       run: npm run build
@@ -44,14 +42,8 @@ jobs:
         VITE_KAKAO_REST_API_KEY: ${{ secrets.VITE_KAKAO_REST_API_KEY }}
         VITE_KAKAO_REDIRECT_URI: ${{ secrets.VITE_KAKAO_REDIRECT_URI }}
         VITE_IMP_KEY: ${{ secrets.VITE_IMP_KEY }}
-      continue-on-error: false
-
-    - name: Build project
-      run: npm run build
-      env:
         VITE_API_URL_MEMBER: ${{ secrets.API_URL_MEMBER }}
         VITE_API_URL_PARTNER: ${{ secrets.API_URL_PARTNER }}
-      continue-on-error: false
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -63,9 +55,7 @@ jobs:
     - name: Deploy to S3
       run: |
         aws s3 sync dist/ s3://${{ secrets.S3_BUCKET }} --delete
-      continue-on-error: false
 
     - name: Invalidate CloudFront cache
       run: |
         aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
-      continue-on-error: false
