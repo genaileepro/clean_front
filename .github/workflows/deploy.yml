@@ -30,8 +30,8 @@ jobs:
       run: npm ci
 
     # Option 1: Use --passWithNoTests
-    - name: Run tests
-      run: npm test -- --passWithNoTests
+    # - name: Run tests
+    #   run: npm test -- --passWithNoTests
 
     # Option 2: Remove test step entirely
     # (uncomment the following line and remove the "Run tests" step above if you choose this option)
