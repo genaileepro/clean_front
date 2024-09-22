@@ -30,7 +30,9 @@ export const fetchCommissionSendDetail = async (
 };
 
 export const createCommission = async (
-  commission: Omit<Commission, 'commissionId' | 'memberNick'>,
+  commission: Omit<Commission, 'commissionId' | 'memberNick'> & {
+    addressId: number;
+  },
 ): Promise<Commission> => {
   const response = await api.post<Commission>('/commission', commission);
   return response.data;

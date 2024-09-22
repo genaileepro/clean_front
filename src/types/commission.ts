@@ -5,7 +5,7 @@ export const Status = {
   FINISH: 'FINISH',
 } as const;
 
-export type Status = typeof Status[keyof typeof Status];
+export type Status = (typeof Status)[keyof typeof Status];
 
 export const StatusKorean = {
   [Status.CHECK]: '대기',
@@ -21,7 +21,7 @@ export const HouseType = {
   TOILET: 'TOILET',
 } as const;
 
-export type HouseType = typeof HouseType[keyof typeof HouseType];
+export type HouseType = (typeof HouseType)[keyof typeof HouseType];
 
 export const HouseTypeKorean = {
   [HouseType.APT]: '아파트',
@@ -35,7 +35,7 @@ export const CleanType = {
   SPECIAL: 'SPECIAL',
 } as const;
 
-export type CleanType = typeof CleanType[keyof typeof CleanType];
+export type CleanType = (typeof CleanType)[keyof typeof CleanType];
 
 export const CleanTypeKorean = {
   [CleanType.NORMAL]: '일반 청소',
@@ -52,7 +52,6 @@ export interface Commission {
   cleanType: CleanType;
   desiredDate: string;
   significant?: string;
-  status: Status;
 }
 
 export interface CommissionFormData {
