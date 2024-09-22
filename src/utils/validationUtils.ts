@@ -114,8 +114,10 @@ export const validateSignificant = createValidator(
 );
 
 // 주소 유효성 검사
-export const validateAddress = (addressData: any): ValidationResult => {
-  if (!addressData || !addressData.address || !addressData.addressDetail) {
+export const validateAddress = (
+  addressData: number | null,
+): ValidationResult => {
+  if (!addressData) {
     return {
       isValid: false,
       message: '주소를 선택하고 상세주소를 입력해주세요.',

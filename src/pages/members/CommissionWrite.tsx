@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -10,7 +10,6 @@ import {
   CleanType,
   CommissionFormData,
   AddressData,
-  Status,
   CleanTypeKorean,
   HouseTypeKorean,
 } from '../../types/commission';
@@ -49,10 +48,10 @@ const CommissionWrite: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAddressSelect = (addressData: AddressData) => {
+  const handleAddressSelect = useCallback((addressData: AddressData) => {
     setForm(prev => ({ ...prev, addressId: addressData.id }));
     setSelectedAddress(addressData);
-  };
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -104,12 +103,12 @@ const CommissionWrite: React.FC = () => {
     }
   };
 
-  const validateForm = (): boolean => {
+  const validateForm = useCallback((): boolean => {
     const validations = [
       { field: 'size', validation: validateSize(form.size?.toString() || '') },
       { field: 'houseType', validation: validateHouseType(form.houseType) },
       { field: 'cleanType', validation: validateCleanType(form.cleanType) },
-      { field: 'address', validation: validateAddress(selectedAddress) },
+      { field: 'addressId', validation: validateAddress(form.addressId) },
       { field: 'image', validation: validateImage(form.image) },
       {
         field: 'desiredDate',
@@ -118,6 +117,13 @@ const CommissionWrite: React.FC = () => {
       {
         field: 'significant',
         validation: validateSignificant(form.significant),
+      },
+      {
+        field: 'addressId',
+        validation: {
+          isValid: !!form.addressId,
+          message: '주소를 선택해주세요.',
+        },
       },
     ];
 
@@ -131,14 +137,14 @@ const CommissionWrite: React.FC = () => {
     });
 
     return isValid;
-  };
+  }, [form]);
 
   const getFieldName = (field: string): string => {
     const fieldNames: { [key: string]: string } = {
       size: '평수',
       houseType: '주거 형태',
       cleanType: '청소 종류',
-      address: '주소',
+      addressId: '주소',
       image: '이미지',
       desiredDate: '희망 날짜',
       significant: '특이사항',
@@ -155,15 +161,16 @@ const CommissionWrite: React.FC = () => {
 
     try {
       const newCommission = {
-        ...form,
         size: form.size || 0,
-        addressId: form.addressId || 0,
-        desiredDate: new Date(form.desiredDate).toISOString(),
+        addressId: form.addressId as number,
+        image: form.image,
         houseType: form.houseType as HouseType,
         cleanType: form.cleanType as CleanType,
-        address: selectedAddress?.address || '',
-        status: 'CHECK' as Status,
+        desiredDate: new Date(form.desiredDate).toISOString(),
+        significant: form.significant,
       };
+
+      console.log('Sending commission data:', newCommission);
 
       await createCommissionMutation.mutateAsync(newCommission);
       toast.success('의뢰가 성공적으로 작성되었습니다.');
